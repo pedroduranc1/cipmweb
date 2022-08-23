@@ -2,9 +2,7 @@ import React, { useState } from 'react'
 import * as emailjs from '@emailjs/browser'
 
 
-export const Contact = ({fullpage}) => {
-
-
+const Contact = ({fullpage}) => {
   const [nombre, setnombre] = useState("")
   const [apellido, setapellido] = useState('')
   const [from_name, setfrom_name] = useState("")
@@ -136,3 +134,5 @@ export const Contact = ({fullpage}) => {
     </div>
   )
 }
+
+export default Contact;
