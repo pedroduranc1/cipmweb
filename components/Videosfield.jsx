@@ -1,5 +1,5 @@
 import React from 'react'
-import { Videocard } from '../minicomponents/Videocard'
+import Videocard from '../minicomponents/Videocard'
 import videoslist from '../db/videos'
 
 const Videosfield = () => {
