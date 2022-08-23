@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 
-export const Videocard = ({data}) => {
+const Videocard = ({data}) => {
     return (
         <Link href={`/video/${data.id}`}>
             <div className='grid grid-cols-1 p-3 grid-rows-1 cursor-pointer'>
@@ -13,3 +13,5 @@ export const Videocard = ({data}) => {
 
     )
 }
+
+export default Videocard;

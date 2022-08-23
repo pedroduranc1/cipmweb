@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { Videocard } from './Videocard'
+import Videocard from './Videocard'
 
 
-export const Videofield = ({videoslist}) => {
+const Videofield = ({videoslist}) => {
 
     const [range, setrange] = useState(3)
 
@@ -50,3 +50,5 @@ export const Videofield = ({videoslist}) => {
         </div>
     )
 }
+
+export default Videofield;

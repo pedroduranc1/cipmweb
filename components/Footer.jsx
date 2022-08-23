@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 
-export const Footer = () => {
+const Footer = () => {
     return (
         <div className='bg-gray-200 w-full '>
             <div className="max-w-7xl mx-auto px-4  sm:px-6">
@@ -84,3 +84,6 @@ export const Footer = () => {
         </div>
     )
 }
+
+export default Footer;
+

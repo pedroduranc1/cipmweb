@@ -1,9 +1,9 @@
 import React from 'react'
 import Head from 'next/head'
 import Contact from '../components/Contact'
-import { Footer } from '../components/Footer'
-import { Navbar } from '../components/Navbar'
-import { Heros } from '../components/Heros'
+import Footer from '../components/Footer'
+import Navbar from '../components/Navbar'
+import Heros from '../components/Heros'
 
  const Contactos = () => {
   let fullpage = true

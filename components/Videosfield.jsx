@@ -2,7 +2,7 @@ import React from 'react'
 import { Videocard } from '../minicomponents/Videocard'
 import videoslist from '../db/videos'
 
-export const Videosfield = () => {
+const Videosfield = () => {
     let videos = [];
 
     for (let index = 0; index <= 3; index++) {
@@ -30,3 +30,5 @@ export const Videosfield = () => {
         </div>
     )
 }
+
+export default Videosfield;

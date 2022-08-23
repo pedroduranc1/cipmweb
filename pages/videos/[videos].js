@@ -1,9 +1,9 @@
 import React from 'react'
 import Head from 'next/head'
 import Contact from '../../components/contact'
-import { Footer } from '../../components/Footer'
-import { Navbar } from '../../components/Navbar'
-import { Videofield } from '../../minicomponents/Videofield'
+import Footer  from '../../components/Footer'
+import Navbar  from '../../components/Navbar'
+import Videofield from '../../minicomponents/Videofield'
 import videoslist from '../../db/videos'
 import { useRouter } from 'next/router'
 
