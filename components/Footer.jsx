@@ -7,14 +7,17 @@ export const Footer = () => {
             <div className="max-w-7xl mx-auto px-4  sm:px-6">
                 <div className="flex flex-col sm:flex-row  justify-between items-center py-6 md:justify-start md:space-x-10">
                     <div className="flex justify-start lg:w-0 lg:flex-1">
-                        <a href="/" className='flex '>
-                            <img
-                                className="h-14 w-auto sm:h-15"
-                                src="/logo.svg"
-                                alt=""
-                            />
-                            <h1 className='grid items-center font-bold ml-2'>C.I.M.P</h1>
-                        </a>
+                        <Link href="">
+                            <a href="/" className='flex '>
+                                <img
+                                    className="h-14 w-auto sm:h-15"
+                                    src="/logo.svg"
+                                    alt=""
+                                />
+                                <h1 className='grid items-center font-bold ml-2'>C.I.M.P</h1>
+                            </a>
+                        </Link>
+
                     </div>
 
                     <div className=" md:flex items-center justify-end md:flex-1 lg:w-0">
