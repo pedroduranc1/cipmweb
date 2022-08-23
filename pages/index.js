@@ -1,9 +1,9 @@
 import Head from 'next/head'
-import { Contact } from '../components/contact'
+import Contact from '../components/contact'
 import { Footer } from '../components/Footer'
 import { Heros } from '../components/Heros'
-import { Navbar } from '../components/navbar'
-import { Plans } from '../components/plans'
+import Navbar from '../components/navbar'
+import Plans from '../components/plans'
 import { Services } from '../components/Services'
 import { Videosfield } from '../components/Videosfield'
 

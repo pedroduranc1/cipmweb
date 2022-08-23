@@ -1,6 +1,7 @@
 import React,{useState} from 'react'
 import * as emailjs from '@emailjs/browser'
-export const Plans = () => {
+
+const Plans = () => {
 
   const [nombre, setnombre] = useState("")
   const [apellido, setapellido] = useState('')
@@ -157,3 +158,5 @@ export const Plans = () => {
     </div>
   )
 }
+
+export default Plans;

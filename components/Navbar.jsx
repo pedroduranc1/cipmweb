@@ -76,7 +76,7 @@ function classNames(...classes) {
 }
 
 
-export const Navbar = () => {
+const Navbar = () => {
   const [videoname, setvideoname] = useState("cimp")
   return (
     <Popover className="relative bg-white">
@@ -261,3 +261,5 @@ export const Navbar = () => {
     </Popover>
   )
 }
+
+export default Navbar;
