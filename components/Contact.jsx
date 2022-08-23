@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import * as emailjs from '@emailjs/browser'
 
+
 export const Contact = ({fullpage}) => {
 
 
@@ -74,28 +75,31 @@ export const Contact = ({fullpage}) => {
                     className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-10"
                     src="/ws.svg"
                     alt=""
+                    layout='fill'
                     onClick={() => {
                       window.location.href = "https://wa.link/8ebgdv";
                     }}
-                  />
+                  ></img>
 
                   <img
                     className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-3"
                     src="/fb.svg"
                     alt=""
+                    layout='fill'
                     onClick={() => {
                       window.location.href = "https://www.facebook.com/olympusgroupmx";
                     }}
-                  />
+                  ></img>
 
                   <img
                     className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-3"
                     src="/tiktok.svg"
                     alt=""
+                    layout='fill'
                     onClick={() => {
                       window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
                     }}
-                  />
+                  ></img>
                 </div>
 
               </div>
@@ -112,7 +116,8 @@ export const Contact = ({fullpage}) => {
             <div className='w-1/2'>
               <img src="/googlemap.svg"
                 className='w-screen h-auto'
-                alt="" />
+                layout='fill'
+                alt="" ></img>
             </div>
           </div>
 

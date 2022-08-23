@@ -86,10 +86,9 @@ export const Navbar = () => {
             <Link href="/">
               <a className='flex'>
                 <img
-                  className="h-14 w-auto sm:h-15"
+                  className='h-14 w-auto sm:h-15'
                   src="/logo.svg"
-                  alt=""
-                />
+                  alt="" ></img>
                 <h1 className='grid items-center font-bold ml-2'>C.I.M.P</h1>
               </a>
             </Link>
@@ -102,7 +101,7 @@ export const Navbar = () => {
           </div>
           <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
             <Link href="/">
-              <a href="/" className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
+              <a className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
                 Inicio
               </a>
             </Link>
@@ -135,29 +134,32 @@ export const Navbar = () => {
             <img
               className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-10"
               src="/ws.svg"
+              layout='fill'
               alt=""
               onClick={() => {
                 window.location.href = "https://wa.link/8ebgdv";
               }}
-            />
+            ></img>
 
             <img
               className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-3"
               src="/fb.svg"
+              layout='fill'
               alt=""
               onClick={() => {
                 window.location.href = "https://www.facebook.com/olympusgroupmx";
               }}
-            />
+            ></img>
 
             <img
               className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-3"
               src="/tiktok.svg"
               alt=""
+              layout='fill'
               onClick={() => {
                 window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
               }}
-            />
+            ></img>
 
           </div>
         </div>

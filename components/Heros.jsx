@@ -18,11 +18,11 @@ export const Heros = () => {
               onClick={() => window.location.href = 'https://play.google.com/store/apps/details?id=com.leal.cipm_testing&hl=en_US&gl=US'}
             >
               <a className='bg-yellow-400 px-7 py-5 rounded-2xl font-semibold'>Obtener la app</a>
-              <img src="/playstore.svg" className='h-14 ml-10 w-auto sm:h-10 ' alt="" />
+              <img src="/playstore.svg" layout='fill' className='h-14 ml-10 w-auto sm:h-10 ' alt="" ></img>
             </div>
         </div>
         <div className="flex justify-start w-full sm:w-1/2 ">
-          <img src="/herosimg.svg" className="my-14" alt="" />
+          <img src="/herosimg.svg" layout='fill' className="my-14" alt="" ></img>
         </div>
       </div>
     </div>

@@ -1,6 +1,5 @@
 import React,{useState} from 'react'
 import * as emailjs from '@emailjs/browser'
-
 export const Plans = () => {
 
   const [nombre, setnombre] = useState("")
@@ -124,28 +123,31 @@ export const Plans = () => {
                     className="h-8 w-auto sm:h-14 hover:cursor-pointer ml-10"
                     src="/ws.svg"
                     alt=""
+                    layout='fill'
                     onClick={() => {
                       window.location.href = "https://wa.link/8ebgdv";
                     }}
-                  />
+                  ></img>
 
                   <img
                     className="h-8 w-auto sm:h-14 hover:cursor-pointer ml-3"
                     src="/fb.svg"
                     alt=""
+                    layout='fill'
                     onClick={() => {
                       window.location.href = "https://www.facebook.com/olympusgroupmx";
                     }}
-                  />
+                  ></img>
 
                   <img
                     className="h-8 w-auto sm:h-14 hover:cursor-pointer ml-3"
                     src="/tiktok.svg"
                     alt=""
+                    layout='fill'
                     onClick={() => {
                       window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
                     }}
-                  />
+                  ></img>
                 </div>
               </div>
             </div>

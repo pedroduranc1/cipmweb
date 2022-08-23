@@ -8,12 +8,13 @@ export const Footer = () => {
                 <div className="flex flex-col sm:flex-row  justify-between items-center py-6 md:justify-start md:space-x-10">
                     <div className="flex justify-start lg:w-0 lg:flex-1">
                         <Link href="">
-                            <a href="/" className='flex '>
+                            <a className='flex '>
                                 <img
                                     className="h-14 w-auto sm:h-15"
                                     src="/logo.svg"
                                     alt=""
-                                />
+                                    layout='fill'
+                                ></img>
                                 <h1 className='grid items-center font-bold ml-2'>C.I.M.P</h1>
                             </a>
                         </Link>
@@ -47,28 +48,31 @@ export const Footer = () => {
                                 className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-10"
                                 src="/ws.svg"
                                 alt=""
+                                layout='fill'
                                 onClick={() => {
                                     window.location.href = "https://wa.link/8ebgdv";
                                 }}
-                            />
+                            ></img>
 
                             <img
                                 className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-3"
                                 src="/fb.svg"
                                 alt=""
+                                layout='fill'
                                 onClick={() => {
                                     window.location.href = "https://www.facebook.com/olympusgroupmx";
                                 }}
-                            />
+                            ></img>
 
                             <img
                                 className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-3"
                                 src="/tiktok.svg"
                                 alt=""
+                                layout='fill'
                                 onClick={() => {
                                     window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
                                 }}
-                            />
+                            ></img>
                         </div>
 
                     </div>

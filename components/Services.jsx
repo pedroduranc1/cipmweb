@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 
 export const Services = () => {
   return (
@@ -9,29 +10,32 @@ export const Services = () => {
 
           <div className='w-full flex items-center space-y-10 flex-col md:flex-row my-8 justify-around'>
             <div className='flex flex-col justify-center'>
-              <img src="/clasesindividuales.svg" className='h-24' alt="" />
+              <img src="/clasesindividuales.svg" layout='fill' className='h-24' alt="" ></img>
               <h1 className='font-semibold mt-5 text-2xl text-center text-white'>Clases individuales</h1>
             </div>
             <div className='flex flex-col justify-center'>
-              <img src="/clasesgrupales.svg" className='h-24' alt="" />
+              <img src="/clasesgrupales.svg" layout='fill' className='h-24' alt="" ></img>
               <h1 className='font-semibold mt-5 text-2xl text-center text-white'>Clases grupales</h1>
             </div>
             <div className='flex flex-col justify-center'>
-              <img src="/clasessuperrapidas.svg" className='h-24' alt="" />
+              <img src="/clasessuperrapidas.svg" layout='fill' className='h-24' alt="" ></img>
               <h1 className='font-semibold mt-5 text-center text-2xl text-white'>Clases super <br /> intensivas</h1>
             </div>
             <div className='flex flex-col justify-center'>
-              <img src="/appingles.svg" className='h-24' alt="" />
+              <img src="/appingles.svg" layout='fill' className='h-24' alt="" ></img>
               <h1 className='font-semibold mt-5 text-2xl text-center text-white'>App para <br /> aprender ingles</h1>
             </div>
             <div className='flex flex-col justify-center'>
-              <img src="/clasespregrab.svg" className='h-24' alt="" />
+              <img src="/clasespregrab.svg" layout='fill' className='h-24' alt="" ></img>
               <h1 className='font-semibold mt-5 text-2xl text-center text-white'>Clases pre-grabadas</h1>
             </div>
           </div>
 
           <div className='flex justify-center my-8'>
-            <a href="/" className='bg-yellow-500 text-gray-800 cursor-pointer font-semibold rounded-lg px-8 py-4'>Obtener info</a>
+            <Link href="/">
+              <a className='bg-yellow-500 text-gray-800 cursor-pointer font-semibold rounded-lg px-8 py-4'>Obtener info</a>
+            </Link>
+
           </div>
         </div>
       </div>

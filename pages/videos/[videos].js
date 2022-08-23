@@ -8,7 +8,7 @@ import videoslist from '../../db/videos'
 import { useRouter } from 'next/router'
 
 
-export default function videos() {
+export default function Videos() {
   const router = useRouter()
   
   const { videos } = router.query
