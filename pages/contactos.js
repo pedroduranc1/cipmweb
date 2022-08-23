@@ -5,7 +5,7 @@ import { Footer } from '../components/Footer'
 import { Navbar } from '../components/Navbar'
 import { Heros } from '../components/Heros'
 
-export default function contacos() {
+ const Contactos = () => {
   let fullpage = true
   return (
     <>
@@ -21,3 +21,5 @@ export default function contacos() {
     </>
   )
 }
+
+export default Contactos;
