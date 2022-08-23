@@ -10,6 +10,7 @@ import { useRouter } from 'next/router'
 
 export default function videos() {
   const router = useRouter()
+  
   const { videos } = router.query
 
   let arr = videos?.replace('%20', ' ');
