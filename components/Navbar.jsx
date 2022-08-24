@@ -161,6 +161,16 @@ const Navbar = () => {
               }}
             ></img>
 
+            <img
+              className="h-8 w-auto sm:h-9 hover:cursor-pointer ml-3"
+              src="/youtube.svg"
+              alt=""
+              layout='fill'
+              onClick={() => {
+                window.location.href = "https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA";
+              }}
+            ></img>
+
           </div>
         </div>
       </div>
@@ -213,19 +223,21 @@ const Navbar = () => {
             <div className="py-6 px-5 space-y-6">
               <div>
                 <div className="flex items-center w-full justify-center">
-                  <div className="flex border-2 w-full rounded">
-                    <input type="text" className="px-4 py-2 w-full selection:border-gray-500" placeholder="Search..." />
-                    <button className="flex items-center justify-center px-4 border-l">
-                      <svg className="w-4 h-4 text-gray-600" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24">
-                        <path
-                          d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" />
-                      </svg>
-                    </button>
+                  <div className="flex w-full border-2 rounded">
+                    <input type="text" onChange={(e) => { setvideoname(e.target.value) }} className="px-4 py-2 w-full selection:border-gray-500" placeholder="Search..." />
+                    <Link href={`/videos/${encodeURIComponent(videoname)}`}>
+                      <a className="flex cursor-pointer items-center justify-center px-4 border-l">
+                        <svg className="w-4 h-4 text-gray-600" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24">
+                          <path
+                            d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" />
+                        </svg>
+                      </a>
+                    </Link>
                   </div>
                 </div>
 
-                <div className='w-full mt-6 flex justify-around'>
+                <div className='grid place-items-center grid-cols-4 mt-6 gap-4'>
                   <img
                     className="h-8 w-auto sm:h-7 hover:cursor-pointer"
                     src="/ws.svg"
@@ -252,6 +264,16 @@ const Navbar = () => {
                       window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
                     }}
                   />
+
+                  <img
+                    className="h-8 w-auto sm:h-9 hover:cursor-pointer"
+                    src="/youtube.svg"
+                    alt=""
+                    layout='fill'
+                    onClick={() => {
+                      window.location.href = "https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA";
+                    }}
+                  ></img>
                 </div>
               </div>
             </div>

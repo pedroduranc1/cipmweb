@@ -43,9 +43,9 @@ const Footer = () => {
                             </Link>
                         </div>
 
-                        <div className='flex mt-6 justify-around'>
+                        <div className='grid grid-cols-4 place-items-center gap-4 mt-6 md:ml-6'>
                             <img
-                                className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-10"
+                                className="h-8 w-auto sm:h-7 hover:cursor-pointer"
                                 src="/ws.svg"
                                 alt=""
                                 layout='fill'
@@ -55,7 +55,7 @@ const Footer = () => {
                             ></img>
 
                             <img
-                                className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-3"
+                                className="h-8 w-auto sm:h-7 hover:cursor-pointer"
                                 src="/fb.svg"
                                 alt=""
                                 layout='fill'
@@ -65,7 +65,7 @@ const Footer = () => {
                             ></img>
 
                             <img
-                                className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-3"
+                                className="h-8 w-auto sm:h-7 hover:cursor-pointer"
                                 src="/tiktok.svg"
                                 alt=""
                                 layout='fill'
@@ -73,12 +73,22 @@ const Footer = () => {
                                     window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
                                 }}
                             ></img>
+
+                            <img
+                                className="h-8 w-auto sm:h-9 hover:cursor-pointer"
+                                src="/youtube.svg"
+                                alt=""
+                                layout='fill'
+                                onClick={() => {
+                                    window.location.href = "https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA";
+                                }}
+                            ></img>
                         </div>
 
                     </div>
                 </div>
                 <div className='flex justify-center'>
-                    <h1 className='py-10 text-gray-900 font-semibold'>Nombredelapagina.com | Copyright 2022 ©</h1>
+                    <h1 className='py-10 text-gray-900 font-semibold'>cipmweb.vercel.app | Copyright 2022 ©</h1>
                 </div>
             </div>
         </div>

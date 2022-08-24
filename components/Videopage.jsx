@@ -8,24 +8,21 @@ const Videopage = () => {
     const router = useRouter()
     const { video } = router.query
 
-    const videoselec = videoslist[video-1]
+    const videoselec = videoslist[video - 1]
 
     let arr = videoselec?.videoname.split(' ');
     //console.log(arr)
 
-    let videos = [
-        
-    ]
+    let videos = []
+    let min = 0
 
-    if(arr !== ""){
-        videoslist.map((video)=>{
-            if(arr !== undefined){
-                if(video.videoname.toLowerCase().includes(arr[1].toLowerCase())){
-                    if(videos.length !== 4){
-                        videos.push(video)
-    
-                    }
-                }
+
+    if (arr !== "") {
+        const videosdiferente = videoslist.filter(videof => videof.id !== videoselec?.id);
+
+        videosdiferente.map((video) => {
+            if(videos.length <= 3){
+                videos.push(video)
             }
         })
     }
@@ -51,15 +48,7 @@ const Videopage = () => {
                     <div className='col-span-3 row-span-2'>
                         <h1 className='text-3xl font-semibold text-gray-700 pt-10'>{videoselec?.videoname}</h1>
                         <h2 className='text-lg text-gray-700 pt-3'>{videoselec?.fecha}</h2>
-                        <h2 className='text-lg text-gray-700 pt-3 pb-6'>Descripción del video
-
-                            Lorem ipsum dolor sit amet consectetur adipiscing elit
-                            laoreet in, purus praesent integer id cum etiam mattis mi,
-                            ligula rutrum commodo leo venenatis suspendisse egestas ridiculus.
-                            Mus non ac consequat semper faucibus odio, fringilla sagittis natoque
-                            eu at tristique platea, parturient molestie a et commodo. Torquent vulputate
-                            placerat hac facilisi est, netus auctor ornare sollicitudin posuere, dignissim
-                            nulla sem aliquet  </h2>
+                        <h2 className='text-lg text-gray-700 pt-3 pb-6'>{videoselec?.descripcion === "" ? "Este video no posee descripcion" : videoselec?.descripcion} </h2>
                         <div className='flex justify-center md:justify-start pt-6 pb-6 space-x-6'>
                             <img
                                 className="h-8 w-auto sm:h-12 hover:cursor-pointer"

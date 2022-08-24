@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React, { useState } from 'react'
 import * as emailjs from '@emailjs/browser'
 
 const Plans = () => {
@@ -29,12 +29,12 @@ const Plans = () => {
         <div className='grid grid-cols-1  md:grid-cols-4 gap-4'>
           <div className='p-6 flex flex-col border-2 border-yellow-400 rounded-2xl'>
             <h1 className='text-center mt-4 text-lg text-yellow-400 font-semibold'>Personalizada</h1>
-            <h1 className='font-bold mt-6 uppercase text-center text-gray-600 text-3xl'>250 MXN</h1>
+            <h1 className='font-bold mt-6 uppercase text-center text-gray-600 text-3xl'>275 MXN</h1>
             <p className='text-center text-xs mt-2'>Por hora</p>
             <hr className='border-2 border-yellow-400 my-4' />
             <p className='text-center mt-4 text-xs'>Clases individuales <br />
               Minimo 3 horas por semana <br />
-              Lunes - Viernas
+              Lunes - Viernes
             </p>
             <p className='text-center mt-4 mb-8 text-xs'>
               12 semanas
@@ -42,7 +42,7 @@ const Plans = () => {
           </div>
           <div className='p-6 flex flex-col border-2 border-blue-600 rounded-2xl'>
             <h1 className='text-center mt-4 text-lg text-blue-600 font-semibold'>Grupal</h1>
-            <h1 className='font-bold mt-6 uppercase text-center text-gray-600 text-3xl'>435 MXN</h1>
+            <h1 className='font-bold mt-6 uppercase text-center text-gray-600 text-3xl'>375 MXN</h1>
             <p className='text-center text-xs mt-2'>Cuota semanal</p>
             <hr className='border-2 border-blue-600 my-4' />
             <p className='text-center mt-4 text-xs'>Clases Grupales <br />
@@ -55,7 +55,7 @@ const Plans = () => {
           </div>
           <div className='p-6 flex flex-col border-2 border-violet-700 rounded-2xl'>
             <h1 className='text-center mt-4 text-lg text-violet-700 font-semibold'>Grupal, Fin de semana</h1>
-            <h1 className='font-bold mt-6 uppercase text-center text-gray-600 text-3xl'>261 MXN</h1>
+            <h1 className='font-bold mt-6 uppercase text-center text-gray-600 text-3xl'>225 MXN</h1>
             <p className='text-center text-xs mt-2'>Por hora</p>
             <hr className='border-2 border-violet-700 my-4' />
             <p className='text-center mt-4 text-xs'>Clases grupales <br />
@@ -101,27 +101,27 @@ const Plans = () => {
             <h1 className='text-center mt-4 text-lg text-gray-700 font-semibold'>Estoy interesado/a</h1>
             <div className='grid grid-cols-1 md:grid-cols-2 md:gap-4 my-8'>
               <div className='grid md:border-r-2 border-gray-700 items-center px-4 gap-y-4'>
-                <input type="text" placeholder='Nombre y apellido' 
-                className='w-full px-6 py-2 border-2 border-gray-700
+                <input type="text" placeholder='Nombre y apellido'
+                  className='w-full px-6 py-2 border-2 border-gray-700
                  placeholder:text-gray-400 rounded-full' />
-                <input type="email" placeholder='Correo electronico' 
-                className='w-full px-6 py-2 border-2 border-gray-700
+                <input type="email" placeholder='Correo electronico'
+                  className='w-full px-6 py-2 border-2 border-gray-700
                  placeholder:text-gray-400 rounded-full' />
-                 <textarea 
-                 className='w-full px-6 pt-2 border-2 border-gray-700
+                <textarea
+                  className='w-full px-6 pt-2 border-2 border-gray-700
                  placeholder:text-gray-400 rounded-full'
-                 placeholder='mensaje' 
-                 id=""></textarea>
-                <button 
-                onClick={enviarcorreo}
-                className='w-full bg-yellow-500 py-2 font-semibold
+                  placeholder='mensaje'
+                  id=""></textarea>
+                <button
+                  onClick={enviarcorreo}
+                  className='w-full bg-yellow-500 py-2 font-semibold
                  text-gray-700 rounded-full'>Enviar</button>
               </div>
               <div className='grid items-center p-8'>
                 <h1 className='text-center mb-8 md:mb-0'>O Escribenos por cualquier red social</h1>
-                <div className='flex justify-center space-x-8'>
+                <div className='grid grid-cols-4 place-items-center gap-2'>
                   <img
-                    className="h-8 w-auto sm:h-14 hover:cursor-pointer ml-10"
+                    className="h-8 w-auto sm:h-14 hover:cursor-pointer"
                     src="/ws.svg"
                     alt=""
                     layout='fill'
@@ -131,7 +131,7 @@ const Plans = () => {
                   ></img>
 
                   <img
-                    className="h-8 w-auto sm:h-14 hover:cursor-pointer ml-3"
+                    className="h-8 w-auto sm:h-14 hover:cursor-pointer"
                     src="/fb.svg"
                     alt=""
                     layout='fill'
@@ -141,12 +141,22 @@ const Plans = () => {
                   ></img>
 
                   <img
-                    className="h-8 w-auto sm:h-14 hover:cursor-pointer ml-3"
+                    className="h-8 w-auto sm:h-14 hover:cursor-pointer"
                     src="/tiktok.svg"
                     alt=""
                     layout='fill'
                     onClick={() => {
                       window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
+                    }}
+                  ></img>
+
+                  <img
+                    className="h-8 w-auto sm:h-16 hover:cursor-pointer"
+                    src="/youtube.svg"
+                    alt=""
+                    layout='fill'
+                    onClick={() => {
+                      window.location.href = "https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA";
                     }}
                   ></img>
                 </div>

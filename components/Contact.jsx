@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import * as emailjs from '@emailjs/browser'
 
 
-const Contact = ({fullpage}) => {
+const Contact = ({ fullpage }) => {
   const [nombre, setnombre] = useState("")
   const [apellido, setapellido] = useState('')
   const [from_name, setfrom_name] = useState("")
@@ -38,7 +38,7 @@ const Contact = ({fullpage}) => {
           </div>
           <div className='w-full flex justify-center'>
             <input type="text" placeholder='Numero de telefono'
-              onChange={(e)=>{
+              onChange={(e) => {
                 settelefono(e.target.value)
               }}
               className='bg-white w-full sm:w-1/2 px-5 py-4 rounded-lg my-1' />
@@ -52,9 +52,9 @@ const Contact = ({fullpage}) => {
           </div>
           <div className='w-full flex justify-center'>
             <textarea
-              onChange={ (e) =>{
+              onChange={(e) => {
                 setmessage(e.target.value)
-              } }
+              }}
               placeholder='Mensaje'
               className='bg-white w-full sm:w-1/2 resize-none px-5 py-4 rounded-lg my-1'
             ></textarea>
@@ -68,9 +68,9 @@ const Contact = ({fullpage}) => {
                   className='px-8 py-2 border-2 cursor-pointer border-white rounded-lg text-white font-semibold'
                 >Enviar</div>
 
-                <div className='flex items-center space-x-6'>
+                <div className='grid grid-cols-4 place-items-center gap-4'>
                   <img
-                    className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-10"
+                    className="h-8 w-auto sm:h-7 hover:cursor-pointer"
                     src="/ws.svg"
                     alt=""
                     layout='fill'
@@ -80,7 +80,7 @@ const Contact = ({fullpage}) => {
                   ></img>
 
                   <img
-                    className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-3"
+                    className="h-8 w-auto sm:h-7 hover:cursor-pointer"
                     src="/fb.svg"
                     alt=""
                     layout='fill'
@@ -90,12 +90,22 @@ const Contact = ({fullpage}) => {
                   ></img>
 
                   <img
-                    className="h-8 w-auto sm:h-7 hover:cursor-pointer ml-3"
+                    className="h-8 w-auto sm:h-7 hover:cursor-pointer"
                     src="/tiktok.svg"
                     alt=""
                     layout='fill'
                     onClick={() => {
                       window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
+                    }}
+                  ></img>
+
+                  <img
+                    className="h-8 w-auto sm:h-9 hover:cursor-pointer"
+                    src="/youtube.svg"
+                    alt=""
+                    layout='fill'
+                    onClick={() => {
+                      window.location.href = "https://www.youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA";
                     }}
                   ></img>
                 </div>
