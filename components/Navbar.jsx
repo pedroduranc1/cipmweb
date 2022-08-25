@@ -30,7 +30,7 @@ const solutions = [
   {
     name: 'Videos',
     description: 'Speak directly to your customers in a more meaningful way.',
-    href: '/videos/cimp',
+    href: '/videos/cipm',
     icon: FilmIcon,
   },
   {
@@ -89,7 +89,7 @@ const Navbar = () => {
                   className='h-14 w-auto sm:h-15'
                   src="/logo.svg"
                   alt="" ></img>
-                <h1 className='grid items-center font-bold ml-2'>C.I.M.P</h1>
+                <h1 className='grid items-center font-bold ml-2'>C.I.P.M</h1>
               </a>
             </Link>
           </div>
@@ -105,7 +105,7 @@ const Navbar = () => {
                 Inicio
               </a>
             </Link>
-            <Link href="/videos/cimp">
+            <Link href="/videos/cipm">
               <a className="whitespace-nowrap text-base font-medium ml-10 text-gray-500 hover:text-gray-900">
                 Videos
               </a>
@@ -194,7 +194,7 @@ const Navbar = () => {
                     src="/logo.svg"
                     alt="Workflow"
                   />
-                  <h1 className='grid items-center font-bold ml-2'>C.I.M.P</h1>
+                  <h1 className='grid items-center font-bold ml-2'>C.I.P.M</h1>
                 </div>
                 <div className="-mr-2">
                   <Popover.Button className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">

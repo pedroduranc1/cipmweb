@@ -15,7 +15,7 @@ const Footer = () => {
                                     alt=""
                                     layout='fill'
                                 ></img>
-                                <h1 className='grid items-center font-bold ml-2'>C.I.M.P</h1>
+                                <h1 className='grid items-center font-bold ml-2'>C.I.P.M</h1>
                             </a>
                         </Link>
 

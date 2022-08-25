@@ -19,7 +19,7 @@ export default function Videos() {
 
   //console.log(videosarr)
 
-  if (videos !== '' && videos !== 'cimp') {
+  if (videos !== '' && videos !== 'cipm') {
     if (arr !== "") {
       videoslist.map((video) => {
         if (arr !== undefined) {
