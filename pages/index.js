@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Incio - CIMP</title>
+        <title>Inicio - CIMP</title>
         <link rel="icon" href="logo.svg"/>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
