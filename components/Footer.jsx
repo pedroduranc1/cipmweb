@@ -88,7 +88,7 @@ const Footer = () => {
                     </div>
                 </div>
                 <div className='flex justify-center'>
-                    <h1 className='py-10 text-gray-900 font-semibold'>cipmweb.vercel.app | Copyright 2022 ©</h1>
+                    <h1 className='py-10 text-gray-900 font-semibold'>cursosdeinglespersonalizadosenmonterrey.com | Copyright 2022 ©</h1>
                 </div>
             </div>
         </div>

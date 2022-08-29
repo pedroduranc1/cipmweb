@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import * as emailjs from '@emailjs/browser'
+import swal from 'sweetalert'
 
 const Plans = () => {
 
@@ -8,6 +9,7 @@ const Plans = () => {
   const [from_name, setfrom_name] = useState("")
   const [message, setmessage] = useState("")
   const [telefono, settelefono] = useState('No Disponible')
+  const [Enviandocorreo, setEnviandocorreo] = useState(false)
 
   let values = {
     nombre,
@@ -19,7 +21,21 @@ const Plans = () => {
 
   const enviarcorreo = () => {
     //console.log(values)
-    emailjs.send('service_zf4o6rf', 'template_ba8iocf', values, 'mHjoux4EbEL8zmau2');
+    emailjs.send('service_zf4o6rf', 'template_ba8iocf', values, 'mHjoux4EbEL8zmau2')
+      .then(function (response) {
+        swal(`Felicidades ${values.nombre} ${values.apellido}`, "Tu correo a sido enviado con exito", "success");
+        limpiarinp()
+        setEnviandocorreo(false)
+      }, function (error) {
+        swal("Oops", "Ocurrio un error al enviar el correo", "error");
+        setEnviandocorreo(false)
+      });
+  }
+
+  const limpiarinp = () => {
+    document.getElementById('nombre').value = ''
+    document.getElementById('correo').value = ''
+    document.getElementById('mensaje').value = ''
   }
 
   return (
@@ -103,19 +119,22 @@ const Plans = () => {
               <div className='grid md:border-r-2 border-gray-700 items-center px-4 gap-y-4'>
                 <input type="text" placeholder='Nombre y apellido'
                   className='w-full px-6 py-2 border-2 border-gray-700
-                 placeholder:text-gray-400 rounded-full' />
+                 placeholder:text-gray-400 rounded-full' id='nombre' />
                 <input type="email" placeholder='Correo electronico'
                   className='w-full px-6 py-2 border-2 border-gray-700
-                 placeholder:text-gray-400 rounded-full' />
+                 placeholder:text-gray-400 rounded-full' id='correo' />
                 <textarea
                   className='w-full px-6 pt-2 border-2 border-gray-700
                  placeholder:text-gray-400 rounded-full'
                   placeholder='mensaje'
-                  id=""></textarea>
-                <button
-                  onClick={enviarcorreo}
-                  className='w-full bg-yellow-500 py-2 font-semibold
-                 text-gray-700 rounded-full'>Enviar</button>
+                  id="mensaje"></textarea>
+                {
+                  Enviandocorreo !== true && <button
+                    onClick={enviarcorreo}
+                    className='w-full bg-yellow-500 py-2 font-semibold
+                   text-gray-700 rounded-full'>Enviar</button>
+                }
+
               </div>
               <div className='grid items-center p-8'>
                 <h1 className='text-center mb-8 md:mb-0'>O Escribenos por cualquier red social</h1>

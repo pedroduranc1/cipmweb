@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import * as emailjs from '@emailjs/browser'
+import swal from 'sweetalert'
 
 
 const Contact = ({ fullpage }) => {
@@ -8,6 +9,7 @@ const Contact = ({ fullpage }) => {
   const [from_name, setfrom_name] = useState("")
   const [message, setmessage] = useState("")
   const [telefono, settelefono] = useState('')
+  const [Enviandocorreo, setEnviandocorreo] = useState(false)
 
   let values = {
     nombre,
@@ -18,8 +20,23 @@ const Contact = ({ fullpage }) => {
   }
 
   const enviarcorreo = () => {
-    //console.log(values)
-    emailjs.send('service_zf4o6rf', 'template_ba8iocf', values, 'mHjoux4EbEL8zmau2');
+    setEnviandocorreo(true)
+    emailjs.send('service_zf4o6rf', 'template_ba8iocf', values, 'mHjoux4EbEL8zmau2')
+      .then(function (response) {
+        swal(`Felicidades ${values.nombre} ${values.apellido}`, "Tu correo a sido enviado con exito", "success");
+        limpiarinp()
+        setEnviandocorreo(false)
+      }, function (error) {
+        swal("Oops", "Ocurrio un error al enviar el correo", "error");
+        setEnviandocorreo(false)
+      });
+  }
+
+  const limpiarinp = () => {
+    document.getElementById('nombre').value = ''
+    document.getElementById('numero').value = ''
+    document.getElementById('correo').value = ''
+    document.getElementById('mensaje').value = ''
   }
 
   return (
@@ -28,7 +45,9 @@ const Contact = ({ fullpage }) => {
         <div className='flex flex-col px-5 sm:px-0 md:translate-x-[10%]'>
           <h1 className='text-center text-white text-2xl font-semibold pt-10 pb-7'>Contacto</h1>
           <div className='w-full flex justify-center'>
-            <input type="text" placeholder='Nombre y Apellido'
+            <input type="text"
+              placeholder='Nombre y Apellido'
+              id='nombre'
               onChange={(e) => {
                 let nombrecompleto = e.target.value.split(' ')
                 setnombre(nombrecompleto[0])
@@ -37,7 +56,9 @@ const Contact = ({ fullpage }) => {
               className='bg-white w-full sm:w-1/2 px-5 py-4 rounded-lg my-1' />
           </div>
           <div className='w-full flex justify-center'>
-            <input type="text" placeholder='Numero de telefono'
+            <input type="text"
+              placeholder='Numero de telefono'
+              id='numero'
               onChange={(e) => {
                 settelefono(e.target.value)
               }}
@@ -45,6 +66,7 @@ const Contact = ({ fullpage }) => {
           </div>
           <div className='w-full flex justify-center'>
             <input type="email" placeholder='Correo electronico'
+              id='correo'
               onChange={(e) => {
                 setfrom_name(e.target.value)
               }}
@@ -52,6 +74,7 @@ const Contact = ({ fullpage }) => {
           </div>
           <div className='w-full flex justify-center'>
             <textarea
+              id='mensaje'
               onChange={(e) => {
                 setmessage(e.target.value)
               }}
@@ -63,10 +86,13 @@ const Contact = ({ fullpage }) => {
           <div className='flex justify-center mt-8 mb-20 w-full'>
             <div className='w-full sm:w-1/2 flex justify-center bg-blue-600'>
               <div className='flex w-full justify-between items-center'>
-                <div
-                  onClick={enviarcorreo}
-                  className='px-8 py-2 border-2 cursor-pointer border-white rounded-lg text-white font-semibold'
-                >Enviar</div>
+                {
+                  Enviandocorreo !== true && <div
+                    onClick={enviarcorreo}
+                    className='px-8 py-2 border-2 cursor-pointer border-white rounded-lg text-white font-semibold'
+                  >Enviar</div>
+                }
+
 
                 <div className='grid grid-cols-4 place-items-center gap-4'>
                   <img
