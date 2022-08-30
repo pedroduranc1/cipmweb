@@ -1,145 +1,174 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import * as emailjs from '@emailjs/browser'
 import swal from 'sweetalert'
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 
 const Contact = ({ fullpage }) => {
-  const [nombre, setnombre] = useState("")
-  const [apellido, setapellido] = useState('')
-  const [from_name, setfrom_name] = useState("")
-  const [message, setmessage] = useState("")
-  const [telefono, settelefono] = useState('')
-  const [Enviandocorreo, setEnviandocorreo] = useState(false)
 
-  let values = {
-    nombre,
-    apellido,
-    from_name,
-    message,
-    telefono
-  }
+  const [EnviandoCorreoContac, setEnviandoCorreoContac] = useState(false)
 
-  const enviarcorreo = () => {
-    setEnviandocorreo(true)
-    emailjs.send('service_zf4o6rf', 'template_ba8iocf', values, 'mHjoux4EbEL8zmau2')
-      .then(function (response) {
-        swal(`Felicidades ${values.nombre} ${values.apellido}`, "Tu correo a sido enviado con exito", "success");
-        limpiarinp()
-        setEnviandocorreo(false)
-      }, function (error) {
-        swal("Oops", "Ocurrio un error al enviar el correo", "error");
-        setEnviandocorreo(false)
-      });
-  }
+  const formik = useFormik({
+    initialValues: {
+      nombrecompleto: '',
+      email: '',
+      message: '',
+      telefono: ''
+    },
+    validationSchema: Yup.object({
+      nombrecompleto: Yup.string()
+        .required('Required'),
+      email: Yup.string()
+        .email('Invalid email address')
+        .required('Required'),
+      message: Yup.string()
+        .required('Required'),
+      telefono: Yup.number()
+        .required('Required'),
+    }),
+    onSubmit: (values) => {
+
+      let valuesemaill = {
+        nombre: values.nombrecompleto,
+        from_name: values.email,
+        message: values.message,
+        telefono: values.telefono
+      }
+
+      setEnviandoCorreoContac(true)
+      emailjs.send('service_zf4o6rf', 'template_ba8iocf', valuesemaill, 'mHjoux4EbEL8zmau2')
+        .then(function (response) {
+          swal(`Felicidades ${valuesemaill.nombrecompleto}`, "Tu correo a sido enviado con exito", "success");
+          limpiarinp()
+          setEnviandoCorreoContac(false)
+        }, function (error) {
+          swal("Oops", "Ocurrio un error al enviar el correo", "error");
+          setEnviandoCorreoContac(false)
+        });
+    },
+  });
 
   const limpiarinp = () => {
-    document.getElementById('nombre').value = ''
-    document.getElementById('numero').value = ''
-    document.getElementById('correo').value = ''
-    document.getElementById('mensaje').value = ''
+    formik.values.nombrecompleto = ""
+    formik.values.email = ""
+    formik.values.telefono = ""
+    formik.values.message = ""
   }
+
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
       <div className='flex flex-col justify-end w-full md:w-1/2 bg-blue-600'>
-        <div className='flex flex-col px-5 sm:px-0 md:translate-x-[10%]'>
-          <h1 className='text-center text-white text-2xl font-semibold pt-10 pb-7'>Contacto</h1>
-          <div className='w-full flex justify-center'>
-            <input type="text"
-              placeholder='Nombre y Apellido'
-              id='nombre'
-              onChange={(e) => {
-                let nombrecompleto = e.target.value.split(' ')
-                setnombre(nombrecompleto[0])
-                setapellido(nombrecompleto[1])
-              }}
-              className='bg-white w-full sm:w-1/2 px-5 py-4 rounded-lg my-1' />
-          </div>
-          <div className='w-full flex justify-center'>
-            <input type="text"
-              placeholder='Numero de telefono'
-              id='numero'
-              onChange={(e) => {
-                settelefono(e.target.value)
-              }}
-              className='bg-white w-full sm:w-1/2 px-5 py-4 rounded-lg my-1' />
-          </div>
-          <div className='w-full flex justify-center'>
-            <input type="email" placeholder='Correo electronico'
-              id='correo'
-              onChange={(e) => {
-                setfrom_name(e.target.value)
-              }}
-              className='bg-white w-full sm:w-1/2 px-5 py-4 rounded-lg my-1' />
-          </div>
-          <div className='w-full flex justify-center'>
-            <textarea
-              id='mensaje'
-              onChange={(e) => {
-                setmessage(e.target.value)
-              }}
-              placeholder='Mensaje'
-              className='bg-white w-full sm:w-1/2 resize-none px-5 py-4 rounded-lg my-1'
-            ></textarea>
-          </div>
+        <form onSubmit={formik.handleSubmit}>
+          <div className='flex flex-col px-5 sm:px-0 md:translate-x-[10%]'>
+            <h1 className='text-center text-white text-2xl font-semibold pt-10 pb-7'>Contacto</h1>
+            <div className='w-full flex justify-center'>
+              <input
+                placeholder='Nombre y Apellido'
+                id="nombrecompleto"
+                name="nombrecompleto"
+                type="text"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.nombrecompleto}
+                className={`bg-white border-2 ${formik.errors.nombrecompleto && 'border-red-500'} w-full sm:w-1/2 px-5 py-4 rounded-lg my-1`} />
+            </div>
+            <div className='w-full flex justify-center'>
+              <input
+                placeholder='Numero de telefono'
+                id="telefono"
+                name="telefono"
+                type="number"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.telefono}
+                className={`bg-white border-2 ${formik.errors.telefono && 'border-red-500'} w-full sm:w-1/2 px-5 py-4 rounded-lg my-1`} />
+            </div>
+            <div className='w-full flex justify-center'>
+              <input
+                type="email"
+                placeholder='Correo electronico'
+                id="email"
+                name="email"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.email}
+                className={`bg-white border-2 ${formik.errors.email && 'border-red-500'} w-full sm:w-1/2 px-5 py-4 rounded-lg my-1`} />
+            </div>
+            <div className='w-full flex justify-center'>
+              <textarea
+                id="message"
+                name="message"
+                type="text"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.message}
+                placeholder='Mensaje'
+                className={`bg-white border-2 ${formik.errors.message && 'border-red-500'} w-full sm:w-1/2 px-5 py-4 rounded-lg my-1`}
+              ></textarea>
+            </div>
 
-          <div className='flex justify-center mt-8 mb-20 w-full'>
-            <div className='w-full sm:w-1/2 flex justify-center bg-blue-600'>
-              <div className='flex w-full justify-between items-center'>
-                {
-                  Enviandocorreo !== true && <div
-                    onClick={enviarcorreo}
-                    className='px-8 py-2 border-2 cursor-pointer border-white rounded-lg text-white font-semibold'
-                  >Enviar</div>
-                }
+            <div className='flex justify-center mt-8 mb-20 w-full'>
+              <div className='w-full sm:w-1/2 flex justify-center bg-blue-600'>
+                <div className='flex w-full justify-between items-center'>
+                  {
+                    EnviandoCorreoContac !== true && <button
+                      type="submit"
+                      // onClick={limpiarinp}
+                      className='px-8 py-2 border-2 cursor-pointer border-white rounded-lg text-white font-semibold'
+                    >Enviar</button>
+                  }
 
 
-                <div className='grid grid-cols-4 place-items-center gap-4'>
-                  <img
-                    className="h-8 w-auto sm:h-7 hover:cursor-pointer"
-                    src="/ws.svg"
-                    alt=""
-                    layout='fill'
-                    onClick={() => {
-                      window.location.href = "https://wa.link/8ebgdv";
-                    }}
-                  ></img>
+                  <div className='grid grid-cols-4 place-items-center gap-4'>
+                    <img
+                      className="h-8 w-auto sm:h-7 hover:cursor-pointer"
+                      src="/ws.svg"
+                      alt=""
+                      layout='fill'
+                      onClick={() => {
+                        window.location.href = "https://wa.link/8ebgdv";
+                      }}
+                    ></img>
 
-                  <img
-                    className="h-8 w-auto sm:h-7 hover:cursor-pointer"
-                    src="/fb.svg"
-                    alt=""
-                    layout='fill'
-                    onClick={() => {
-                      window.location.href = "https://www.facebook.com/olympusgroupmx";
-                    }}
-                  ></img>
+                    <img
+                      className="h-8 w-auto sm:h-7 hover:cursor-pointer"
+                      src="/fb.svg"
+                      alt=""
+                      layout='fill'
+                      onClick={() => {
+                        window.location.href = "https://www.facebook.com/olympusgroupmx";
+                      }}
+                    ></img>
 
-                  <img
-                    className="h-8 w-auto sm:h-7 hover:cursor-pointer"
-                    src="/tiktok.svg"
-                    alt=""
-                    layout='fill'
-                    onClick={() => {
-                      window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
-                    }}
-                  ></img>
+                    <img
+                      className="h-8 w-auto sm:h-7 hover:cursor-pointer"
+                      src="/tiktok.svg"
+                      alt=""
+                      layout='fill'
+                      onClick={() => {
+                        window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
+                      }}
+                    ></img>
 
-                  <img
-                    className="h-8 w-auto sm:h-9 hover:cursor-pointer"
-                    src="/youtube.svg"
-                    alt=""
-                    layout='fill'
-                    onClick={() => {
-                      window.location.href = "https://www.youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA";
-                    }}
-                  ></img>
+                    <img
+                      className="h-8 w-auto sm:h-9 hover:cursor-pointer"
+                      src="/youtube.svg"
+                      alt=""
+                      layout='fill'
+                      onClick={() => {
+                        window.location.href = "https://www.youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA";
+                      }}
+                    ></img>
+                  </div>
+
                 </div>
-
               </div>
             </div>
           </div>
-        </div>
+        </form>
+
       </div>
       <div className='flex flex-col justify-start w-full md:w-1/2'>
         <div className='flex flex-col md:-translate-x-[10%]'>
@@ -167,6 +196,7 @@ const Contact = ({ fullpage }) => {
 
         </div>
       </div>
+
     </div>
   )
 }

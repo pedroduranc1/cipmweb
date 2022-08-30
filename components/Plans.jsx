@@ -1,41 +1,54 @@
 import React, { useState } from 'react'
 import * as emailjs from '@emailjs/browser'
 import swal from 'sweetalert'
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const Plans = () => {
+  const [EnviandoCorreoPlans, setEnviandoCorreoPlans] = useState(false)
 
-  const [nombre, setnombre] = useState("")
-  const [apellido, setapellido] = useState('')
-  const [from_name, setfrom_name] = useState("")
-  const [message, setmessage] = useState("")
-  const [telefono, settelefono] = useState('No Disponible')
-  const [Enviandocorreo, setEnviandocorreo] = useState(false)
+  const formik = useFormik({
+    initialValues: {
+      nombrecompleto: '',
+      email: '',
+      message: '',
+      telefono: 'No Disponible'
+    },
+    validationSchema: Yup.object({
+      nombrecompleto: Yup.string()
+        .required('Required'),
+      email: Yup.string()
+        .email('Invalid email address')
+        .required('Required'),
+      message: Yup.string()
+        .required('Required'),
+    }),
+    onSubmit: (values) => {
 
-  let values = {
-    nombre,
-    apellido,
-    from_name,
-    message,
-    telefono
-  }
+      let valuesemaill = {
+        nombre: values.nombrecompleto,
+        from_name: values.email,
+        message: values.message,
+        telefono: values.telefono
+      }
 
-  const enviarcorreo = () => {
-    //console.log(values)
-    emailjs.send('service_zf4o6rf', 'template_ba8iocf', values, 'mHjoux4EbEL8zmau2')
-      .then(function (response) {
-        swal(`Felicidades ${values.nombre} ${values.apellido}`, "Tu correo a sido enviado con exito", "success");
-        limpiarinp()
-        setEnviandocorreo(false)
-      }, function (error) {
-        swal("Oops", "Ocurrio un error al enviar el correo", "error");
-        setEnviandocorreo(false)
-      });
-  }
+      setEnviandoCorreoPlans(true)
+      emailjs.send('service_zf4o6rf', 'template_ba8iocf', valuesemaill, 'mHjoux4EbEL8zmau2')
+        .then(function (response) {
+          swal(`Felicidades ${valuesemaill.nombrecompleto}`, "Tu correo a sido enviado con exito", "success");
+          limpiarinp()
+          setEnviandoCorreoPlans(false)
+        }, function (error) {
+          swal("Oops", "Ocurrio un error al enviar el correo", "error");
+          setEnviandoCorreoPlans(false)
+        });
+    },
+  });
 
   const limpiarinp = () => {
-    document.getElementById('nombre').value = ''
-    document.getElementById('correo').value = ''
-    document.getElementById('mensaje').value = ''
+    formik.values.nombrecompleto = ""
+    formik.values.email = ""
+    formik.values.message = ""
   }
 
   return (
@@ -116,26 +129,48 @@ const Plans = () => {
           <div className='col-span-3 p-6 flex flex-col border-2 border-gray-700 rounded-2xl'>
             <h1 className='text-center mt-4 text-lg text-gray-700 font-semibold'>Estoy interesado/a</h1>
             <div className='grid grid-cols-1 md:grid-cols-2 md:gap-4 my-8'>
-              <div className='grid md:border-r-2 border-gray-700 items-center px-4 gap-y-4'>
-                <input type="text" placeholder='Nombre y apellido'
-                  className='w-full px-6 py-2 border-2 border-gray-700
-                 placeholder:text-gray-400 rounded-full' id='nombre' />
-                <input type="email" placeholder='Correo electronico'
-                  className='w-full px-6 py-2 border-2 border-gray-700
-                 placeholder:text-gray-400 rounded-full' id='correo' />
-                <textarea
-                  className='w-full px-6 pt-2 border-2 border-gray-700
-                 placeholder:text-gray-400 rounded-full'
-                  placeholder='mensaje'
-                  id="mensaje"></textarea>
-                {
-                  Enviandocorreo !== true && <button
-                    onClick={enviarcorreo}
-                    className='w-full bg-yellow-500 py-2 font-semibold
+              <form onSubmit={formik.handleSubmit}>
+                <div className='grid md:border-r-2 border-gray-700 items-center px-4 gap-y-4'>
+                  <input
+                    type="text"
+                    placeholder='Nombre y apellido'
+                    id="nombrecompleto"
+                    name="nombrecompleto"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.nombrecompleto}
+                    className={`w-full px-6 py-2 border-2 border-gray-700 ${formik.errors.nombrecompleto && 'border-red-500'}
+                    placeholder:text-gray-400 rounded-full`}
+                  />
+                  <input
+                    type="email"
+                    placeholder='Correo electronico'
+                    id="email"
+                    name="email"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.email}
+                    className={`w-full px-6 py-2 border-2 border-gray-700 ${formik.errors.email && 'border-red-500'}
+                    placeholder:text-gray-400 rounded-full`}  />
+                  <textarea
+                    className={`w-full px-6 py-2 border-2 border-gray-700 ${formik.errors.message && 'border-red-500'}
+                    placeholder:text-gray-400 rounded-full`}
+                    placeholder='mensaje'
+                    id="message"
+                    name="message"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.message}></textarea>
+                  {
+                    EnviandoCorreoPlans !== true && <button
+                      type='submit'
+                      className='w-full bg-yellow-500 py-2 font-semibold
                    text-gray-700 rounded-full'>Enviar</button>
-                }
+                  }
 
-              </div>
+                </div>
+              </form>
+
               <div className='grid items-center p-8'>
                 <h1 className='text-center mb-8 md:mb-0'>O Escribenos por cualquier red social</h1>
                 <div className='grid grid-cols-4 place-items-center gap-2'>
