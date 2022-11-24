@@ -37,7 +37,7 @@ const Contact = ({ fullpage }) => {
       }
 
       setEnviandoCorreoContac(true)
-      emailjs.send('service_zf4o6rf', 'template_ba8iocf', valuesemaill, 'mHjoux4EbEL8zmau2')
+      emailjs.send('service_9jc938i', 'template_ba8iocf', valuesemaill, 'mHjoux4EbEL8zmau2')
         .then(function (response) {
           swal(`Felicidades ${valuesemaill.nombrecompleto}`, "Tu correo a sido enviado con exito", "success");
           limpiarinp()
