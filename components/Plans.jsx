@@ -33,7 +33,7 @@ const Plans = () => {
       }
 
       setEnviandoCorreoPlans(true)
-      emailjs.send('service_9jc938i', 'template_ba8iocf', valuesemaill, '3Z8BU-k9bSAu5bHtx')
+      emailjs.send('service_6nyy3ia', 'template_ba8iocf', valuesemaill, '3Z8BU-k9bSAu5bHtx')
         .then(function (response) {
           swal(`Felicidades ${valuesemaill.nombrecompleto}`, "Tu correo a sido enviado con exito", "success");
           limpiarinp()
