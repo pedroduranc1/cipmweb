@@ -10,7 +10,7 @@ import Heros from '../components/Heros'
   return (
     <>
       <Head>
-        <title>Contactos - CIMP</title>
+        <title>Contactos - CIPM</title>
         <link rel="icon" href="logo.svg"/>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
