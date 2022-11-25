@@ -189,7 +189,7 @@ const Contact = ({ fullpage }) => {
               <h1 className='text-center mt-10 text-xl pb-10 md:pb-0 text-gray-600'>
                 Monterrey - Mexico <br />
                 Horario de trabajo 9 - 5 pm / Lunes - Viernes <br />
-                Correo electrónico : Noeadrianleal@gmail.com
+                Correo electrónico : cipm3gh@gmail.com
               </h1>
             </div>
           </div>
