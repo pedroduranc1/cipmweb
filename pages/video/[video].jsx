@@ -8,7 +8,7 @@ export default function video() {
     return (
         <>
             <Head>
-                <title>Video - CIMP</title>
+                <title>Video - CIPM</title>
                 <link rel="icon" href="/logo.svg"/>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
             </Head>
