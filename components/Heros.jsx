@@ -8,16 +8,25 @@ const Heros = () => {
             <h1 className='lg:text-6xl text-center sm:text-start md:text-5xl text-3xl font-semibold text-gray-700'>
               Una forma diferente <br/> De aprender ingles
             </h1>
-            <p className='mt-6 text-center sm:text-start lg:text-2xl md:text-lg text-md text-gray-700'>
-            La práctica hace al maestro, deja de aprender <br /> 
-            con personas que usan vocabulario confuso y <br />
-            obtén nuestra app
-            </p>
+          
+            <h4 className="text-center md:text-start text-2xl font-semibold text-gray-700 mt-2">
+              100% Conversacional
+            </h4>
+
+            <h4 className="text-center md:text-start text-2xl font-semibold text-gray-700 ">
+              75 Pesos la hora
+            </h4>
+
+            <h4 className="text-center md:text-start text-2xl font-semibold text-gray-700 ">
+              Grupos de 3 a 6 Personas
+            </h4>
 
             <div className='flex items-center justify-center cursor-pointer sm:justify-start mt-12'
-              onClick={() => window.location.href = 'https://play.google.com/store/apps/details?id=com.leal.cipm_testing&hl=en_US&gl=US'}
+              onClick={() => {
+                window.location.href = "https://wa.link/jlznzn";
+              }}
             >
-              <a className='bg-yellow-400 px-7 py-5 rounded-2xl font-semibold'>Obtener la app</a>
+              <a className='bg-yellow-400 px-7 py-5 rounded-2xl font-semibold'>Agendar una clase de prueba</a>
               <img src="/playstore.svg" layout='fill' className='h-14 ml-10 w-auto sm:h-10 ' alt="" ></img>
             </div>
         </div>

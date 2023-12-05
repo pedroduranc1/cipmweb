@@ -11,6 +11,7 @@ export default function video() {
                 <title>Video - CIPM</title>
                 <link rel="icon" href="/logo.svg"/>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
             </Head>
             <Navbar />
             <Videopage />

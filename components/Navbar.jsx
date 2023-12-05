@@ -243,7 +243,7 @@ const Navbar = () => {
                     src="/ws.svg"
                     alt=""
                     onClick={() => {
-                      window.location.href = "https://wa.link/8ebgdv";
+                      window.location.href = "https://wa.link/jlznzn";
                     }}
                   />
 

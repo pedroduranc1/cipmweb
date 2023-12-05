@@ -128,7 +128,7 @@ const Contact = ({ fullpage }) => {
                       alt=""
                       layout='fill'
                       onClick={() => {
-                        window.location.href = "https://wa.link/8ebgdv";
+                        window.location.href = "https://wa.link/jlznzn";
                       }}
                     ></img>
 
