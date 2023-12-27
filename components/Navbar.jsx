@@ -115,6 +115,16 @@ const Navbar = () => {
                 Contacto
               </a>
             </Link>
+            {/* <Link href="/login">
+              <a className="whitespace-nowrap text-base font-medium ml-10 text-gray-500 hover:text-gray-900">
+                Login
+              </a>
+            </Link>
+            <Link href="/registro">
+              <a className="whitespace-nowrap text-base font-medium ml-10 text-gray-500 hover:text-gray-900">
+                Registro
+              </a>
+            </Link> */}
 
             <div className="flex items-center justify-center ml-10">
               <div className="flex border-2 rounded">
