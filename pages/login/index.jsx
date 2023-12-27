@@ -8,7 +8,7 @@ import * as Yup from "yup";
 import { Auth } from "../../db/Auth";
 
 const AuthCtrl = new Auth();
-export default function () {
+const index = () => {
 
     return (
         <>
@@ -74,3 +74,5 @@ export default function () {
         </>
     )
 }
+
+export default index;
