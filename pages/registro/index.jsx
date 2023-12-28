@@ -20,7 +20,7 @@ const index = () => {
                 <img src="/logo.svg" alt="" />
 
                 {/* Formularion de registro */}
-                <div className="bg-white shadow-md w-[30%] h-fit rounded-md p-4 flex flex-col">
+                <div className="bg-white shadow-md w-[90%] md:w-[30%] h-fit rounded-md p-4 flex flex-col">
                     <h1 className="text-center font-bold text-2xl py-3">Registro</h1>
                     <Formik
                         initialValues={{
