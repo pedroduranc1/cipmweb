@@ -1,5 +1,4 @@
-import { ENV } from "../../utils/constans";
-import { default as jwtDecode } from 'jwt-decode'; 
+import { ENV } from "../../utils/constans"; 
 
 export class Token {
     setToken(token) {
