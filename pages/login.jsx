@@ -5,17 +5,17 @@ import Head from 'next/head'
 
 import { Form, Field, Formik } from 'formik'
 import * as Yup from "yup";
-import { Auth } from "../../db/Auth";
-import { useAuth } from "../../hooks/useAuth";
 import { useRouter } from 'next/router';
+import { Auth } from '../db/Auth';
+import { useAuth } from '../hooks/useAuth';
 
 const AuthCtrl = new Auth();
 
-export default function login(){
+const login = () => {
     const { login } = useAuth();
     const router = useRouter();
-    return (
-        <>
+  return (
+    <>
             <Head>
                 <title>Login - CIPM</title>
                 <link rel="icon" href="logo.svg" />
@@ -76,5 +76,7 @@ export default function login(){
 
             </div>
         </>
-    )
+  )
 }
+
+export default login

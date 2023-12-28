@@ -6,7 +6,6 @@ import Navbar from '../components/Navbar'
 import Plans from '../components/Plans'
 import Services from '../components/Services'
 import Videosfield from '../components/Videosfield'
-import { useAuth } from "../hooks/useAuth";
 
 export default function Home() {
 
