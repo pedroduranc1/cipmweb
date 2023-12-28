@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 
 const AuthCtrl = new Auth();
 
-const index = () => {
+export default function login(){
     const { login } = useAuth();
     const router = useRouter();
     return (
@@ -78,5 +78,3 @@ const index = () => {
         </>
     )
 }
-
-export default index;
