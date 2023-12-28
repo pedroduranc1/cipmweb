@@ -10,11 +10,12 @@ import { useAuth } from "../../hooks/useAuth";
 import { useRouter } from 'next/router';
 
 const AuthCtrl = new Auth();
+
+import React from 'react'
+
 const index = () => {
-
-    const {login} = useAuth();
+    const { login } = useAuth();
     const router = useRouter();
-
     return (
         <>
             <Head>
@@ -46,8 +47,8 @@ const index = () => {
                             const { email, password } = values
 
                             //accessToken
-                            const {uid,accessToken} = await AuthCtrl.login(email, password);
-                            await login(accessToken,uid);
+                            const { uid, accessToken } = await AuthCtrl.login(email, password);
+                            await login(accessToken, uid);
                             router.push('/');
                         }}
                     >
