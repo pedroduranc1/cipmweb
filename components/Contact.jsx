@@ -58,7 +58,7 @@ const Contact = ({ fullpage }) => {
 
 
   return (
-    <div className='flex flex-col md:flex-row w-full'>
+    <div className='flex flex-col md:flex-row w-full pb-[12%]'>
       <div className='flex flex-col justify-end w-full md:w-1/2 bg-blue-600'>
         <form onSubmit={formik.handleSubmit}>
           <div className='flex flex-col px-5 sm:px-0 md:translate-x-[10%]'>

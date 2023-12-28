@@ -6,9 +6,14 @@ import Head from 'next/head'
 import { Form, Field, Formik } from 'formik'
 import * as Yup from "yup";
 import { Auth } from "../../db/Auth";
+import { useAuth } from "../../hooks/useAuth";
+import { useRouter } from 'next/router';
 
 const AuthCtrl = new Auth();
 const index = () => {
+
+    const {login} = useAuth();
+    const router = useRouter();
 
     return (
         <>
@@ -38,12 +43,12 @@ const index = () => {
                         })}
                         onSubmit={async (values) => {
                             // same shape as initial values
-                            //console.log(values);
                             const { email, password } = values
 
-                            const {accessToken} = await AuthCtrl.login(email, password);
-
-                            console.log(accessToken)
+                            //accessToken
+                            const {uid,accessToken} = await AuthCtrl.login(email, password);
+                            await login(accessToken,uid);
+                            router.push('/');
                         }}
                     >
                         {({ errors, touched }) => (

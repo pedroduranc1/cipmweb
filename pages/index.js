@@ -19,13 +19,16 @@ export default function Home() {
         <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
 
       </Head>
-      <Navbar />
-      <Heros />
-      <Services />
-      <Plans />
-      <Videosfield />
-      <Contact />
-      <Footer />
+      <div className="relative">
+        <Navbar />
+        <Heros />
+        <Services />
+        <Plans />
+        <Videosfield />
+        <Contact />
+        <Footer />
+      </div>
+
     </>
   )
 }

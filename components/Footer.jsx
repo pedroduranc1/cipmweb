@@ -2,8 +2,9 @@ import React from 'react'
 import Link from 'next/link'
 
 const Footer = () => {
+    const year = new Date(Date.now()).getFullYear();
     return (
-        <div className='bg-gray-200 w-full '>
+        <div className='bg-gray-200 w-full absolute bottom-0 left-0'>
             <div className="max-w-7xl mx-auto px-4  sm:px-6">
                 <div className="flex flex-col sm:flex-row  justify-between items-center py-6 md:justify-start md:space-x-10">
                     <div className="flex justify-start lg:w-0 lg:flex-1">
@@ -44,51 +45,24 @@ const Footer = () => {
                         </div>
 
                         <div className='grid grid-cols-4 place-items-center gap-4 mt-6 md:ml-6'>
-                            <img
-                                className="h-8 w-auto sm:h-7 hover:cursor-pointer"
-                                src="/ws.svg"
-                                alt=""
-                                layout='fill'
-                                onClick={() => {
-                                    window.location.href = "https://wa.link/jlznzn";
-                                }}
-                            ></img>
-
-                            <img
-                                className="h-8 w-auto sm:h-7 hover:cursor-pointer"
-                                src="/fb.svg"
-                                alt=""
-                                layout='fill'
-                                onClick={() => {
-                                    window.location.href = "https://www.facebook.com/olympusgroupmx";
-                                }}
-                            ></img>
-
-                            <img
-                                className="h-8 w-auto sm:h-7 hover:cursor-pointer"
-                                src="/tiktok.svg"
-                                alt=""
-                                layout='fill'
-                                onClick={() => {
-                                    window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
-                                }}
-                            ></img>
-
-                            <img
-                                className="h-8 w-auto sm:h-9 hover:cursor-pointer"
-                                src="/youtube.svg"
-                                alt=""
-                                layout='fill'
-                                onClick={() => {
-                                    window.location.href = "https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA";
-                                }}
-                            ></img>
+                            <a target="_blank" className="w-8 h-8 inline-block " href="https://wa.link/8ebgdv">
+                                <img src="/ws.svg" alt="" />
+                            </a>
+                            <a target="_blank" className="w-8 h-8 inline-block " href="https://www.facebook.com/Cursosdeinglesmty?mibextid=2JQ9oc">
+                                <img src="/fb.svg" alt="" />
+                            </a>
+                            <a target="_blank" className="w-8 h-8 inline-block " href="https://www.tiktok.com/@adrianlealcaldera?lang=en">
+                                <img src="/tiktok.svg" alt="" />
+                            </a>
+                            <a target="_blank" className="w-8 h-8 inline-block " href="https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA">
+                                <img src="/youtube.svg" alt="" />
+                            </a>
                         </div>
 
                     </div>
                 </div>
                 <div className='flex justify-center'>
-                    <h1 className='py-10 text-gray-900 font-semibold'>cursosdeinglespersonalizadosenmonterrey.com | Copyright 2022 ©</h1>
+                    <h1 className='py-10 text-gray-900 font-semibold'>cursosdeinglespersonalizadosenmonterrey.com | Copyright {year} ©</h1>
                 </div>
             </div>
         </div>
