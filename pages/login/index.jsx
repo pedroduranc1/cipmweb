@@ -11,8 +11,6 @@ import { useRouter } from 'next/router';
 
 const AuthCtrl = new Auth();
 
-import React from 'react'
-
 const index = () => {
     const { login } = useAuth();
     const router = useRouter();
