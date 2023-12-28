@@ -12,10 +12,12 @@ import { useAuth } from '../hooks/useAuth';
 const AuthCtrl = new Auth();
 
 const login = () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { login } = useAuth();
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const router = useRouter();
-  return (
-    <>
+    return (
+        <>
             <Head>
                 <title>Login - CIPM</title>
                 <link rel="icon" href="logo.svg" />
@@ -76,7 +78,7 @@ const login = () => {
 
             </div>
         </>
-  )
+    )
 }
 
 export default login
