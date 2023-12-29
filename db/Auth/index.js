@@ -18,7 +18,7 @@ export class Auth{
             // Handle Errors here.
             // console.error("Error code:", errorCode);
             // console.error("Error message:", errorMessage);
-            throw error;
+            return errorMessage
           }
     }
 }

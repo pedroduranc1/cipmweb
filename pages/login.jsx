@@ -9,6 +9,9 @@ import { useRouter } from 'next/router';
 import { Auth } from '../db/Auth';
 import { useAuth } from '../hooks/useAuth';
 
+import { useToast } from "../src/components/ui/use-toast"
+
+
 const AuthCtrl = new Auth();
 
 const login = () => {
@@ -16,6 +19,8 @@ const login = () => {
     const { login } = useAuth();
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const router = useRouter();
+
+    const { toast } = useToast()
     return (
         <>
             <Head>
@@ -46,10 +51,34 @@ const login = () => {
                             // same shape as initial values
                             const { email, password } = values
 
-                            //accessToken
-                            const { uid, accessToken } = await AuthCtrl.login(email, password);
-                            await login(accessToken, uid);
-                            router.push('/');
+                            const data = await AuthCtrl.login(email, password);
+
+                            if (typeof data === 'string' && data.startsWith("Firebase:")) {
+                                // Es un error de Firebase
+                                if(data == "Firebase: Error (auth/wrong-password)."){
+                                    toast({
+                                        variant: "destructive",
+                                        title: "Login Error",
+                                        description: "Contraseña Incorrecta",
+                                    })
+                                }
+
+                                if(data == "Firebase: Error (auth/user-not-found)."){
+                                    toast({
+                                        variant: "destructive",
+                                        title: "Login Error",
+                                        description: "Su correo no existe",
+                                    })
+                                }
+                                
+                            }
+                            else {
+                                const {accessToken, uid} = data;
+                                await login(accessToken, uid);
+                                router.push("/")
+                                console.log("login completo")
+                            }
+
                         }}
                     >
                         {({ errors, touched }) => (

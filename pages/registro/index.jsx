@@ -25,6 +25,7 @@ const index = () => {
                     <Formik
                         initialValues={{
                             name: '',
+                            lastName: "",
                             email: '',
                             password: '',
                         }}
@@ -40,11 +41,26 @@ const index = () => {
                     >
                         {({ errors, touched }) => (
                             <Form className="flex flex-col h-full p-4">
-                                <label className="font-bold text-gray-600" htmlFor="name">Nombre Completo</label>
-                                <Field className={`py-2 w-full ${errors.name && touched.name ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="name" />
-                                {errors.name && touched.name ? (
-                                    <div>{errors.name}</div>
-                                ) : null}
+
+                                <div className='flex space-x-3'>
+                                    <div>
+                                        <label className="font-bold text-gray-600" htmlFor="name">Nombre</label>
+                                        <Field className={`py-2 w-full ${errors.name && touched.name ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="name" />
+                                        {errors.name && touched.name ? (
+                                            <div>{errors.name}</div>
+                                        ) : null}
+                                    </div>
+
+                                    <div>
+                                        <label className="font-bold text-gray-600" htmlFor="lastName">Apellido</label>
+                                        <Field className={`py-2 w-full ${errors.lastName && touched.lastName ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="lastName" />
+                                        {errors.lastName && touched.lastName ? (
+                                            <div>{errors.lastName}</div>
+                                        ) : null}
+                                    </div>
+
+                                </div>
+
 
                                 <label className="font-bold text-gray-600" htmlFor="email">Correo</label>
                                 <Field className={`py-2 w-full ${errors.email && touched.email ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="email" />

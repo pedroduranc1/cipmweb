@@ -37,10 +37,22 @@ export function AuthProvider(props) {
 
     const login = async (token, uid) => {
         try {
+            let IsPremium = false;
             setLoading(true);
             tokenCtrl.setToken(token);
             const response = await UserCtrl.getMe(uid);
-            localStorage.setItem("ui", JSON.stringify(response));
+            const premiumresp = await UserCtrl.isPremium(uid);
+
+            if(premiumresp){
+                IsPremium = premiumresp.isPremium
+            }
+
+            let newData = {
+                ...response,
+                IsPremium
+            }
+
+            localStorage.setItem("ui", JSON.stringify(newData));
             const data = JSON.parse(localStorage.getItem('ui'));
             setUser(data);
             setLoading(false);

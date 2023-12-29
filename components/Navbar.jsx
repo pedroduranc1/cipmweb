@@ -47,12 +47,12 @@ const solutions = [
     href: '/login',
     icon: LogIn,
   },
-  {
-    name: 'Registrate',
-    description: 'Speak directly to your customers in a more meaningful way.',
-    href: '/registro',
-    icon: UserRoundPlus,
-  },
+  // {
+  //   name: 'Registrate',
+  //   description: 'Speak directly to your customers in a more meaningful way.',
+  //   href: '/registro',
+  //   icon: UserRoundPlus,
+  // },
 ]
 
 const solutionsLog = [
@@ -172,11 +172,11 @@ const Navbar = () => {
                     Login
                   </a>
                 </Link>
-                <Link href="/registro">
+                {/* <Link href="/registro">
                   <a className="whitespace-nowrap text-base font-medium ml-10 text-gray-500 hover:text-gray-900">
                     Registro
                   </a>
-                </Link>
+                </Link> */}
               </>) : (<>
                 <Link href="/cursos">
                   <a className="whitespace-nowrap text-base font-medium ml-10 text-gray-500 hover:text-gray-900">
