@@ -76,7 +76,6 @@ const login = () => {
                                 const {accessToken, uid} = data;
                                 await login(accessToken, uid);
                                 router.push("/")
-                                console.log("login completo")
                             }
 
                         }}

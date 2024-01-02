@@ -1,8 +1,8 @@
 import React from 'react'
 import Head from 'next/head'
 import Contact from '../../components/Contact'
-import Footer  from '../../components/Footer'
-import Navbar  from '../../components/Navbar'
+import Footer from '../../components/Footer'
+import Navbar from '../../components/Navbar'
 import Videofield from '../../minicomponents/Videofield'
 import videoslist from '../../db/videos'
 import { useRouter } from 'next/router'
@@ -10,7 +10,7 @@ import { useRouter } from 'next/router'
 
 export default function Videos() {
   const router = useRouter()
-  
+
   const { videos } = router.query
 
   let arr = videos?.replace('%20', ' ');
@@ -40,9 +40,12 @@ export default function Videos() {
         <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
       </Head>
       <Navbar />
-      <Videofield videoslist={videosarr.length !== 0 ? videosarr : videoslist} />
-      <Contact />
-      <Footer />
+      <div className='relative'>
+        <Videofield videoslist={videosarr.length !== 0 ? videosarr : videoslist} />
+        <Contact />
+        <Footer />
+      </div>
+
     </>
   )
 }
