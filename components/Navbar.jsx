@@ -199,7 +199,7 @@ const Navbar = () => {
             {/*  */}
 
             <div className="w-full h-full flex px-2 space-x-2">
-              <a target="_blank" className="w-8 h-8 inline-block " href="https://wa.link/8ebgdv">
+              <a target="_blank" className="w-8 h-8 inline-block " href="https://wa.link/fm0w6y">
                 <img src="/ws.svg" alt="" />
               </a>
               <a target="_blank" className="w-8 h-8 inline-block " href="https://www.facebook.com/Cursosdeinglesmty?mibextid=2JQ9oc">
@@ -307,7 +307,7 @@ const Navbar = () => {
                 </div>
 
                 <div className='grid place-items-center grid-cols-4 mt-6 gap-4'>
-                  <a target="_blank" className="w-8 h-8 inline-block " href="https://wa.link/8ebgdv">
+                  <a target="_blank" className="w-8 h-8 inline-block " href="https://wa.link/fm0w6y">
                     <img src="/ws.svg" alt="" />
                   </a>
                   <a target="_blank" className="w-8 h-8 inline-block " href="https://www.facebook.com/Cursosdeinglesmty?mibextid=2JQ9oc">
