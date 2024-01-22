@@ -43,6 +43,17 @@ export class Cursos {
     }
   }
 
+  async updateCurso(blogId, blogData) {
+    try {
+      const blogRef = doc(db, "cursos", blogId);
+      await updateDoc(blogRef, blogData);
+      return true;
+    } catch (error) {
+      console.error("Error updating blog: ", error);
+      return false;
+    }
+  }
+
   async uploadCursoImage(file, uid, slug) {
     // Obtén la extensión del archivo
     const fileExtension = file.name.split(".").pop();
@@ -146,6 +157,17 @@ export class Cursos {
       return true;
     } catch (error) {
       console.log(error);
+      return false;
+    }
+  }
+
+  async updateVideo(videoId, videoData) {
+    try {
+      const blogRef = doc(db, "videos", videoId);
+      await updateDoc(blogRef, videoData);
+      return true;
+    } catch (error) {
+      console.error("Error updating blog: ", error);
       return false;
     }
   }
