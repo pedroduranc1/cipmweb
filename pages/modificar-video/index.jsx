@@ -86,7 +86,7 @@ const CursoSelect = ({ cursoID }) => {
               <SelectContent>
                 <SelectGroup>
                   {
-                    DataVideosCurso?.map((curso) => (<SelectItem value={curso}>{curso.Titulo}</SelectItem>))
+                    DataVideosCurso?.map((curso) => (<SelectItem value={curso}>{curso.Titulo} - {curso.Descripcion}</SelectItem>))
                   }
                 </SelectGroup>
               </SelectContent>

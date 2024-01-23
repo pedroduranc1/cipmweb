@@ -4,6 +4,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  orderBy,
   query,
   setDoc,
   updateDoc,
@@ -108,12 +109,14 @@ export class Cursos {
       await deleteDoc(cursoRef);
 
       // Eliminar la información de la imagen (u otro archivo) relacionada con el blog en Storage
-      const storageImgRef = ref(storage, curso.ImgCurso); // blogImageRefPath debe ser la referencia al archivo en Storage
-      await deleteObject(storageImgRef);
+      if(curso.ImgUrl !== ""){
+        const storageImgRef = ref(storage, curso.ImgUrl); // blogImageRefPath debe ser la referencia al archivo en Storage
+        await deleteObject(storageImgRef);
+      }
 
       if (curso.videos && curso.videos.length > 0) {
         curso.videos.map(async (video) => {
-          //await this.deleteVideo(video);
+          await this.deleteVideo(video);
         });
       }
 
@@ -127,7 +130,7 @@ export class Cursos {
   async getVideosCurso(id) {
     const q = query(
       collection(db, "videos"), 
-      where("CursoID", "==", id), 
+      where("CursoID", "==", id),
     );
 
     const querySnapshot = await getDocs(q);
@@ -168,6 +171,25 @@ export class Cursos {
       return true;
     } catch (error) {
       console.error("Error updating blog: ", error);
+      return false;
+    }
+  }
+
+  async deleteVideo(video) {
+    try {
+      // Eliminar el documento del blog de la colección "blogs"
+      const cursoRef = doc(db, "videos", video.id);
+      await deleteDoc(cursoRef);
+
+      // Eliminar la información de la imagen (u otro archivo) relacionada con el blog en Storage
+      if(video.ImgUrl){
+        const storageImgRef = ref(storage, video.ImgUrl); // blogImageRefPath debe ser la referencia al archivo en Storage
+        await deleteObject(storageImgRef);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Error al eliminar el Video:", error);
       return false;
     }
   }

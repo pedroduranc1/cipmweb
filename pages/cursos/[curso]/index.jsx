@@ -9,13 +9,39 @@ import { Cursos } from "../../../db/Cursos";
 const cursoCtrl = new Cursos();
 
 const CursoPage = () => {
-
+    const [VideoFiltrados, setVideoFiltrados] = useState(null)
     const router = useRouter()
 
     const { curso: CursoID } = router.query
 
     const { data: CursosData, isLoading: IsLoadingCurso, isError: isErrorCurso } = useQuery(`${CursoID}`, () => cursoCtrl.getCurso(CursoID))
-    const { data: VideosData, isLoading: IsLoadingVideos, isError: isErrorVideos } = useQuery("Videos", ()=> cursoCtrl.getVideosCurso(CursoID));
+    const { data: VideosData, isLoading: IsLoadingVideos, isError: isErrorVideos } = useQuery("Videos", () => cursoCtrl.getVideosCurso(CursoID));
+
+    
+
+    function filtrarCursosPorFecha(cursos) {
+        // Ordenar los cursos por fecha de manera ascendente
+        const cursosOrdenados = cursos.sort((curso1, curso2) => {
+            const fecha1 = curso1.Fecha.toDate();
+            const fecha2 = curso2.Fecha.toDate();
+            return fecha1 - fecha2;
+        });
+
+        return cursosOrdenados;
+    }
+
+    useEffect(() => {
+        if (VideosData) {
+            // Uso: 
+            // Uso de la función
+            const cursosFiltrados = filtrarCursosPorFecha(VideosData);
+            setVideoFiltrados(cursosFiltrados);
+        }
+
+    }, [VideosData])
+
+
+
 
 
     return (
@@ -44,7 +70,7 @@ const CursoPage = () => {
 
             <div className='w-[80%] grid grid-cols-3 grid-flow-row gap-4 mx-auto'>
                 {
-                    VideosData?.map((video)=>(
+                    VideoFiltrados?.map((video) => (
                         <Cursocard slug={`/${CursoID}/video/${video.id}`} titulo={video.Titulo} descripcion={video.Descripcion} />
                     ))
                 }

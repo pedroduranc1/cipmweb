@@ -18,6 +18,7 @@ import * as Yup from "yup";
 import { useRouter } from 'next/router';
 import { uid } from 'uid';
 import { toast } from '../../src/components/ui/use-toast';
+import { Timestamp } from 'firebase/firestore';
 
 const cursoCtrl = new Cursos();
 const index = () => {
@@ -33,7 +34,7 @@ const index = () => {
     <>
       <Navbar />
 
-      <div className='w-[30%] h-fit mt-[5%] bg-white/90 overflow-hidden rounded-md shadow-md mx-auto'>
+      <div className='lg:w-[30%] md:w-[60%] w-[90%] h-fit mt-[5%] bg-white/90 overflow-hidden rounded-md shadow-md mx-auto'>
         <h2 className='text-2xl font-bold text-center text-gray-600 mt-2'>Agregar Videos al Curso</h2>
 
         <div className='w-full flex justify-center'>
@@ -69,7 +70,8 @@ const index = () => {
                 ImgUrl: ImgCurso
                 ? await cursoCtrl.uploadCursoImage(ImgCurso,Slug,Slug)
                 : "",
-                CursoID:CursoID
+                CursoID:CursoID,
+                Fecha: Timestamp.now()
               }
   
   
@@ -133,7 +135,7 @@ const index = () => {
                   }}
                 />
   
-                <button className="py-2 px-4 mt-5 bg-blue-500 rounded-md text-white hover:bg-blue-300 transition-colors " type="submit">Crear Curso</button>
+                <button className="py-2 px-4 mt-5 bg-blue-500 rounded-md text-white hover:bg-blue-300 transition-colors " type="submit">Agregar Video</button>
   
               </Form>
             )}
