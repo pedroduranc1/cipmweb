@@ -17,7 +17,7 @@ const CursoPage = () => {
     const { data: CursosData, isLoading: IsLoadingCurso, isError: isErrorCurso } = useQuery(`${CursoID}`, () => cursoCtrl.getCurso(CursoID))
     const { data: VideosData, isLoading: IsLoadingVideos, isError: isErrorVideos } = useQuery("Videos", () => cursoCtrl.getVideosCurso(CursoID));
 
-    
+    console.log(VideosData)
 
     function filtrarCursosPorFecha(cursos) {
         // Ordenar los cursos por fecha de manera ascendente

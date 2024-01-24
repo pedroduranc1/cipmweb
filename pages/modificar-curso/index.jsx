@@ -46,7 +46,7 @@ const index = () => {
         </div>
 
         {
-          CursoID && (<><CursoFormUpdate data={CursoID}/></>)
+          CursoID && (<><CursoFormUpdate data={CursoID} /></>)
         }
 
 
@@ -68,7 +68,8 @@ const CursoFormUpdate = ({ data }) => {
         id: data?.id || "",
         Titulo: data?.Titulo || "",
         Descripcion: data?.Descripcion || "",
-        ImgUrl: data.ImgUrl || ""
+        ImgUrl: data.ImgUrl || "",
+        precio: data?.precio || ""
       }}
       validationSchema={Yup.object({
         Titulo: Yup.string().required("Porfavor. Ingrese un Titulo"),
@@ -82,7 +83,7 @@ const CursoFormUpdate = ({ data }) => {
             : "",
         }
 
-        const result = await cursoCtrl.updateCurso(dataCurso.id,dataCurso)
+        const result = await cursoCtrl.updateCurso(dataCurso.id, dataCurso)
 
         if (result) {
           // El blog se creó correctamente
@@ -117,6 +118,15 @@ const CursoFormUpdate = ({ data }) => {
             type="text" />
           {errors.Descripcion && touched.Descripcion ? (
             <div>{errors.Descripcion}</div>
+          ) : null}
+
+          <label className="font-bold mt-3 text-gray-600" htmlFor="password">Precio</label>
+          <Field
+            className={`py-2 w-full ${errors.precio && touched.precio ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`}
+            name="precio"
+            type="number" />
+          {errors.precio && touched.precio ? (
+            <div>{errors.precio}</div>
           ) : null}
 
           <label className="font-bold mt-3 text-gray-600" htmlFor="password">Miniatura del Video</label>

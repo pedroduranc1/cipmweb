@@ -25,18 +25,20 @@ const index = () => {
         initialValues={{
           Titulo: '',
           Descripcion: '',
+          precio: null,
         }}
         validationSchema={Yup.object({
           Titulo: Yup.string().required("Porfavor. Ingrese un Titulo"),
-          Descripcion: Yup.string().required("Porfavor. Ingrese una Descripcion")
+          Descripcion: Yup.string().required("Porfavor. Ingrese una Descripcion"),
+          precio: Yup.number().required("Porfavor. agrega un precio para el curso")
         })}
         onSubmit={async (values) => {
           const Slug = uid(25);
           let dataCurso = {
             ...values,
             ImgUrl: ImgCurso
-            ? await cursoCtrl.uploadCursoImage(ImgCurso,Slug,Slug)
-            : "",
+              ? await cursoCtrl.uploadCursoImage(ImgCurso, Slug, Slug)
+              : "",
           }
 
           const result = await cursoCtrl.createCurso(Slug, dataCurso);
@@ -46,8 +48,8 @@ const index = () => {
             toast({
               title: "Curso Creado Exitosamente",
             });
-    
-            
+
+
             formik.resetForm();
 
             router.push("/cursos")
@@ -61,7 +63,7 @@ const index = () => {
             });
           }
 
-          console.log(Slug,dataCurso)
+          console.log(Slug, dataCurso)
 
 
         }}
@@ -83,15 +85,24 @@ const index = () => {
               <div>{errors.Descripcion}</div>
             ) : null}
 
+            <label className="font-bold mt-3 text-gray-600" htmlFor="password">Precio</label>
+            <Field
+              className={`py-2 w-full ${errors.precio && touched.precio ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`}
+              name="precio"
+              type="number" />
+            {errors.precio && touched.precio ? (
+              <div>{errors.precio}</div>
+            ) : null}
+
             <label className="font-bold mt-3 text-gray-600" htmlFor="password">Miniatura del Curso</label>
             <Field
               className={`py-2 w-full ${errors.Descripcion && touched.Descripcion ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`}
               name="imgCurso"
-              type="file" 
+              type="file"
               onChange={(event) => {
                 setImgCurso(event.currentTarget.files[0]);
               }}
-              />
+            />
 
             <button className="py-2 px-4 mt-5 bg-blue-500 rounded-md text-white hover:bg-blue-300 transition-colors " type="submit">Crear Curso</button>
 
