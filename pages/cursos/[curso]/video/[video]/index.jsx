@@ -14,20 +14,26 @@ const VideoPage = () => {
 
     const { video } = router.query
 
-    const {data:videoData,isLoading,isError} = useQuery(`${video}`,()=> cursoCtrl.getVideo(video))
+    const { data: videoData, isLoading, isError } = useQuery(`${video}`, () => cursoCtrl.getVideo(video))
 
     return (
         <>
             <Navbar />
 
             <div className='w-[80%] mx-auto'>
-            <button onClick={()=>{router.back()}}>Volver</button>
+                <button onClick={() => { router.back() }}>Volver</button>
 
             </div>
 
             <div className='w-[80%] flex  mx-auto'>
                 <div className='w-fit flex items-center  h-full md:h-[50vh]'>
-                    <ReactPlayer className="w-full h-full" controls url={videoData?.VideoUrl} />
+                    <ReactPlayer controls config={{
+                        file: {
+                            attributes: {
+                                controlsList: 'nodownload', // Esto desactiva el botón de descarga
+                            },
+                        },
+                    }} className="w-full h-full" playIcon={true} url={videoData?.VideoUrl} />
                 </div>
 
                 <div className='w-full md:w-1/2 h-full md:h-[50vh] flex flex-col md:py-[5%] md:px-10'>

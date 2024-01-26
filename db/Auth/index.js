@@ -1,6 +1,8 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
+import { User } from "../User";
 
+const userCtrl = new User();
 export class Auth{
     async login(email, password){
         try {
@@ -11,7 +13,17 @@ export class Auth{
             );
       
             const user = userCredentials.user;
-      
+
+            const ColecUserData = await userCtrl.getUser(user?.uid)
+
+            if(ColecUserData == "no existe user"){
+
+              let userData = {
+                email,
+              }
+              await userCtrl.createUserWeb(user?.uid,userData)
+            }
+
             return user;
           } catch (error) {
             const errorMessage = error.message;

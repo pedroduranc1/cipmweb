@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Navbar from "../../../components/Navbar";
 import Footer from '../../../components/Footer'
 import { useRouter } from 'next/router'
-import { Cursocard } from '../../../minicomponents/Cursocard'
+import { Cursocard } from "../../../minicomponents/cardVideo";
 import { useQuery } from 'react-query';
 import { Cursos } from "../../../db/Cursos";
 
@@ -17,7 +17,6 @@ const CursoPage = () => {
     const { data: CursosData, isLoading: IsLoadingCurso, isError: isErrorCurso } = useQuery(`${CursoID}`, () => cursoCtrl.getCurso(CursoID))
     const { data: VideosData, isLoading: IsLoadingVideos, isError: isErrorVideos } = useQuery("Videos", () => cursoCtrl.getVideosCurso(CursoID));
 
-    console.log(VideosData)
 
     function filtrarCursosPorFecha(cursos) {
         // Ordenar los cursos por fecha de manera ascendente
@@ -32,9 +31,8 @@ const CursoPage = () => {
 
     useEffect(() => {
         if (VideosData) {
-            // Uso: 
-            // Uso de la función
             const cursosFiltrados = filtrarCursosPorFecha(VideosData);
+            
             setVideoFiltrados(cursosFiltrados);
         }
 

@@ -109,7 +109,7 @@ export class Cursos {
       await deleteDoc(cursoRef);
 
       // Eliminar la información de la imagen (u otro archivo) relacionada con el blog en Storage
-      if(curso.ImgUrl !== ""){
+      if (curso.ImgUrl !== "") {
         const storageImgRef = ref(storage, curso.ImgUrl); // blogImageRefPath debe ser la referencia al archivo en Storage
         await deleteObject(storageImgRef);
       }
@@ -129,7 +129,7 @@ export class Cursos {
 
   async getVideosCurso(id) {
     const q = query(
-      collection(db, "videos"), 
+      collection(db, "videos"),
       where("CursoID", "==", id),
     );
 
@@ -182,14 +182,50 @@ export class Cursos {
       await deleteDoc(cursoRef);
 
       // Eliminar la información de la imagen (u otro archivo) relacionada con el blog en Storage
-      if(video.ImgUrl){
+      if (video.ImgUrl) {
         const storageImgRef = ref(storage, video.ImgUrl); // blogImageRefPath debe ser la referencia al archivo en Storage
         await deleteObject(storageImgRef);
       }
-      
+
       return true;
     } catch (error) {
       console.error("Error al eliminar el Video:", error);
+      return false;
+    }
+  }
+
+  async getCursosCliente(userID) {
+    try {
+      const docRef = doc(db, "cursosCliente", userID);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        return docSnap.data();
+      } 
+
+      if(!docSnap.exists()){
+        let cursoData = {
+          cursos:[]
+        };
+        const blogRef = doc(db, "cursosCliente", userID);
+        await setDoc(blogRef, cursoData);
+
+        return cursoData
+      }
+    } catch (error) {
+      console.log(error)
+      return "Error"
+    }
+
+  }
+
+  async activarCurso(userID, cursoData) {
+    try {
+      const blogRef = doc(db, "cursosCliente", userID);
+      await updateDoc(blogRef, cursoData);
+      return true;
+    } catch (error) {
+      console.error("Error updating blog: ", error);
       return false;
     }
   }

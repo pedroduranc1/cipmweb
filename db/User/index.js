@@ -45,39 +45,27 @@ export class User {
 
   }
 
-  async obtenerColecciones() {
-    try {
-      const coleccionesSnapshot = await listCollections(db)
+  async getUsers() {
+    const q = query(
+      collection(db, "users")
+    );
+    const dataSnapshot = await getDocs(q);
+    const newData = dataSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-      // Array para almacenar los nombres de todas las colecciones
-      const todasLasColecciones = [];
-
-      // Recorre las colecciones y agrega sus nombres al array
-      coleccionesSnapshot.forEach((coleccion) => {
-        todasLasColecciones.push(coleccion.id);
-      });
-
-      // Excluir dos colecciones específicas
-      const coleccionesExcluidas = ['cursos', 'videos'];
-      const coleccionesFiltradas = todasLasColecciones.filter(
-        (coleccion) => !coleccionesExcluidas.includes(coleccion)
-      );
-
-      console.log('Todas las colecciones:', todasLasColecciones);
-      console.log('Colecciones filtradas:', coleccionesFiltradas);
-    } catch (error) {
-      console.error('Error al obtener colecciones:', error);
-    }
+    return newData;
   }
 
-  async obteColecciones() {
-    const q = query(db);
-
-    const snapshot = await getDocs(q);
-
-    const collections = snapshot.docs.map(doc => doc.id);
-
-    console.log(collections)
-    return collections
+  async createUserWeb(uid, cursoData) {
+    try {
+      const blogRef = doc(db, "users", uid);
+      await setDoc(blogRef, cursoData);
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   }
 }
