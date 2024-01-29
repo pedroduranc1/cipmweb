@@ -28,6 +28,21 @@ export class User {
     }
   }
 
+  async getUser(uid) {
+    try {
+      // Comprobar si el usuario existe en la colección 'users'
+      let userData;
+      const userRef = doc(db, "users", uid);
+      const userSnap = await getDoc(userRef);
+
+      userData = { ...userSnap.data(), uid };
+      // Devolver los datos del usuario
+      return userData;
+    } catch (error) {
+      throw `Error de firebase : ${error}`;
+    }
+  }
+
   async isPremium(uid) {
 
     let isPremium = false;

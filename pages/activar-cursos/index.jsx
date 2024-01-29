@@ -19,20 +19,49 @@ const index = () => {
     const router = useRouter()
 
     const { data: CursosData, isLoading: isLoaCursos, isError: isErrCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
-    const { data: CursosCliente, isLoading: IsloaCC, isError: IsErrCC } = useQuery("clientes", () => userCtrl.getUsers())
+    const { data: Clientes, isLoading: IsloaCC, isError: IsErrCC } = useQuery("clientes", () => userCtrl.getUsers())
 
 
     const handleSubmit = async () => {
-        let cursos = []
-        cursos.push(CursoID)
-        await cursoCtrl.activarCurso(UserID, {
-            cursos
-        })
+        const CursosCliente = await cursoCtrl.getCursosCliente(UserID)
+        const cursos = []
 
-        router.push("/")
-        toast({
-            title: "Curso activado",
-        })
+        if (CursosCliente.cursos.length === 0) {
+            cursos.push(CursoID)
+
+            await cursoCtrl.activarCurso(UserID, {
+                cursos
+            })
+    
+            router.push("/")
+            toast({
+                title: "Curso activado",
+            })
+        }
+
+        if (CursosCliente.cursos.includes(CursoID)) {
+            toast({
+                title: "Este Cliente ya posee el curso",
+            })
+        }
+
+        if (!CursosCliente.cursos.includes(CursoID)) {
+            cursos = [
+                ...CursosCliente.cursos,
+                CursoID
+            ]
+
+            await cursoCtrl.activarCurso(UserID, {
+                cursos
+            })
+    
+            router.push("/")
+            toast({
+                title: "Curso activado",
+            })
+        }
+
+        
 
     }
 
@@ -53,7 +82,7 @@ const index = () => {
                         <SelectContent>
                             <SelectGroup>
                                 {
-                                    CursosCliente?.map((curso) => (<SelectItem value={curso.id}>{curso.email}</SelectItem>))
+                                    Clientes?.map((curso) => (<SelectItem value={curso.id}>{curso.email}</SelectItem>))
                                 }
                             </SelectGroup>
                         </SelectContent>
