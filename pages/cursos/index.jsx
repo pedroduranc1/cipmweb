@@ -59,7 +59,7 @@ const index = () => {
           {
             isLoading ? (<>Cargando Cursos..</>) : (<>
               {
-                CursosData?.map(curso=>(<Cursocard slug={curso.id} titulo={curso.Titulo} descripcion={curso.Descripcion} precio={curso.precio} />))
+                CursosData?.map(curso=>(<Cursocard slug={curso.id} img={curso.ImgUrl} titulo={curso.Titulo} descripcion={curso.Descripcion} precio={curso.precio} />))
               }
             </>)
           }

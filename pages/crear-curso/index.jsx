@@ -7,6 +7,7 @@ import { Cursos } from "../../db/Cursos";
 import { uid } from 'uid';
 import { toast } from "../../src/components/ui/use-toast";
 import { useRouter } from 'next/router';
+import { Loader2 } from 'lucide-react';
 
 const cursoCtrl = new Cursos();
 const index = () => {
@@ -62,13 +63,9 @@ const index = () => {
                 "algo paso al monento de registrar los datos suministrados.",
             });
           }
-
-          console.log(Slug, dataCurso)
-
-
         }}
       >
-        {({ errors, touched }) => (
+        {({ errors, touched,isSubmitting,isValid }) => (
           <Form className="flex flex-col lg:w-[30%] md:w-[60%] w-[90%] mt-10 mx-auto bg-white/70 p-5 shadow-md h-full ">
             <label className="font-bold text-gray-600" htmlFor="Titulo">Titulo</label>
             <Field className={`py-2 w-full ${errors.Titulo && touched.Titulo ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="Titulo" />
@@ -104,7 +101,11 @@ const index = () => {
               }}
             />
 
-            <button className="py-2 px-4 mt-5 bg-blue-500 rounded-md text-white hover:bg-blue-300 transition-colors " type="submit">Crear Curso</button>
+            <button 
+            disabled={isValid || isSubmitting ? false : true} 
+            className="py-2 px-4 mt-5 disabled:opacity-20 transition-colors bg-blue-500 
+            rounded-md text-white hover:bg-blue-300 " 
+            type="submit">{isSubmitting ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin'/></div> : "Crear Curso"}</button>
 
           </Form>
         )}

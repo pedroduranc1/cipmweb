@@ -8,6 +8,7 @@ import { User } from '../../db/User'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../../src/components/ui/select';
 import { useRouter } from 'next/router';
 import { toast } from '../../src/components/ui/use-toast';
+import { Loader2 } from 'lucide-react';
 
 const cursoCtrl = new Cursos();
 const userCtrl = new User();
@@ -15,6 +16,7 @@ const index = () => {
     const { User } = useAuth()
     const [CursoID, setCursoID] = useState(null)
     const [UserID, setUserID] = useState(null)
+    const [IsLoading, setIsLoading] = useState(false)
 
     const router = useRouter()
 
@@ -23,6 +25,7 @@ const index = () => {
 
 
     const handleSubmit = async () => {
+        setIsLoading(true)
         const CursosCliente = await cursoCtrl.getCursosCliente(UserID)
         const cursos = []
 
@@ -32,6 +35,7 @@ const index = () => {
             await cursoCtrl.activarCurso(UserID, {
                 cursos
             })
+            setIsLoading(false)
     
             router.push("/")
             toast({
@@ -40,6 +44,7 @@ const index = () => {
         }
 
         if (CursosCliente.cursos.includes(CursoID)) {
+            setIsLoading(false)
             toast({
                 title: "Este Cliente ya posee el curso",
             })
@@ -54,6 +59,8 @@ const index = () => {
             await cursoCtrl.activarCurso(UserID, {
                 cursos
             })
+
+            setIsLoading(false)
     
             router.push("/")
             toast({
@@ -104,7 +111,13 @@ const index = () => {
                     </Select>
                 </div>
                 <div className='flex justify-center'>
-                    <button onClick={handleSubmit} disabled={CursoID && UserID ? false : true} className='w-[80%] disabled:opacity-50 hover:bg-blue-300 transition-colors mx-auto py-2 mb-[5%] text-white bg-blue-500 rounded-md'>Activar Curso</button>
+                    <button onClick={handleSubmit} 
+                    disabled={CursoID && UserID || IsLoading ? false : true} 
+                    className='w-[80%] disabled:opacity-50 hover:bg-blue-300 
+                    transition-colors mx-auto py-2 mb-[5%] text-white bg-blue-500 rounded-md'>
+                        {IsLoading ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin'/></div> : "Activar Curso"}
+                        
+                    </button>
                 </div>
             </div>
 

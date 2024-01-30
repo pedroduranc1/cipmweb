@@ -7,6 +7,7 @@ import { Cursos } from '../../db/Cursos'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import { toast } from '../../src/components/ui/use-toast'
+import { Loader2 } from 'lucide-react'
 
 const cursoCtrl = new Cursos();
 const index = () => {
@@ -64,7 +65,17 @@ const index = () => {
         </div>
 
         {
-          CursoID && (<form onSubmit={formik.handleSubmit} className='w-full flex justify-center mb-5'><button type='submit' className='w-[80%] mx-auto py-2 rounded-md bg-red-500 text-white'>Eliminar Curso</button></form>)
+          CursoID &&
+          (<form
+            onSubmit={formik.handleSubmit}
+            className='w-full flex justify-center mb-5'>
+            
+            <button
+              disabled={formik.isValid || formik.isSubmitting ? false : true}
+              className="py-2 px-4 mt-5 disabled:opacity-20 transition-colors bg-red-500 
+            rounded-md text-white hover:bg-red-300 "
+              type="submit">{formik.isSubmitting ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Eliminar Curso"}</button>
+          </form>)
         }
 
 

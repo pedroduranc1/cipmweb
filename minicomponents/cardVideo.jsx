@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Link from "next/link";
 
-export const Cursocard = ({ titulo, descripcion, slug, precio }) => {
+export const Cursocard = ({ titulo, descripcion, slug, img, imgSecond }) => {
+
+
     return (
         <Link href={`/cursos/${slug}`}>
             <a className=' grid grid-cols-1 overflow-hidden rounded-md cursor-pointer h-[260px] shadow-md'>
                 <div className=' h-[60%]'>
-                    <img src='/imgvideo.svg' alt="curso img" className='w-full h-full' />
+                    <img src={img ? img : imgSecond} alt="curso img" className='w-full h-full' />
                 </div>
 
                 <div className='px-4  py-4'>

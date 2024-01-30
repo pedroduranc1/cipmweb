@@ -64,7 +64,7 @@ export class Cursos {
 
     const fileRef = ref(
       storage,
-      `${uid}/cursoImages/${slug}/${firebaseFileName}`
+      `/cursoImages/${slug}/${firebaseFileName}`
     );
     const uploadTask = uploadBytesResumable(fileRef, file);
 

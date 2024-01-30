@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { Cursos } from '../../db/Cursos';
@@ -16,6 +16,7 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from "yup";
 import { useRouter } from 'next/router';
 import { toast } from '../../src/components/ui/use-toast';
+import { Loader2 } from 'lucide-react';
 
 const cursoCtrl = new Cursos();
 const index = () => {
@@ -63,12 +64,35 @@ const index = () => {
 
 const CursoSelect = ({ cursoID }) => {
   const [VideoData, setVideoData] = useState(null)
+  const [VideosFiltados, setVideosFiltados] = useState(null)
   const { data: DataVideosCurso } = useQuery(`${cursoID}`, () => cursoCtrl.getVideosCurso(cursoID))
+
+  function filtrarCursosPorFecha(cursos) {
+    // Ordenar los cursos por fecha de manera ascendente
+    const cursosOrdenados = cursos.sort((curso1, curso2) => {
+      const fecha1 = curso1.Fecha.toDate();
+      const fecha2 = curso2.Fecha.toDate();
+      return fecha1 - fecha2;
+    });
+
+    return cursosOrdenados;
+  }
+
+  useEffect(() => {
+    if (DataVideosCurso) {
+      const cursosFiltrados = filtrarCursosPorFecha(DataVideosCurso);
+
+      setVideosFiltados(cursosFiltrados);
+    }
+
+  }, [DataVideosCurso])
 
 
   const handleVideoData = (data) => {
     setVideoData(data)
   }
+
+  console.log(VideosFiltados)
 
 
   return (
@@ -86,7 +110,7 @@ const CursoSelect = ({ cursoID }) => {
               <SelectContent>
                 <SelectGroup>
                   {
-                    DataVideosCurso?.map((curso) => (<SelectItem value={curso}>{curso.Titulo} - {curso.Descripcion}</SelectItem>))
+                    VideosFiltados?.map((curso) => (<SelectItem value={curso}>{curso.Titulo} - {curso.Descripcion}</SelectItem>))
                   }
                 </SelectGroup>
               </SelectContent>
@@ -112,21 +136,22 @@ const VideoFormUpdate = ({ data }) => {
         Descripcion: data?.Descripcion || "",
         CursoID: data?.CursoID || "",
         VideoUrl: data?.VideoUrl || "",
-        ImgUrl: data.ImgUrl || ""
+        ImgUrl: data?.ImgUrl || ""
       }}
       validationSchema={Yup.object({
         Titulo: Yup.string().required("Porfavor. Ingrese un Titulo"),
-        Descripcion: Yup.string().required("Porfavor. Ingrese una Descripcion")
+        Descripcion: Yup.string().required("Porfavor. Ingrese una Descripcion"),
       })}
       onSubmit={async (values) => {
+        let imagenPrev = data?.ImgUrl ? data?.ImgUrl : ""
         let dataCurso = {
           ...values,
           ImgUrl: ImgCurso
-          ? await cursoCtrl.uploadCursoImage(ImgCurso,values.id,values.id)
-          : "",
+            ? await cursoCtrl.uploadCursoImage(ImgCurso, values.id, values.id)
+            : imagenPrev,
         }
 
-        const result = await cursoCtrl.updateVideo(dataCurso.id,dataCurso)
+        const result = await cursoCtrl.updateVideo(dataCurso.id, dataCurso)
 
         if (result) {
           // El blog se creó correctamente
@@ -146,7 +171,7 @@ const VideoFormUpdate = ({ data }) => {
         }
       }}
     >
-      {({ errors, touched }) => (
+      {({ errors, touched, isSubmitting, isValid }) => (
         <Form className="flex flex-col w-full mt-3 bg-white/70 p-5 shadow-md h-full ">
           <label className="font-bold text-gray-600" htmlFor="Titulo">Titulo</label>
           <Field className={`py-2 w-full ${errors.Titulo && touched.Titulo ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="Titulo" />
@@ -181,9 +206,12 @@ const VideoFormUpdate = ({ data }) => {
               setImgCurso(event.currentTarget.files[0]);
             }}
           />
-
-          <button className="py-2 px-4 mt-5 bg-blue-500 rounded-md text-white hover:bg-blue-300 transition-colors " type="submit">Modificar Video</button>
-
+          
+          <button
+            disabled={isValid || isSubmitting ? false : true}
+            className="py-2 px-4 mt-5 disabled:opacity-20 transition-colors bg-blue-500 
+            rounded-md text-white hover:bg-blue-300 "
+            type="submit">{isSubmitting ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Modificar Video"}</button>
         </Form>
       )}
     </Formik>

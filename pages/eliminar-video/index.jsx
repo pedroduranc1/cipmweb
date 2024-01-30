@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { useFormik } from 'formik';
 import { toast } from '../../src/components/ui/use-toast';
 import { useRouter } from 'next/router';
+import { Loader2 } from 'lucide-react';
 
 const cursoCtrl = new Cursos();
 const index = () => {
@@ -38,7 +39,7 @@ const index = () => {
         </div>
 
         {
-          CursoID && (<><CursoSelect cursoID={CursoID}/></>)
+          CursoID && (<><CursoSelect cursoID={CursoID} /></>)
         }
 
 
@@ -63,28 +64,28 @@ const CursoSelect = ({ cursoID }) => {
   const router = useRouter();
 
   const formik = useFormik({
-    initialValues:{},
-    validateOnChange:false,
+    initialValues: {},
+    validateOnChange: false,
     onSubmit: async () => {
 
       const result = await cursoCtrl.deleteVideo(VideoData)
 
-        if (result) {
-          // El blog se creó correctamente
-          toast({
-            title: "Video Eliminado Exitosamente",
-          });
+      if (result) {
+        // El blog se creó correctamente
+        toast({
+          title: "Video Eliminado Exitosamente",
+        });
 
-          router.push("/cursos")
-        } else {
-          // Hubo un error al crear el blog
-          toast({
-            variant: "destructive",
-            title: "Ocurrio un error al Eliminar el Video",
-            description:
-              "algo paso al monento de registrar los datos suministrados.",
-          });
-        }
+        router.push("/cursos")
+      } else {
+        // Hubo un error al crear el blog
+        toast({
+          variant: "destructive",
+          title: "Ocurrio un error al Eliminar el Video",
+          description:
+            "algo paso al monento de registrar los datos suministrados.",
+        });
+      }
     }
   })
 
@@ -109,11 +110,20 @@ const CursoSelect = ({ cursoID }) => {
               </SelectContent>
             </Select>
           </div>
-          
+
           {
-            VideoData && (<form onSubmit={formik.handleSubmit} className='w-full flex justify-center mb-5'><button type='submit' className='w-[80%] mx-auto py-2 rounded-md bg-red-500 text-white'>Eliminar Video</button></form>)
+            VideoData && (
+              <form
+                onSubmit={formik.handleSubmit}
+                className='w-full flex justify-center mb-5'>
+                <button
+                  disabled={formik.isValid || formik.isSubmitting ? false : true}
+                  className="py-2 px-4 mt-5 disabled:opacity-20 transition-colors bg-red-500 
+            rounded-md text-white hover:bg-red-300 "
+                  type="submit">{formik.isSubmitting ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Eliminar Video"}</button>
+              </form>)
           }
-          
+
         </>)
       }
 

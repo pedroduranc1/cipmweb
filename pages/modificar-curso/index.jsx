@@ -16,6 +16,7 @@ import { useRouter } from 'next/router';
 import { Field, Form, Formik } from 'formik';
 import { toast } from '../../src/components/ui/use-toast';
 import * as Yup from "yup";
+import { Loader2 } from 'lucide-react';
 
 const cursoCtrl = new Cursos();
 const index = () => {
@@ -68,19 +69,21 @@ const CursoFormUpdate = ({ data }) => {
         id: data?.id || "",
         Titulo: data?.Titulo || "",
         Descripcion: data?.Descripcion || "",
-        ImgUrl: data.ImgUrl || "",
-        precio: data?.precio || ""
+        ImgUrl: data?.ImgUrl || "",
+        precio: data?.precio || null
       }}
       validationSchema={Yup.object({
         Titulo: Yup.string().required("Porfavor. Ingrese un Titulo"),
-        Descripcion: Yup.string().required("Porfavor. Ingrese una Descripcion")
+        Descripcion: Yup.string().required("Porfavor. Ingrese una Descripcion"),
+        precio : Yup.number().moreThan(0, 'El número debe ser mayor que 0').required()
       })}
       onSubmit={async (values) => {
+        let imagenPrev = data?.ImgUrl ? data?.ImgUrl : ""
         let dataCurso = {
           ...values,
           ImgUrl: ImgCurso
             ? await cursoCtrl.uploadCursoImage(ImgCurso, values.id, values.id)
-            : "",
+            : imagenPrev,
         }
 
         const result = await cursoCtrl.updateCurso(dataCurso.id, dataCurso)
@@ -103,7 +106,7 @@ const CursoFormUpdate = ({ data }) => {
         }
       }}
     >
-      {({ errors, touched }) => (
+      {({ errors, touched, isSubmitting, isValid }) => (
         <Form className="flex flex-col w-full mt-3 bg-white/70 p-5 shadow-md h-full ">
           <label className="font-bold text-gray-600" htmlFor="Titulo">Titulo</label>
           <Field className={`py-2 w-full ${errors.Titulo && touched.Titulo ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="Titulo" />
@@ -139,8 +142,11 @@ const CursoFormUpdate = ({ data }) => {
             }}
           />
 
-          <button className="py-2 px-4 mt-5 bg-blue-500 rounded-md text-white hover:bg-blue-300 transition-colors " type="submit">Modificar Curso</button>
-
+          <button
+            disabled={isValid || isSubmitting ? false : true}
+            className="py-2 px-4 mt-5 disabled:opacity-20 transition-colors bg-blue-500 
+            rounded-md text-white hover:bg-blue-300 "
+            type="submit">{isSubmitting ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Modificar Curso"}</button>
         </Form>
       )}
     </Formik>

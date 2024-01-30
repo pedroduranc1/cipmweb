@@ -19,6 +19,7 @@ import { useRouter } from 'next/router';
 import { uid } from 'uid';
 import { toast } from '../../src/components/ui/use-toast';
 import { Timestamp } from 'firebase/firestore';
+import { Loader2 } from 'lucide-react';
 
 const cursoCtrl = new Cursos();
 const index = () => {
@@ -68,24 +69,24 @@ const index = () => {
               let dataCurso = {
                 ...values,
                 ImgUrl: ImgCurso
-                ? await cursoCtrl.uploadCursoImage(ImgCurso,Slug,Slug)
-                : "",
-                CursoID:CursoID,
+                  ? await cursoCtrl.uploadCursoImage(ImgCurso, Slug, Slug)
+                  : "",
+                CursoID: CursoID,
                 Fecha: Timestamp.now()
               }
-  
-  
+
+
               const result = await cursoCtrl.createVideoCurso(Slug, dataCurso);
-  
+
               if (result) {
                 // El blog se creó correctamente
                 toast({
                   title: "Video Agregado Exitosamente",
                 });
-  
-  
+
+
                 formik.resetForm();
-  
+
                 router.push("/cursos")
               } else {
                 // Hubo un error al crear el blog
@@ -96,17 +97,17 @@ const index = () => {
                     "algo paso al monento de registrar los datos suministrados.",
                 });
               }
-  
+
             }}
           >
-            {({ errors, touched }) => (
+            {({ errors, touched, isValid, isSubmitting }) => (
               <Form className="flex flex-col w-full mt-3 bg-white/70 p-5 shadow-md h-full ">
                 <label className="font-bold text-gray-600" htmlFor="Titulo">Titulo</label>
                 <Field className={`py-2 w-full ${errors.Titulo && touched.Titulo ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="Titulo" />
                 {errors.Titulo && touched.Titulo ? (
                   <div>{errors.Titulo}</div>
                 ) : null}
-  
+
                 <label className="font-bold mt-3 text-gray-600" htmlFor="password">Descripcion</label>
                 <Field
                   className={`py-2 w-full ${errors.Descripcion && touched.Descripcion ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`}
@@ -115,7 +116,7 @@ const index = () => {
                 {errors.Descripcion && touched.Descripcion ? (
                   <div>{errors.Descripcion}</div>
                 ) : null}
-  
+
                 <label className="font-bold mt-3 text-gray-600" htmlFor="VideoUrl">Url del Video</label>
                 <Field
                   className={`py-2 w-full ${errors.VideoUrl && touched.VideoUrl ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`}
@@ -124,24 +125,27 @@ const index = () => {
                 {errors.VideoUrl && touched.VideoUrl ? (
                   <div>{errors.VideoUrl}</div>
                 ) : null}
-  
+
                 <label className="font-bold mt-3 text-gray-600" htmlFor="password">Miniatura del Video</label>
                 <Field
-                  className={`py-2 w-full ${errors.Descripcion && touched.Descripcion ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`}
+                  className={`py-2 w-full  border-2 px-2 rounded-md outline-none focus:border-gray-400`}
                   name="imgCurso"
                   type="file"
                   onChange={(event) => {
                     setImgCurso(event.currentTarget.files[0]);
                   }}
                 />
-  
-                <button className="py-2 px-4 mt-5 bg-blue-500 rounded-md text-white hover:bg-blue-300 transition-colors " type="submit">Agregar Video</button>
-  
+
+                <button
+                  disabled={isValid || isSubmitting ? false : true}
+                  className="py-2 px-4 mt-5 disabled:opacity-20 transition-colors bg-blue-500 
+            rounded-md text-white hover:bg-blue-300 "
+                  type="submit">{isSubmitting ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Agregar Video"}</button>
               </Form>
             )}
           </Formik>)
-        }        
-        
+        }
+
 
       </div>
 

@@ -5,7 +5,7 @@ import { useQuery } from 'react-query';
 import { Cursos } from "../db/Cursos";
 
 const cursoCtrl = new Cursos();
-export const Cursocard = ({ titulo, descripcion, slug, precio }) => {
+export const Cursocard = ({ titulo, descripcion, slug, precio,img }) => {
     const { User } = useAuth();
     const [active, setactive] = useState(false)
 
@@ -13,7 +13,6 @@ export const Cursocard = ({ titulo, descripcion, slug, precio }) => {
 
     useEffect(() => {
         if (userCursosData?.cursos?.includes(slug)) {
-            console.log('paso')
             setactive(true)
         }
     }, [userCursosData])
@@ -27,7 +26,7 @@ export const Cursocard = ({ titulo, descripcion, slug, precio }) => {
                         <Link href={`/cursos/${slug}`}>
                             <div className='flex flex-col relative justify-start overflow-hidden rounded-md cursor-pointer h-full shadow-md'>
                                 <div className='h-[30%]'>
-                                    <img src='/imgvideo.svg' alt="curso img" className='w-full h-full' />
+                                    <img src={img ? img : '/imgvideo.svg'} alt="curso img" className='w-full h-full' />
                                 </div>
 
                                 <div className='px-4  py-4' >
@@ -48,7 +47,7 @@ export const Cursocard = ({ titulo, descripcion, slug, precio }) => {
 
                             <div className='flex flex-col overflow-hidden rounded-md cursor-pointer h-full shadow-md'>
                                 <div className='h-[30%]'>
-                                    <img src='/imgvideo.svg' alt="curso img" className='w-full h-full' />
+                                    <img src={img ? img : '/imgvideo.svg'} alt="curso img" className='w-full h-full' />
                                 </div>
 
                                 <div className='px-4  py-4'>
