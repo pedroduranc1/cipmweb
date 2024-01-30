@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useQuery } from 'react-query';
 import { Cursos } from "../db/Cursos";
 
+
 const cursoCtrl = new Cursos();
 export const Cursocard = ({ titulo, descripcion, slug, precio,img }) => {
     const { User } = useAuth();
@@ -17,6 +18,7 @@ export const Cursocard = ({ titulo, descripcion, slug, precio,img }) => {
         }
     }, [userCursosData])
 
+    console.log(img)
 
     return (
         <>
@@ -26,7 +28,7 @@ export const Cursocard = ({ titulo, descripcion, slug, precio,img }) => {
                         <Link href={`/cursos/${slug}`}>
                             <div className='flex flex-col relative justify-start overflow-hidden rounded-md cursor-pointer h-full shadow-md'>
                                 <div className='h-[30%]'>
-                                    <img src={img ? img : '/imgvideo.svg'} alt="curso img" className='w-full h-full' />
+                                    <img src={img ? img : '/miniaturavideo.svg'} alt="curso img" className='w-full h-full' />
                                 </div>
 
                                 <div className='px-4  py-4' >
@@ -47,7 +49,7 @@ export const Cursocard = ({ titulo, descripcion, slug, precio,img }) => {
 
                             <div className='flex flex-col overflow-hidden rounded-md cursor-pointer h-full shadow-md'>
                                 <div className='h-[30%]'>
-                                    <img src={img ? img : '/imgvideo.svg'} alt="curso img" className='w-full h-full' />
+                                    <img src={img ? img : '/miniaturavideo.svg'} alt="curso img" className='w-full h-full' />
                                 </div>
 
                                 <div className='px-4  py-4'>

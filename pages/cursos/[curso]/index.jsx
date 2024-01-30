@@ -52,7 +52,7 @@ const CursoPage = () => {
 
             <div className='w-[80%] mx-auto flex md:flex-row flex-col'>
                 <div className='w-full md:w-1/2 h-full md:h-[50vh] '>
-                    <img src={CursosData?.ImgUrl ? CursosData?.ImgUrl : "/imgvideo.svg"} className='w-full h-full' alt="" />
+                    <img src={CursosData?.ImgUrl ? CursosData?.ImgUrl : '/miniaturavideo.svg'} className='w-full h-full' alt="" />
                 </div>
                 <div className='w-full md:w-1/2 h-full md:h-[50vh] flex flex-col md:py-[5%] md:px-10'>
                     <h3 className='text-gray-600 mt-5 md:mt-0 text-2xl'>{CursosData?.Titulo}</h3>
@@ -69,7 +69,7 @@ const CursoPage = () => {
             <div className='w-[80%] grid grid-cols-3 grid-flow-row gap-4 mx-auto'>
                 {
                     VideoFiltrados?.map((video) => (
-                        <Cursocard slug={`/${CursoID}/video/${video.id}`} img={video.ImgUrl} imgSecond={CursosData?.ImgUrl ? CursosData?.ImgUrl : "/imgvideo.svg"} titulo={video.Titulo} descripcion={video.Descripcion} />
+                        <Cursocard slug={`/${CursoID}/video/${video.id}`} img={video.ImgUrl} imgSecond={CursosData?.ImgUrl ? CursosData?.ImgUrl : "/miniaturavideo.svg"} titulo={video.Titulo} descripcion={video.Descripcion} />
                     ))
                 }
             </div>
