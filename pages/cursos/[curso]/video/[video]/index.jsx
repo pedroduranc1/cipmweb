@@ -1,16 +1,23 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Navbar from '../../../../../components/Navbar'
 import Footer from '../../../../../components/Footer'
 import { useRouter } from 'next/router'
 
 import ReactPlayer from 'react-player'
-import Link from 'next/link'
 import { useQuery } from 'react-query'
 import { Cursos } from "../../../../../db/Cursos";
 
 const cursoCtrl = new Cursos();
 const VideoPage = () => {
+    const {User} = useRouter()
     const router = useRouter()
+
+    useEffect(() => {
+      if(!User){
+        router.push("/")
+      }
+    }, [User])
+    
 
     const { video } = router.query
 

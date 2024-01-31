@@ -9,7 +9,8 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { auth, db } from "../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 
 export class User {
@@ -31,15 +32,19 @@ export class User {
   async getUser(uid) {
     try {
       // Comprobar si el usuario existe en la colección 'users'
-      let userData;
       const userRef = doc(db, "users", uid);
       const userSnap = await getDoc(userRef);
-
-      userData = { ...userSnap.data(), uid };
-      // Devolver los datos del usuario
-      return userData;
+  
+      if (userSnap.exists()) {
+        // El usuario existe, devolver sus datos
+        const userData = { ...userSnap.data(), uid };
+        return userData;
+      } else {
+        // El usuario no existe, devolver mensaje indicando que no existe
+        return "No existe usuario";
+      }
     } catch (error) {
-      throw `Error de firebase : ${error}`;
+      throw `Error de Firebase: ${error}`;
     }
   }
 
@@ -81,6 +86,43 @@ export class User {
     } catch (error) {
       console.log(error);
       return false;
+    }
+  }
+
+  async createUser(userData) {
+    try {
+      const { email, password } = userData;
+      //crea el email y password en firebase auth
+      const userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      const { uid } = userCredentials.user;
+
+      let UserWebData = {
+        email: userData.email,
+      };
+
+      let UserAppData = {
+        nombre: userData?.nombre,
+        apellido: userData?.apellido,
+        email: userData?.email
+      }
+
+      const userDocRef = doc(db, "users", uid);
+      await setDoc(userDocRef, UserWebData);
+
+      const userAppDocRef = doc(db,uid,"EstudentsInfo")
+
+      await setDoc(userAppDocRef,UserAppData)
+
+      return true;
+    } catch (error) {
+      console.log(error.message)
+
+      return error.message;
     }
   }
 }

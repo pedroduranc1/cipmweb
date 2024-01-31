@@ -18,7 +18,6 @@ export const Cursocard = ({ titulo, descripcion, slug, precio,img }) => {
         }
     }, [userCursosData])
 
-    console.log(img)
 
     return (
         <>

@@ -10,6 +10,7 @@ import { Auth } from '../db/Auth';
 import { useAuth } from '../hooks/useAuth';
 
 import { useToast } from "../src/components/ui/use-toast"
+import { Loader2 } from 'lucide-react';
 
 
 const AuthCtrl = new Auth();
@@ -55,7 +56,7 @@ const login = () => {
 
                             if (typeof data === 'string' && data.startsWith("Firebase:")) {
                                 // Es un error de Firebase
-                                if(data == "Firebase: Error (auth/wrong-password)."){
+                                if (data == "Firebase: Error (auth/wrong-password).") {
                                     toast({
                                         variant: "destructive",
                                         title: "Login Error",
@@ -63,24 +64,24 @@ const login = () => {
                                     })
                                 }
 
-                                if(data == "Firebase: Error (auth/user-not-found)."){
+                                if (data == "Firebase: Error (auth/user-not-found).") {
                                     toast({
                                         variant: "destructive",
                                         title: "Login Error",
                                         description: "Su correo no existe",
                                     })
                                 }
-                                
+
                             }
                             else {
-                                const {accessToken, uid} = data;
+                                const { accessToken, uid } = data;
                                 await login(accessToken, uid);
                                 router.push("/")
                             }
 
                         }}
                     >
-                        {({ errors, touched }) => (
+                        {({ errors, touched, isValid, isSubmitting }) => (
                             <Form className="flex flex-col h-full p-4">
                                 <label className="font-bold text-gray-600" htmlFor="password">Correo</label>
                                 <Field className={`py-2 w-full ${errors.email && touched.email ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="email" />
@@ -97,7 +98,12 @@ const login = () => {
                                     <div>{errors.password}</div>
                                 ) : null}
 
-                                <button className="py-2 px-4 mt-5 bg-blue-500 rounded-md text-white hover:bg-blue-300 transition-colors " type="submit">Login</button>
+                                <button
+                                    disabled={isValid || isSubmitting ? false : true}
+                                    className="py-2 px-4 mt-5 disabled:opacity-20 transition-colors bg-blue-500 
+            rounded-md text-white hover:bg-blue-300 "
+                                    type="submit">{isSubmitting ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Login"}</button>
+
                                 <Link className="mt-3 inline-block" href="/registro" >No tienes cuenta? haz click aqui</Link>
                             </Form>
                         )}

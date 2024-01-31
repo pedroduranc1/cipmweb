@@ -17,10 +17,20 @@ import * as Yup from "yup";
 import { useRouter } from 'next/router';
 import { toast } from '../../src/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 const cursoCtrl = new Cursos();
 const index = () => {
+  const {User} = useAuth()
   const [CursoID, setCursoID] = useState(null)
+
+  const router = useRouter()
+
+  useEffect(() => {
+    if(!User){
+      router.push('/')
+    }
+  }, [User])
 
   const { data: DataCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
 

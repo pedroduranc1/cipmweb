@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { Field, Form, Formik, useFormik } from 'formik'
@@ -8,10 +8,19 @@ import { uid } from 'uid';
 import { toast } from "../../src/components/ui/use-toast";
 import { useRouter } from 'next/router';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 const cursoCtrl = new Cursos();
 const index = () => {
+  const {User} = useAuth()
+
   const [ImgCurso, setImgCurso] = useState(false)
+
+  useEffect(() => {
+    if(!User){
+      router.push('/')
+    }
+  }, [User])
 
   const formik = useFormik({});
 

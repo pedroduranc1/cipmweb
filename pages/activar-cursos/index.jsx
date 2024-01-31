@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { useQuery } from 'react-query'
@@ -19,6 +19,13 @@ const index = () => {
     const [IsLoading, setIsLoading] = useState(false)
 
     const router = useRouter()
+
+    useEffect(() => {
+      if(!User){
+        router.push('/')
+      }
+    }, [User])
+    
 
     const { data: CursosData, isLoading: isLoaCursos, isError: isErrCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
     const { data: Clientes, isLoading: IsloaCC, isError: IsErrCC } = useQuery("clientes", () => userCtrl.getUsers())

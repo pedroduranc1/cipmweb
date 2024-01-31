@@ -11,8 +11,15 @@ const cursoCtrl = new Cursos();
 const CursoPage = () => {
     const [VideoFiltrados, setVideoFiltrados] = useState(null)
     const router = useRouter()
+    const {User} = useRouter()
 
     const { curso: CursoID } = router.query
+
+    useEffect(() => {
+        if(!User){
+          router.push("/")
+        }
+      }, [User])
 
     const { data: CursosData, isLoading: IsLoadingCurso, isError: isErrorCurso } = useQuery(`${CursoID}`, () => cursoCtrl.getCurso(CursoID))
     const { data: VideosData, isLoading: IsLoadingVideos, isError: isErrorVideos } = useQuery("Videos", () => cursoCtrl.getVideosCurso(CursoID));

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import {
@@ -17,10 +17,21 @@ import { Field, Form, Formik } from 'formik';
 import { toast } from '../../src/components/ui/use-toast';
 import * as Yup from "yup";
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 const cursoCtrl = new Cursos();
 const index = () => {
+  const {User} = useAuth()
+
   const [CursoID, setCursoID] = useState(null)
+
+  const router = useRouter()
+
+  useEffect(() => {
+    if(!User){
+      router.push('/')
+    }
+  }, [User])
 
   const { data: DataCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
 

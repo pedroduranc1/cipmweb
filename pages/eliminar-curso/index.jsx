@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../../src/components/ui/select'
@@ -8,14 +8,22 @@ import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import { toast } from '../../src/components/ui/use-toast'
 import { Loader2 } from 'lucide-react'
+import { useAuth } from '../../hooks/useAuth'
 
 const cursoCtrl = new Cursos();
 const index = () => {
-  const [CursoID, setCursoID] = useState(null)
+  const {User} = useAuth()
 
+  const [CursoID, setCursoID] = useState(null)
+  const router = useRouter();
+
+  useEffect(() => {
+    if(!User){
+      router.push('/')
+    }
+  }, [User])
   const { data: DataCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
 
-  const router = useRouter();
 
   const formik = useFormik({
     initialValues: {},

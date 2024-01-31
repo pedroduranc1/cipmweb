@@ -3,8 +3,14 @@ import Head from 'next/head'
 import Link from 'next/link';
 import React from 'react'
 import * as Yup from "yup";
+import { User } from "../../db/User";
+import { toast } from '../../src/components/ui/use-toast';
+import { useRouter } from 'next/router';
+import { Loader2 } from 'lucide-react';
 
+const userCtrl = new User();
 const index = () => {
+    const router = useRouter();
     return (
         <>
             <Head>
@@ -34,12 +40,31 @@ const index = () => {
                             email: Yup.string().required("Porfavor. Ingrese el correo"),
                             password: Yup.string().required("Porfavor. Ingrese la contraseña")
                         })}
-                        onSubmit={values => {
+                        onSubmit={async (values) => {
                             // same shape as initial values
-                            console.log(values);
+                            //console.log(values);
+
+                            let UserData = {
+                                nombre: values.name,
+                                apellido: values.lastName,
+                                email: values.email,
+                                password: values.password
+                            }
+
+                            const result = await userCtrl.createUser(UserData)
+
+                            if (!result) {
+                                toast({
+                                    variant: "destructive",
+                                    title: "Error al registrarte",
+                                })
+                            } else {
+                                router.push("/login")
+                            }
+
                         }}
                     >
-                        {({ errors, touched }) => (
+                        {({ errors, touched, isValid, isSubmitting }) => (
                             <Form className="flex flex-col h-full p-4">
 
                                 <div className='flex space-x-3'>
@@ -69,11 +94,17 @@ const index = () => {
                                 ) : null}
 
                                 <label className="font-bold text-gray-600" htmlFor="password">Contraseña</label>
-                                <Field className={`py-2 w-full ${errors.password && touched.password ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="password" />
+                                <Field type="password" className={`py-2 w-full ${errors.password && touched.password ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="password" />
                                 {errors.password && touched.password ? (
                                     <div>{errors.password}</div>
                                 ) : null}
-                                <button className="py-2 px-4 mt-5 bg-blue-500 rounded-md text-white hover:bg-blue-300 transition-colors " type="submit">Registrame</button>
+
+                                <button
+                                    disabled={isValid || isSubmitting ? false : true}
+                                    className="py-2 px-4 mt-5 disabled:opacity-20 transition-colors bg-blue-500 
+            rounded-md text-white hover:bg-blue-300 "
+                                    type="submit">{isSubmitting ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Registrame"}</button>
+
                                 <Link className="mt-3 inline-block" href="/login" >tienes cuenta? haz click aqui</Link>
                             </Form>
                         )}

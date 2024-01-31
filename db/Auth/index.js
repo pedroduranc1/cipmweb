@@ -14,14 +14,14 @@ export class Auth{
       
             const user = userCredentials.user;
 
-            const ColecUserData = await userCtrl.getUser(user?.uid)
+            const UserWebData = await userCtrl.getUser(user.uid)
 
-            if(ColecUserData == "no existe user"){
-
+            if(UserWebData === "No existe usuario"){
               let userData = {
-                email,
+                email 
               }
-              await userCtrl.createUserWeb(user?.uid,userData)
+  
+              await userCtrl.createUserWeb(user.uid,userData)
             }
 
             return user;
