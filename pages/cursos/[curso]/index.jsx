@@ -5,13 +5,15 @@ import { useRouter } from 'next/router'
 import { Cursocard } from "../../../minicomponents/cardVideo";
 import { useQuery } from 'react-query';
 import { Cursos } from "../../../db/Cursos";
+import { useAuth } from '../../../hooks/useAuth';
+import { Undo2 } from 'lucide-react';
 
 const cursoCtrl = new Cursos();
 
 const CursoPage = () => {
     const [VideoFiltrados, setVideoFiltrados] = useState(null)
     const router = useRouter()
-    const {User} = useRouter()
+    const {User} = useAuth()
 
     const { curso: CursoID } = router.query
 
@@ -53,8 +55,8 @@ const CursoPage = () => {
         <>
             <Navbar />
 
-            <div className='w-[80%] mx-auto'>
-                <button onClick={() => { router.back() }}>Volver</button>
+            <div className='w-[80%] my-[1%] mx-auto'>
+                <button className='flex items-center justify-center text-gray-400 gap-x-2 cursor-pointer' onClick={() => { router.back() }}><Undo2 className='text-gray-400'/> Volver</button>
             </div>
 
             <div className='w-[80%] mx-auto flex md:flex-row flex-col'>
@@ -73,7 +75,7 @@ const CursoPage = () => {
                 <h3 className='text-2xl text-gray-600 font-bold'>Contenido del curso</h3>
             </div>
 
-            <div className='w-[80%] grid grid-cols-3 grid-flow-row gap-4 mx-auto'>
+            <div className='w-[80%] grid md:grid-cols-3 transition-all grid-cols-1 grid-flow-row gap-4 mx-auto'>
                 {
                     VideoFiltrados?.map((video) => (
                         <Cursocard slug={`/${CursoID}/video/${video.id}`} img={video.ImgUrl} imgSecond={CursosData?.ImgUrl ? CursosData?.ImgUrl : "/miniaturavideo.svg"} titulo={video.Titulo} descripcion={video.Descripcion} />

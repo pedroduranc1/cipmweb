@@ -6,18 +6,20 @@ import { useRouter } from 'next/router'
 import ReactPlayer from 'react-player'
 import { useQuery } from 'react-query'
 import { Cursos } from "../../../../../db/Cursos";
+import { useAuth } from '../../../../../hooks/useAuth'
+import { Undo2 } from 'lucide-react'
 
 const cursoCtrl = new Cursos();
 const VideoPage = () => {
-    const {User} = useRouter()
+    const { User } = useAuth()
     const router = useRouter()
 
     useEffect(() => {
-      if(!User){
-        router.push("/")
-      }
+        if (!User) {
+            router.push("/")
+        }
     }, [User])
-    
+
 
     const { video } = router.query
 
@@ -27,13 +29,12 @@ const VideoPage = () => {
         <>
             <Navbar />
 
-            <div className='w-[80%] mx-auto'>
-                <button onClick={() => { router.back() }}>Volver</button>
-
+            <div className='w-[80%] my-[1%] mx-auto'>
+                <button className='flex items-center justify-center text-gray-400 gap-x-2 cursor-pointer' onClick={() => { router.back() }}><Undo2 className='text-gray-400' /> Volver</button>
             </div>
 
-            <div className='w-[80%] flex  mx-auto'>
-                <div className='w-fit flex items-center  h-full md:h-[50vh]'>
+            <div className='w-[80%] flex md:flex-row flex-col mx-auto'>
+                <div className='md:w-fit w-full  flex  h-full md:h-[50vh]'>
                     <ReactPlayer controls config={{
                         file: {
                             attributes: {
