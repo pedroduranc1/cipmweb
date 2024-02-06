@@ -45,7 +45,7 @@ const Footer = () => {
                         </div>
 
                         <div className='grid grid-cols-4 place-items-center gap-4 mt-6 md:ml-6'>
-                            <a target="_blank" className="w-8 h-8 inline-block " href="https://wa.link/fm0w6y">
+                            <a target="_blank" className="w-8 h-8 inline-block " href="https://wa.link/sljtqs">
                                 <img src="/ws.svg" alt="" />
                             </a>
                             <a target="_blank" className="w-8 h-8 inline-block " href="https://www.facebook.com/Cursosdeinglesmty?mibextid=2JQ9oc">
