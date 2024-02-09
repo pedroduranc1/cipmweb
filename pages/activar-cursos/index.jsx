@@ -68,14 +68,18 @@ const index = () => {
     }, [User])
 
     const handleSubmit = async () => {
+
+        const clienteID = Clientes.filter((cliente)=> cliente.email === Value)
         setIsLoading(true)
-        const CursosCliente = await cursoCtrl.getCursosCliente(UserID)
+        const CursosCliente = await cursoCtrl.getCursosCliente(clienteID[0].id)
         const cursos = []
+
+        console.log(CursosCliente)
 
         if (CursosCliente.cursos.length === 0) {
             cursos.push(CursoID)
 
-            await cursoCtrl.activarCurso(UserID, {
+            await cursoCtrl.activarCurso(clienteID[0].id, {
                 cursos
             })
             setIsLoading(false)
@@ -99,7 +103,9 @@ const index = () => {
                 CursoID
             ]
 
-            await cursoCtrl.activarCurso(UserID, {
+            console.log(cursos)
+
+            await cursoCtrl.activarCurso(clienteID[0].id, {
                 cursos
             })
 
@@ -110,7 +116,6 @@ const index = () => {
                 title: "Curso activado",
             })
         }
-
     }
 
     return (
