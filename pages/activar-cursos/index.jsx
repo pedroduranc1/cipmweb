@@ -6,9 +6,22 @@ import { Cursos } from "../../db/Cursos";
 import { useAuth } from '../../hooks/useAuth'
 import { User } from '../../db/User'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../../src/components/ui/select';
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+} from "../../src/components/ui/command"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "../../src/components/ui/popover"
 import { useRouter } from 'next/router';
 import { toast } from '../../src/components/ui/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
+import { cn } from "../../src/lib/utils"
 
 const cursoCtrl = new Cursos();
 const userCtrl = new User();
@@ -18,18 +31,41 @@ const index = () => {
     const [UserID, setUserID] = useState(null)
     const [IsLoading, setIsLoading] = useState(false)
 
-    const router = useRouter()
-
-    useEffect(() => {
-      if(!User){
-        router.push('/')
-      }
-    }, [User])
-    
-
     const { data: CursosData, isLoading: isLoaCursos, isError: isErrCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
     const { data: Clientes, isLoading: IsloaCC, isError: IsErrCC } = useQuery("clientes", () => userCtrl.getUsers())
 
+    const [open, setOpen] = useState(false);
+    const [Value, setValue] = useState('');
+    const [filteredClientes, setFilteredClientes] = useState([]); // Inicialmente, muestra todos los clientes
+
+    // Función para filtrar los clientes según el valor de búsqueda
+    const filtrarClientes = (searchValue) => {
+        let data = []
+    
+        const emailsSimilares = Clientes
+            .filter(cliente =>
+                cliente.email.toLowerCase().startsWith(searchValue.toLowerCase())
+            )
+            .map(cliente => cliente);
+
+        if(emailsSimilares == []){
+            data = Clientes
+        }else{
+            data = emailsSimilares
+        }
+
+        
+
+        setFilteredClientes([...data])
+    };
+
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!User) {
+            router.push('/')
+        }
+    }, [User])
 
     const handleSubmit = async () => {
         setIsLoading(true)
@@ -43,7 +79,7 @@ const index = () => {
                 cursos
             })
             setIsLoading(false)
-    
+
             router.push("/")
             toast({
                 title: "Curso activado",
@@ -68,14 +104,12 @@ const index = () => {
             })
 
             setIsLoading(false)
-    
+
             router.push("/")
             toast({
                 title: "Curso activado",
             })
         }
-
-        
 
     }
 
@@ -88,19 +122,45 @@ const index = () => {
                 <p className='text-gray-400 font-semibold text-center'>
                     Ingresa el correo del cliente
                 </p>
-                <div className='w-full flex justify-center'>
-                    <Select key={0} onValueChange={setUserID}>
-                        <SelectTrigger className="w-[80%] my-5">
-                            <SelectValue placeholder="Selecciona al Cliente" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                {
-                                    Clientes?.map((curso) => (<SelectItem value={curso.id}>{curso.email}</SelectItem>))
-                                }
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+                <div className='w-full mt-5 flex justify-center'>
+                    <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                            <button
+                                aria-expanded={open}
+                                className="w-[80%] border-[1px] border-gray-200 text-black py-2 px-3 rounded-md flex items-center justify-between"
+                            >
+                                {Value ? Value : "Buscar Correo"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full h-full max-h-[20dvh] p-0">
+                            <Command>
+                                <CommandInput
+                                    placeholder="Buscar Correo"
+                                    onValueChange={(e)=> {
+                                        setValue(e);
+                                        filtrarClientes(e);
+                                    }}
+                                />
+                                <CommandEmpty>No se encontraron clientes.</CommandEmpty>
+                                <CommandGroup className="overflow-y-auto">
+                                    {filteredClientes?.map(cliente => (
+                                        <CommandItem
+                                            key={cliente?.id}
+                                            value={cliente?.email}
+                                            onSelect={(currentValue) => {
+                                                setValue(currentValue === Value.email ? "" : currentValue);
+                                                setUserID(currentValue === Value.id ? "" : currentValue)
+                                                setOpen(false);
+                                            }}
+                                        >
+                                            {cliente.email}
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
                 </div>
 
                 <div className='w-full flex justify-center'>
@@ -118,12 +178,12 @@ const index = () => {
                     </Select>
                 </div>
                 <div className='flex justify-center'>
-                    <button onClick={handleSubmit} 
-                    disabled={CursoID && UserID || IsLoading ? false : true} 
-                    className='w-[80%] disabled:opacity-50 hover:bg-blue-300 
+                    <button onClick={handleSubmit}
+                        disabled={CursoID && UserID || IsLoading ? false : true}
+                        className='w-[80%] disabled:opacity-50 hover:bg-blue-300 
                     transition-colors mx-auto py-2 mb-[5%] text-white bg-blue-500 rounded-md'>
-                        {IsLoading ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin'/></div> : "Activar Curso"}
-                        
+                        {IsLoading ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Activar Curso"}
+
                     </button>
                 </div>
             </div>
