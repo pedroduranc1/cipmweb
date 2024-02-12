@@ -219,7 +219,29 @@ export class Cursos {
 
   }
 
+  async getCursoCli(id) {
+    const docRef = doc(db, "cursosCliente", id);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return docSnap.data();
+    } else {
+      return "Error";
+    }
+  }
+
   async activarCurso(userID, cursoData) {
+    try {
+      const blogRef = doc(db, "cursosCliente", userID);
+      await updateDoc(blogRef, cursoData);
+      return true;
+    } catch (error) {
+      console.error("Error updating blog: ", error);
+      return false;
+    }
+  }
+
+  async desactivarCurso(userID,cursoData){
     try {
       const blogRef = doc(db, "cursosCliente", userID);
       await updateDoc(blogRef, cursoData);

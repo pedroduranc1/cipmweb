@@ -1,125 +1,77 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../../components/Navbar'
-import Footer from '../../components/Footer'
-import { useQuery } from 'react-query'
-import { Cursos } from "../../db/Cursos";
-import { useAuth } from '../../hooks/useAuth'
-import { User } from '../../db/User'
+import React, { useEffect, useState } from 'react';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+import { Popover, PopoverContent, PopoverTrigger } from '../../src/components/ui/popover';
+import { ChevronsUpDown, Loader2 } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../../src/components/ui/command';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../../src/components/ui/select';
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-} from "../../src/components/ui/command"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "../../src/components/ui/popover"
+import { Cursos } from '../../db/Cursos';
+import { User } from '../../db/User';
+import { useAuth } from '../../hooks/useAuth';
 import { useRouter } from 'next/router';
+import { useQuery } from 'react-query';
 import { toast } from '../../src/components/ui/use-toast';
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
-import { cn } from "../../src/lib/utils"
 
 const cursoCtrl = new Cursos();
 const userCtrl = new User();
-const index = () => {
-    const { User } = useAuth()
-    const [CursoID, setCursoID] = useState(null)
-    const [UserID, setUserID] = useState(null)
-    const [IsLoading, setIsLoading] = useState(false)
 
-    const { data: CursosData, isLoading: isLoaCursos, isError: isErrCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
-    const { data: Clientes, isLoading: IsloaCC, isError: IsErrCC } = useQuery("clientes", () => userCtrl.getUsers())
-
+const Index = () => {
+    const { User } = useAuth();
+    const [CursoID, setCursoID] = useState(null);
+    const [UserID, setUserID] = useState(null);
+    const [IsLoading, setIsLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [Value, setValue] = useState('');
-    const [filteredClientes, setFilteredClientes] = useState([]); // Inicialmente, muestra todos los clientes
+    const [filteredClientes, setFilteredClientes] = useState([]);
+    const router = useRouter();
 
-    // Función para filtrar los clientes según el valor de búsqueda
-    const filtrarClientes = (searchValue) => {
-        let data = []
-    
-        const emailsSimilares = Clientes
-            .filter(cliente =>
-                cliente.email.toLowerCase().startsWith(searchValue.toLowerCase())
-            )
-            .map(cliente => cliente);
-
-        if(emailsSimilares == []){
-            data = Clientes
-        }else{
-            data = emailsSimilares
-        }
-
-        
-
-        setFilteredClientes([...data])
-    };
-
-    const router = useRouter()
+    const { data: Clientes, isLoading: IsloaCC, isError: IsErrCC } = useQuery("clientes", () => userCtrl.getUsers())
+    const { data: CursosData, isLoading: isLoaCursos, isError: isErrCursos } = useQuery("cursos", () => cursoCtrl.getCursos());
 
     useEffect(() => {
         if (!User) {
-            router.push('/')
+            router.push('/');
         }
-    }, [User])
+    }, [User]);
 
     const handleSubmit = async () => {
+        const DataCursos = await cursoCtrl.getCursoCli(UserID)
 
-        const clienteID = Clientes.filter((cliente)=> cliente.email === Value)
+        const CursosAct = DataCursos?.cursos.filter(curso => curso !== CursoID);
         setIsLoading(true)
-        const CursosCliente = await cursoCtrl.getCursosCliente(clienteID[0].id)
-        const cursos = []
 
-        if (CursosCliente.cursos.length === 0) {
-            cursos.push(CursoID)
+        await cursoCtrl.activarCurso(UserID, {
+            cursos: CursosAct
+        })
 
-            await cursoCtrl.activarCurso(clienteID[0].id, {
-                cursos
-            })
-            setIsLoading(false)
+        setIsLoading(false)
 
-            router.push("/")
-            toast({
-                title: "Curso activado",
-            })
-        }
+        router.push("/")
+        toast({
+            title: "Curso Desactivado",
+        })
+    };
 
-        if (CursosCliente.cursos.includes(CursoID)) {
-            setIsLoading(false)
-            toast({
-                title: "Este Cliente ya posee el curso",
-            })
-        }
+    const filtrarClientes = async (email) => {
+        let data = []
+        const clienteID = Clientes.filter((cliente) => cliente.email === email)
+        setUserID(clienteID[0].id)
+        const DataCursos = await cursoCtrl.getCursoCli(clienteID[0].id)
 
-        if (!CursosCliente.cursos.includes(CursoID)) {
-            cursos = [
-                ...CursosCliente.cursos,
-                CursoID
-            ]
+        CursosData.map((curso) => {
+            if (DataCursos.cursos.includes(curso.id)) {
+                data.push(curso)
+            }
+        })
 
-            await cursoCtrl.activarCurso(clienteID[0].id, {
-                cursos
-            })
-
-            setIsLoading(false)
-
-            router.push("/")
-            toast({
-                title: "Curso activado",
-            })
-        }
-    }
+        setFilteredClientes(data)
+    };
 
     return (
         <>
             <Navbar />
-
             <div className='lg:w-[30%] md:w-[60%] w-[90%] h-fit mt-[5%] bg-white/90 overflow-hidden rounded-md shadow-md mx-auto'>
-                <h2 className='text-2xl font-bold text-center text-gray-600 mt-2'>Activar Cursos a Clientes</h2>
+                <h2 className='text-2xl font-bold text-center text-gray-600 mt-2'>Desactivar Cursos a Clientes</h2>
                 <p className='text-gray-400 font-semibold text-center'>
                     Ingresa el correo del cliente
                 </p>
@@ -138,14 +90,13 @@ const index = () => {
                             <Command>
                                 <CommandInput
                                     placeholder="Buscar Correo"
-                                    onValueChange={(e)=> {
+                                    onValueChange={(e) => {
                                         setValue(e);
-                                        filtrarClientes(e);
                                     }}
                                 />
                                 <CommandEmpty>No se encontraron clientes.</CommandEmpty>
                                 <CommandGroup className="overflow-y-auto">
-                                    {filteredClientes?.map(cliente => (
+                                    {Clientes?.map(cliente => (
                                         <CommandItem
                                             key={cliente?.id}
                                             value={cliente?.email}
@@ -153,6 +104,7 @@ const index = () => {
                                                 setValue(currentValue === Value.email ? "" : currentValue);
                                                 setUserID(currentValue === Value.id ? "" : currentValue)
                                                 setOpen(false);
+                                                filtrarClientes(currentValue)
                                             }}
                                         >
                                             {cliente.email}
@@ -163,7 +115,6 @@ const index = () => {
                         </PopoverContent>
                     </Popover>
                 </div>
-
                 <div className='w-full flex justify-center'>
                     <Select key={1} onValueChange={setCursoID}>
                         <SelectTrigger className="w-[80%] my-5">
@@ -172,7 +123,16 @@ const index = () => {
                         <SelectContent>
                             <SelectGroup>
                                 {
-                                    CursosData?.map((curso) => (<SelectItem value={curso.id}>{curso.Titulo}</SelectItem>))
+                                    filteredClientes &&
+                                    (<>
+                                        {
+                                            filteredClientes.map((curso) => (
+                                                <SelectItem key={curso.id} value={curso.id}>
+                                                    {curso.Titulo}
+                                                </SelectItem>
+                                            ))
+                                        }
+                                    </>)
                                 }
                             </SelectGroup>
                         </SelectContent>
@@ -181,22 +141,18 @@ const index = () => {
                 <div className='flex justify-center'>
                     <button onClick={handleSubmit}
                         disabled={CursoID && UserID || IsLoading ? false : true}
-                        className='w-[80%] disabled:opacity-50 hover:bg-blue-300 
-                    transition-colors mx-auto py-2 mb-[5%] text-white bg-blue-500 rounded-md'>
-                        {IsLoading ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Activar Curso"}
-
+                        className='w-[80%] disabled:opacity-50 hover:bg-red-300 
+                    transition-colors mx-auto py-2 mb-[5%] text-white bg-red-500 rounded-md'>
+                        {IsLoading ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Desactivar Curso"}
                     </button>
                 </div>
             </div>
-
-
-
             <div className='pb-[40vh] ' />
             <div className='relative'>
                 <Footer />
             </div>
         </>
-    )
-}
+    );
+};
 
-export default index
+export default Index;
