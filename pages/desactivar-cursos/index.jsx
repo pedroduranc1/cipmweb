@@ -23,9 +23,10 @@ const Index = () => {
     const [open, setOpen] = useState(false);
     const [Value, setValue] = useState('');
     const [filteredClientes, setFilteredClientes] = useState([]);
+    const [cursosDelCliente, setCursosDelCliente] = useState([]);
     const router = useRouter();
 
-    const { data: Clientes, isLoading: IsloaCC, isError: IsErrCC } = useQuery("clientes", () => userCtrl.getUsers())
+    const { data: Clientes, isLoading: IsloaCC, isError: IsErrCC } = useQuery("clientes", () => userCtrl.getUsers());
     const { data: CursosData, isLoading: isLoaCursos, isError: isErrCursos } = useQuery("cursos", () => cursoCtrl.getCursos());
 
     useEffect(() => {
@@ -34,38 +35,65 @@ const Index = () => {
         }
     }, [User]);
 
+    useEffect(() => {
+        setFilteredClientes(Clientes || []);
+    }, [Clientes]);
+
     const handleSubmit = async () => {
-        const DataCursos = await cursoCtrl.getCursoCli(UserID)
+        setIsLoading(true);
+        try {
+            // Aquí debes implementar la lógica para desactivar el curso para el cliente seleccionado
+            // Asumiendo que tienes una función para desactivar un curso
 
-        const CursosAct = DataCursos?.cursos.filter(curso => curso !== CursoID);
-        setIsLoading(true)
+            const cursosData = cursosDelCliente.filter(curso => curso.id !== CursoID);
+            const dataOnlyId = cursosData.map(data => data.id)
 
-        await cursoCtrl.activarCurso(UserID, {
-            cursos: CursosAct
-        })
-
-        setIsLoading(false)
-
-        router.push("/")
-        toast({
-            title: "Curso Desactivado",
-        })
+            await cursoCtrl.desactivarCurso(UserID, {
+                cursos: dataOnlyId
+            });
+            
+            toast({
+                title: "Curso Desactivado",
+            });
+            router.push("/");
+        } catch (error) {
+            console.error("Error desactivando el curso:", error);
+            toast({
+                title: "Error al desactivar el curso",
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const filtrarClientes = async (email) => {
-        let data = []
-        const clienteID = Clientes.filter((cliente) => cliente.email === email)
-        setUserID(clienteID[0].id)
-        const DataCursos = await cursoCtrl.getCursoCli(clienteID[0].id)
-
-        CursosData.map((curso) => {
-            if (DataCursos.cursos.includes(curso.id)) {
-                data.push(curso)
-            }
-        })
-
-        setFilteredClientes(data)
+    const filtrarClientes = (searchValue) => {
+        if (searchValue === '') {
+            setFilteredClientes(Clientes || []); // Muestra todos los clientes si el filtro está vacío
+        } else {
+            const emailsSimilares = Clientes?.filter(cliente =>
+                cliente.email.toLowerCase().includes(searchValue.toLowerCase())
+            ) || [];
+            setFilteredClientes(emailsSimilares);
+        }
     };
+
+    const handleClienteSeleccionado = async (clienteId, clienteEmail) => {
+        setValue(clienteEmail);
+        setUserID(clienteId);
+        setOpen(false);
+        
+        // Obtener los cursos del cliente seleccionado
+        const cursosCliente = await cursoCtrl.getCursosCliente(clienteId);
+        
+        // Filtrar cursosData para obtener solo los cursos que el cliente tiene
+        const cursosDelCliente = CursosData.filter(curso =>
+            cursosCliente.cursos.includes(curso.id)
+        );
+        
+        // Actualizar el estado con los cursos filtrados
+        setCursosDelCliente(cursosDelCliente || []); 
+    };
+    
 
     return (
         <>
@@ -82,30 +110,27 @@ const Index = () => {
                                 aria-expanded={open}
                                 className="w-[80%] border-[1px] border-gray-200 text-black py-2 px-3 rounded-md flex items-center justify-between"
                             >
-                                {Value ? Value : "Buscar Correo"}
+                                {Value || "Buscar Correo"}
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-full h-full max-h-[20dvh] p-0">
+                        <PopoverContent className="w-full h-[40dvh] p-0">
                             <Command>
                                 <CommandInput
                                     placeholder="Buscar Correo"
+                                    value={Value}
                                     onValueChange={(e) => {
                                         setValue(e);
+                                        filtrarClientes(e);
                                     }}
                                 />
                                 <CommandEmpty>No se encontraron clientes.</CommandEmpty>
                                 <CommandGroup className="overflow-y-auto">
-                                    {Clientes?.map(cliente => (
+                                    {filteredClientes.map(cliente => (
                                         <CommandItem
-                                            key={cliente?.id}
-                                            value={cliente?.email}
-                                            onSelect={(currentValue) => {
-                                                setValue(currentValue === Value.email ? "" : currentValue);
-                                                setUserID(currentValue === Value.id ? "" : currentValue)
-                                                setOpen(false);
-                                                filtrarClientes(currentValue)
-                                            }}
+                                            key={cliente.id}
+                                            value={cliente.email}
+                                            onSelect={() => handleClienteSeleccionado(cliente.id, cliente.email)}
                                         >
                                             {cliente.email}
                                         </CommandItem>
@@ -122,28 +147,21 @@ const Index = () => {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                {
-                                    filteredClientes &&
-                                    (<>
-                                        {
-                                            filteredClientes.map((curso) => (
-                                                <SelectItem key={curso.id} value={curso.id}>
-                                                    {curso.Titulo}
-                                                </SelectItem>
-                                            ))
-                                        }
-                                    </>)
-                                }
+                                {cursosDelCliente.map((curso) => (
+                                    <SelectItem key={curso.id} value={curso.id}>
+                                        {curso.Titulo}
+                                    </SelectItem>
+                                ))}
                             </SelectGroup>
                         </SelectContent>
                     </Select>
                 </div>
                 <div className='flex justify-center'>
                     <button onClick={handleSubmit}
-                        disabled={CursoID && UserID || IsLoading ? false : true}
-                        className='w-[80%] disabled:opacity-50 hover:bg-red-300 
+                        disabled={!CursoID || !UserID || IsLoading}
+                        className='w-[80%] flex justify-center disabled:opacity-50 hover:bg-red-300 
                     transition-colors mx-auto py-2 mb-[5%] text-white bg-red-500 rounded-md'>
-                        {IsLoading ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Desactivar Curso"}
+                        {IsLoading ? <Loader2 className='animate-spin' /> : "Desactivar Curso"}
                     </button>
                 </div>
             </div>

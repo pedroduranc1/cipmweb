@@ -21,7 +21,6 @@ import {
 import { useRouter } from 'next/router';
 import { toast } from '../../src/components/ui/use-toast';
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
-import { cn } from "../../src/lib/utils"
 
 const cursoCtrl = new Cursos();
 const userCtrl = new User();
@@ -39,26 +38,18 @@ const index = () => {
     const [filteredClientes, setFilteredClientes] = useState([]); // Inicialmente, muestra todos los clientes
 
     // Función para filtrar los clientes según el valor de búsqueda
+
     const filtrarClientes = (searchValue) => {
-        let data = []
-    
-        const emailsSimilares = Clientes
-            .filter(cliente =>
-                cliente.email.toLowerCase().startsWith(searchValue.toLowerCase())
-            )
-            .map(cliente => cliente);
-
-        if(emailsSimilares == []){
-            data = Clientes
-        }else{
-            data = emailsSimilares
+        if (searchValue === '') {
+            setFilteredClientes(Clientes); // Muestra todos los clientes si el filtro está vacío
+        } else {
+            const emailsSimilares = Clientes.filter(cliente =>
+                cliente.email.toLowerCase().includes(searchValue.toLowerCase())
+            );
+            setFilteredClientes(emailsSimilares);
         }
-
-        
-
-        setFilteredClientes([...data])
     };
-
+    
     const router = useRouter()
 
     useEffect(() => {
@@ -68,51 +59,54 @@ const index = () => {
     }, [User])
 
     const handleSubmit = async () => {
+        // Buscar el cliente por correo electrónico
+        const cliente = Clientes.find((c) => c.email.toLowerCase() === Value.toLowerCase());
 
-        const clienteID = Clientes.filter((cliente)=> cliente.email === Value)
-        setIsLoading(true)
-        const CursosCliente = await cursoCtrl.getCursosCliente(clienteID[0].id)
-        const cursos = []
-
-        if (CursosCliente.cursos.length === 0) {
-            cursos.push(CursoID)
-
-            await cursoCtrl.activarCurso(clienteID[0].id, {
-                cursos
-            })
-            setIsLoading(false)
-
-            router.push("/")
+        // Verificar si se encontró el cliente
+        if (!cliente) {
             toast({
-                title: "Curso activado",
-            })
+                title: "Cliente no encontrado.",
+            });
+            return; // Detener ejecución si no se encuentra el cliente
         }
 
-        if (CursosCliente.cursos.includes(CursoID)) {
-            setIsLoading(false)
+        setIsLoading(true);
+
+        try {
+            const CursosCliente = await cursoCtrl.getCursosCliente(cliente.id);
+
+            // Verificar si el cliente ya tiene cursos
+            if (CursosCliente.cursos.length === 0) {
+                // El cliente no tiene cursos, agregar el nuevo curso
+                await cursoCtrl.activarCurso(cliente.id, { cursos: [CursoID] });
+                toast({
+                    title: "Curso activado",
+                });
+            } else if (CursosCliente.cursos.includes(CursoID)) {
+                // El cliente ya tiene este curso
+                toast({
+                    title: "Este Cliente ya posee el curso",
+                });
+            } else {
+                // El cliente no tiene este curso, agregarlo a su lista
+                const cursos = [...CursosCliente.cursos, CursoID];
+                await cursoCtrl.activarCurso(cliente.id, { cursos });
+                toast({
+                    title: "Curso activado",
+                });
+            }
+        } catch (error) {
+            //console.error("Error activando el curso para el cliente:", error);
             toast({
-                title: "Este Cliente ya posee el curso",
-            })
+                title: "Error al activar el curso",
+            });
+        } finally {
+            setIsLoading(false);
         }
 
-        if (!CursosCliente.cursos.includes(CursoID)) {
-            cursos = [
-                ...CursosCliente.cursos,
-                CursoID
-            ]
+        router.push("/");
+    };
 
-            await cursoCtrl.activarCurso(clienteID[0].id, {
-                cursos
-            })
-
-            setIsLoading(false)
-
-            router.push("/")
-            toast({
-                title: "Curso activado",
-            })
-        }
-    }
 
     return (
         <>
@@ -130,15 +124,16 @@ const index = () => {
                                 aria-expanded={open}
                                 className="w-[80%] border-[1px] border-gray-200 text-black py-2 px-3 rounded-md flex items-center justify-between"
                             >
-                                {Value ? Value : "Buscar Correo"}
+                                {Value || "Buscar Correo"}
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-full h-full max-h-[20dvh] p-0">
+                        <PopoverContent className="w-full h-[40dvh] p-0">
                             <Command>
                                 <CommandInput
                                     placeholder="Buscar Correo"
-                                    onValueChange={(e)=> {
+                                    value={Value} // Asegúrate de vincular el valor del CommandInput al estado Value
+                                    onValueChange={(e) => {
                                         setValue(e);
                                         filtrarClientes(e);
                                     }}
@@ -150,8 +145,8 @@ const index = () => {
                                             key={cliente?.id}
                                             value={cliente?.email}
                                             onSelect={(currentValue) => {
-                                                setValue(currentValue === Value.email ? "" : currentValue);
-                                                setUserID(currentValue === Value.id ? "" : currentValue)
+                                                setValue(currentValue);
+                                                setUserID(cliente?.id); // Asegúrate de establecer correctamente el UserID basado en la selección
                                                 setOpen(false);
                                             }}
                                         >
@@ -162,6 +157,7 @@ const index = () => {
                             </Command>
                         </PopoverContent>
                     </Popover>
+
                 </div>
 
                 <div className='w-full flex justify-center'>
@@ -172,7 +168,7 @@ const index = () => {
                         <SelectContent>
                             <SelectGroup>
                                 {
-                                    CursosData?.map((curso) => (<SelectItem value={curso.id}>{curso.Titulo}</SelectItem>))
+                                    CursosData?.map((curso, index) => (<SelectItem key={index} value={curso.id}>{curso.Titulo}</SelectItem>))
                                 }
                             </SelectGroup>
                         </SelectContent>
@@ -180,7 +176,7 @@ const index = () => {
                 </div>
                 <div className='flex justify-center'>
                     <button onClick={handleSubmit}
-                        disabled={CursoID && UserID || IsLoading ? false : true}
+                        disabled={!CursoID || !UserID || IsLoading}
                         className='w-[80%] disabled:opacity-50 hover:bg-blue-300 
                     transition-colors mx-auto py-2 mb-[5%] text-white bg-blue-500 rounded-md'>
                         {IsLoading ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Activar Curso"}
