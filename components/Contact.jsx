@@ -58,8 +58,8 @@ const Contact = ({ fullpage }) => {
 
 
   return (
-    <div className='flex flex-col md:flex-row w-full pb-[12%]'>
-      <div className='flex flex-col justify-end w-full md:w-1/2 bg-blue-600'>
+    <div className='flex flex-col md:flex-row w-full pb-[50vh]'>
+      {/* <div className='hidden flex flex-col justify-end w-full md:w-1/2 bg-blue-600'>
         <form onSubmit={formik.handleSubmit}>
           <div className='flex flex-col px-5 sm:px-0 md:translate-x-[10%]'>
             <h1 className='text-center text-white text-2xl font-semibold pt-10 pb-7'>Contacto</h1>
@@ -169,9 +169,9 @@ const Contact = ({ fullpage }) => {
           </div>
         </form>
 
-      </div>
-      <div className='flex flex-col justify-start w-full md:w-1/2'>
-        <div className='flex flex-col md:-translate-x-[10%]'>
+      </div> */}
+      <div className='flex flex-col h-fit justify-center w-full md:w-full mx-auto'>
+        <div className='flex flex-col'>
           <h1 className='text-center text-gray-600  
           text-2xl font-semibold pt-10 pb-7'>Ubicación</h1>
 
@@ -189,8 +189,49 @@ const Contact = ({ fullpage }) => {
               <h1 className='text-center mt-10 text-xl pb-10 md:pb-0 text-gray-600'>
                 Monterrey - Mexico <br />
                 Horario de trabajo 9 - 5 pm / Lunes - Viernes <br />
-                Correo electrónico : cipm3gh@gmail.com
+                
               </h1>
+              <div className='grid grid-cols-4 mt-3 max-w-[30%] mx-auto place-items-center gap-4'>
+                    <img
+                      className="h-8 w-auto sm:h-7 hover:cursor-pointer"
+                      src="/ws.svg"
+                      alt=""
+                      layout='fill'
+                      onClick={() => {
+                        window.location.href = "https://wa.link/sljtqs";
+                      }}
+                    ></img>
+
+                    <img
+                      className="h-8 w-auto sm:h-7 hover:cursor-pointer"
+                      src="/fb.svg"
+                      alt=""
+                      layout='fill'
+                      onClick={() => {
+                        window.location.href = "https://www.facebook.com/olympusgroupmx";
+                      }}
+                    ></img>
+
+                    <img
+                      className="h-8 w-auto sm:h-7 hover:cursor-pointer"
+                      src="/tiktok.svg"
+                      alt=""
+                      layout='fill'
+                      onClick={() => {
+                        window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
+                      }}
+                    ></img>
+
+                    <img
+                      className="h-8 w-auto sm:h-9 hover:cursor-pointer"
+                      src="/youtube.svg"
+                      alt=""
+                      layout='fill'
+                      onClick={() => {
+                        window.location.href = "https://www.youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA";
+                      }}
+                    ></img>
+                  </div>
             </div>
           </div>
 
