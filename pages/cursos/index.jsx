@@ -23,6 +23,11 @@ const index = () => {
     }
   }, [User])
   
+  const ADMIN_ALLOWED = [
+    "YGDmj8LOpmg1ZJIscT9QuH6brCU2",
+    "a1UMHAwQwDTKL21aKRrCGyAMGtO2",
+    'QjvGKUjOnshDwz9NOyciV9767R73'
+  ]
 
 
   return (
@@ -36,7 +41,7 @@ const index = () => {
 
 
         {
-          User?.uid == "YGDmj8LOpmg1ZJIscT9QuH6brCU2" | User?.uid == "a1UMHAwQwDTKL21aKRrCGyAMGtO2" ? (
+          ADMIN_ALLOWED.includes(User?.uid) ? (
             <div className='w-[80%] mx-auto flex flex-wrap justify-center gap-3 '>
               <Link href="/crear-curso" >
                 <a className='px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-400 transition-all text-white' >Crear Curso</a>
