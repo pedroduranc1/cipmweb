@@ -16,7 +16,7 @@ const cursoCtrl = new Cursos();
 const userCtrl = new User();
 
 const Index = () => {
-    const { User } = useAuth();
+    const { User, loading } = useAuth();
     const [CursoID, setCursoID] = useState(null);
     const [UserID, setUserID] = useState(null);
     const [IsLoading, setIsLoading] = useState(false);
@@ -30,10 +30,10 @@ const Index = () => {
     const { data: CursosData, isLoading: isLoaCursos, isError: isErrCursos } = useQuery("cursos", () => cursoCtrl.getCursos());
 
     useEffect(() => {
-        if (!User) {
+        if (!loading && !User) {
             router.push('/');
         }
-    }, [User]);
+    }, [User, loading]);
 
     useEffect(() => {
         setFilteredClientes(Clientes || []);

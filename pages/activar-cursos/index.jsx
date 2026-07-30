@@ -25,7 +25,7 @@ import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 const cursoCtrl = new Cursos();
 const userCtrl = new User();
 const index = () => {
-    const { User } = useAuth()
+    const { User, loading } = useAuth()
     const [CursoID, setCursoID] = useState(null)
     const [UserID, setUserID] = useState(null)
     const [IsLoading, setIsLoading] = useState(false)
@@ -53,10 +53,10 @@ const index = () => {
     const router = useRouter()
 
     useEffect(() => {
-        if (!User) {
+        if (!loading && !User) {
             router.push('/')
         }
-    }, [User])
+    }, [User, loading])
 
     const handleSubmit = async () => {
         // Buscar el cliente por correo electrónico

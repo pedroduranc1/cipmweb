@@ -12,19 +12,16 @@ import { useAuth } from '../../hooks/useAuth';
 
 const cursoCtrl = new Cursos();
 const index = () => {
-  const {User} = useAuth()
+  const { User, loading } = useAuth()
+  const router = useRouter();
 
   const [ImgCurso, setImgCurso] = useState(false)
 
   useEffect(() => {
-    if(!User){
+    if (!loading && !User) {
       router.push('/')
     }
-  }, [User])
-
-  const formik = useFormik({});
-
-  const router = useRouter();
+  }, [User, loading])
 
   return (
     <>

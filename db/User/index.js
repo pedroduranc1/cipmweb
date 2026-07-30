@@ -49,20 +49,21 @@ export class User {
   }
 
   async isPremium(uid) {
-
-    let isPremium = false;
-
     const docRef = doc(db, uid, 'isPremium');
     const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) return docSnap.data().isPremium;
+    return false;
+  }
 
-    if (docSnap.exists()) {
-      isPremium = docSnap.data().isPremium;
-    } else {
-      isPremium = false;
+  async getRole(uid) {
+    try {
+      const userRef = doc(db, "users", uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) return userSnap.data().role ?? null;
+      return null;
+    } catch {
+      return null;
     }
-
-    return isPremium;
-
   }
 
   async getUsers() {

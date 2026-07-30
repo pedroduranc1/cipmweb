@@ -12,22 +12,18 @@ import { useRouter } from 'next/router'
 const cursoCtrl = new Cursos();
 const index = () => {
 
-  const { User } = useAuth();
+  const { User, loading } = useAuth();
   const router = useRouter();
 
   const { data: CursosData, isLoading, isError } = useQuery("Cursos", () => cursoCtrl.getCursos())
 
   useEffect(() => {
-    if(!User){
+    if (!loading && !User) {
       router.push("/")
     }
-  }, [User])
+  }, [User, loading])
   
-  const ADMIN_ALLOWED = [
-    "YGDmj8LOpmg1ZJIscT9QuH6brCU2",
-    "a1UMHAwQwDTKL21aKRrCGyAMGtO2",
-    'QjvGKUjOnshDwz9NOyciV9767R73'
-  ]
+  const isAdmin = User?.role === "admin"
 
 
   return (
@@ -41,7 +37,7 @@ const index = () => {
 
 
         {
-          ADMIN_ALLOWED.includes(User?.uid) ? (
+          isAdmin ? (
             <div className='w-[80%] mx-auto flex flex-wrap justify-center gap-3 '>
               <Link href="/crear-curso" >
                 <a className='px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-400 transition-all text-white' >Crear Curso</a>

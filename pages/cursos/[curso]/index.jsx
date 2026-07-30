@@ -13,18 +13,18 @@ const cursoCtrl = new Cursos();
 const CursoPage = () => {
     const [VideoFiltrados, setVideoFiltrados] = useState(null)
     const router = useRouter()
-    const {User} = useAuth()
+    const { User, loading } = useAuth()
 
     const { curso: CursoID } = router.query
 
     useEffect(() => {
-        if(!User){
+        if (!loading && !User) {
           router.push("/")
         }
-      }, [User])
+      }, [User, loading])
 
-    const { data: CursosData, isLoading: IsLoadingCurso, isError: isErrorCurso } = useQuery(`${CursoID}`, () => cursoCtrl.getCurso(CursoID))
-    const { data: VideosData, isLoading: IsLoadingVideos, isError: isErrorVideos } = useQuery("Videos", () => cursoCtrl.getVideosCurso(CursoID));
+    const { data: CursosData, isLoading: IsLoadingCurso, isError: isErrorCurso } = useQuery(["curso", CursoID], () => cursoCtrl.getCurso(CursoID), { enabled: !!CursoID })
+    const { data: VideosData, isLoading: IsLoadingVideos, isError: isErrorVideos } = useQuery(["videos", CursoID], () => cursoCtrl.getVideosCurso(CursoID), { enabled: !!CursoID });
 
 
     function filtrarCursosPorFecha(cursos) {

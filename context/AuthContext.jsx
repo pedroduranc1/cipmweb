@@ -42,6 +42,7 @@ export function AuthProvider(props) {
             tokenCtrl.setToken(token);
             const response = await UserCtrl.getMe(uid);
             const premiumresp = await UserCtrl.isPremium(uid);
+            const role = await UserCtrl.getRole(uid);
 
             if(premiumresp){
                 IsPremium = premiumresp
@@ -49,7 +50,8 @@ export function AuthProvider(props) {
 
             const newData = {
                 ...response,
-                IsPremium
+                IsPremium,
+                role,
             }
 
             localStorage.setItem("ui", JSON.stringify(newData));
@@ -78,6 +80,7 @@ export function AuthProvider(props) {
     const data = {
         accessToken: token,
         User,
+        loading,
         login,
         logout,
         updateUser,

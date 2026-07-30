@@ -115,9 +115,7 @@ export class Cursos {
       }
 
       if (curso.videos && curso.videos.length > 0) {
-        curso.videos.map(async (video) => {
-          await this.deleteVideo(video);
-        });
+        await Promise.all(curso.videos.map((video) => this.deleteVideo(video)));
       }
 
       return true;

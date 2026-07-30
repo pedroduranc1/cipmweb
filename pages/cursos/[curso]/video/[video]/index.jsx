@@ -11,19 +11,19 @@ import { Undo2 } from 'lucide-react'
 
 const cursoCtrl = new Cursos();
 const VideoPage = () => {
-    const { User } = useAuth()
+    const { User, loading } = useAuth()
     const router = useRouter()
 
     useEffect(() => {
-        if (!User) {
+        if (!loading && !User) {
             router.push("/")
         }
-    }, [User])
+    }, [User, loading])
 
 
     const { video } = router.query
 
-    const { data: videoData, isLoading, isError } = useQuery(`${video}`, () => cursoCtrl.getVideo(video))
+    const { data: videoData, isLoading, isError } = useQuery(["video", video], () => cursoCtrl.getVideo(video), { enabled: !!video })
 
     return (
         <>

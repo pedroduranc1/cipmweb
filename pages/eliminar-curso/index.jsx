@@ -12,16 +12,16 @@ import { useAuth } from '../../hooks/useAuth'
 
 const cursoCtrl = new Cursos();
 const index = () => {
-  const {User} = useAuth()
+  const { User, loading } = useAuth()
 
   const [CursoID, setCursoID] = useState(null)
   const router = useRouter();
 
   useEffect(() => {
-    if(!User){
+    if (!loading && !User) {
       router.push('/')
     }
-  }, [User])
+  }, [User, loading])
   const { data: DataCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
 
 
