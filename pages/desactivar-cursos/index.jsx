@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import Breadcrumb from '../../components/Breadcrumb';
 import { Popover, PopoverContent, PopoverTrigger } from '../../src/components/ui/popover';
 import { ChevronsUpDown, Loader2 } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../../src/components/ui/command';
@@ -98,6 +99,7 @@ const Index = () => {
     return (
         <div className='h-screen flex flex-col overflow-hidden'>
             <Navbar />
+            <Breadcrumb />
             <main className='flex-1 flex items-center justify-center py-6 overflow-y-auto'>
             <div className='lg:w-[30%] md:w-[60%] w-[90%] bg-white overflow-hidden rounded-xl shadow-md'>
                 <h2 className='text-2xl font-bold text-center text-gray-600 mt-2'>Desactivar Cursos a Clientes</h2>

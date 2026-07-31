@@ -1,95 +1,67 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Link from "next/link";
-import { useAuth } from '../hooks/useAuth';
-import { useQuery } from 'react-query';
-import { Cursos } from "../db/Cursos";
+import { PlayCircle, ShoppingCart } from 'lucide-react';
 
-const cursoCtrl = new Cursos();
-
-// Placeholder mientras se determina si el usuario tiene acceso al curso
-const CardSkeleton = () => (
-  <div className="rounded-lg overflow-hidden shadow-md animate-pulse bg-white">
-    <div className="h-44 bg-gray-200" />
+export const CardSkeleton = () => (
+  <div className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm animate-pulse">
+    <div className="aspect-video bg-gray-100" />
     <div className="p-4 space-y-3">
-      <div className="h-4 bg-gray-200 rounded w-3/4" />
-      <div className="h-3 bg-gray-200 rounded w-full" />
-      <div className="h-3 bg-gray-200 rounded w-2/3" />
-    </div>
-    <div className="px-4 pb-4">
-      <div className="h-9 bg-gray-200 rounded-md" />
+      <div className="h-4 bg-gray-100 rounded-full w-3/4" />
+      <div className="h-3 bg-gray-100 rounded-full w-full" />
+      <div className="h-3 bg-gray-100 rounded-full w-2/3" />
+      <div className="h-10 bg-gray-100 rounded-xl mt-5" />
     </div>
   </div>
 )
 
-export const Cursocard = ({ titulo, descripcion, slug, precio, img }) => {
-  const { User } = useAuth();
-  const [active, setActive] = useState(false)
-
-  // Una sola query por usuario — React Query la deduplica entre todas las cards
-  const { data: userCursosData, isLoading } = useQuery(
-    `cursos-cliente-${User?.uid}`,
-    () => cursoCtrl.getCursosCliente(User?.uid),
-    { enabled: !!User?.uid }
-  )
-
-  useEffect(() => {
-    if (userCursosData?.cursos?.includes(slug)) {
-      setActive(true)
-    }
-  }, [userCursosData, slug])
-
-  // Muestra skeleton hasta saber si el curso está activo o no
-  if (isLoading) return <CardSkeleton />
-
-  const thumbnail = img || '/miniaturavideo.svg'
+// active se resuelve en el padre (pages/cursos/index.jsx) para dividir secciones
+export const Cursocard = ({ titulo, descripcion, slug, precio, img, active = false }) => {
+  // string vacío de Firestore también cae al fallback
+  const thumbnail = img?.trim() ? img : '/video-placeholder.svg'
+  const tienePrecio = !active && precio != null && Number(precio) > 0
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-200 h-full">
+    <div className="group flex flex-col rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
 
-      {/* Imagen del curso con altura fija para evitar deformaciones */}
-      <div className="relative h-44 overflow-hidden flex-shrink-0">
+      {/* Imagen */}
+      <div className="relative aspect-video overflow-hidden flex-shrink-0 bg-gray-100">
         <img
           src={thumbnail}
-          alt={`Miniatura de ${titulo}`}
-          className="w-full h-full object-cover"
+          alt={titulo}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        {/* Badge de estado del curso */}
-        <span className={`absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full
-          ${active
-            ? 'bg-green-100 text-green-700 border border-green-200'
-            : 'bg-gray-100 text-gray-600 border border-gray-200'
-          }`}>
+        <span className={`absolute top-3 left-3 text-xs font-medium px-2.5 py-1 rounded-full
+          ${active ? 'bg-green-500 text-white' : 'bg-black/50 text-white'}`}>
           {active ? 'Activo' : 'Disponible'}
         </span>
       </div>
 
-      {/* Contenido de la card */}
-      <div className="flex flex-col flex-1 p-4">
-        <h2 className="text-gray-700 font-bold text-sm leading-snug mb-2">{titulo}</h2>
-        <p className="text-gray-400 text-sm line-clamp-3 flex-1">{descripcion}</p>
-
-        {/* Precio — solo visible cuando el curso no está activo */}
-        {!active && (
-          <p className="text-gray-600 font-semibold text-sm mt-3">
-            Precio: <span className="text-blue-600">${precio}</span>
-          </p>
-        )}
+      {/* Texto */}
+      <div className="px-4 pt-4 pb-0">
+        <h2 className="text-gray-800 font-semibold text-md leading-snug mb-1.5">{titulo}</h2>
+        <p className="text-gray-400 text-xs leading-relaxed">{descripcion}</p>
       </div>
 
-      {/* Acción principal */}
-      <div className="px-4 pb-4">
+      {/* Precio + botón */}
+      <div className="px-4 pt-3 pb-4">
+        {tienePrecio && (
+          <p className="text-gray-800 font-bold text-base mb-3">
+            ${Number(precio).toLocaleString('es-MX')} <span className="text-xs text-gray-400 font-normal">MXN</span>
+          </p>
+        )}
+
         {active ? (
           <Link href={`/cursos/${slug}`}>
-            <a className="block w-full text-center py-2 rounded-md bg-blue-500 text-white text-sm
-                          font-medium hover:bg-blue-600 transition-colors">
+            <a className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
+              <PlayCircle className="w-4 h-4" />
               Ver Curso
             </a>
           </Link>
         ) : (
           <Link href="/comprarCursos">
-            <a className="block w-full text-center py-2 rounded-md bg-blue-500 text-white text-sm
-                          font-medium hover:bg-blue-600 transition-colors">
-              Comprar
+            <a className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
+              <ShoppingCart className="w-4 h-4" />
+              Adquirir
             </a>
           </Link>
         )}

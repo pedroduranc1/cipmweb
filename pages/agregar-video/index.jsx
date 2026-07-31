@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
+import Breadcrumb from '../../components/Breadcrumb'
 
 import { Cursos } from "../../db/Cursos";
 import { useQuery } from 'react-query';
@@ -44,10 +45,11 @@ const index = () => {
 
 
   return (
-    <>
+    <div className='h-screen flex flex-col overflow-hidden'>
       <Navbar />
-
-      <div className='lg:w-[30%] md:w-[60%] w-[90%] h-fit mt-[5%] bg-white/90 overflow-hidden rounded-md shadow-md mx-auto'>
+      <Breadcrumb />
+      <main className='flex-1 flex items-center justify-center py-6 overflow-y-auto'>
+      <div className='lg:w-[30%] md:w-[60%] w-[90%] bg-white overflow-hidden rounded-xl shadow-md'>
         <h2 className='text-2xl font-bold text-center text-gray-600 mt-2'>Agregar Videos al Curso</h2>
 
         <div className='w-full flex justify-center'>
@@ -160,9 +162,9 @@ const index = () => {
 
 
       </div>
-
+      </main>
       <Footer />
-    </>
+    </div>
   )
 }
 

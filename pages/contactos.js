@@ -4,6 +4,7 @@ import Contact from '../components/Contact'
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
 import Heros from '../components/Heros'
+import Breadcrumb from '../components/Breadcrumb'
 
 const Contactos = () => {
   return (
@@ -15,6 +16,7 @@ const Contactos = () => {
         <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
       </Head>
       <Navbar />
+      <Breadcrumb />
       <Heros />
       <Contact />
       <Footer />

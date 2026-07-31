@@ -6,6 +6,7 @@ import Navbar from '../../components/Navbar'
 import Videofield from '../../minicomponents/Videofield'
 import videoslist from '../../db/videos'
 import { useRouter } from 'next/router'
+import Breadcrumb from '../../components/Breadcrumb'
 
 
 export default function Videos() {
@@ -40,6 +41,7 @@ export default function Videos() {
         <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
       </Head>
       <Navbar />
+      <Breadcrumb />
       <Videofield videoslist={videosarr.length !== 0 ? videosarr : videoslist} />
       <Contact />
       <Footer />

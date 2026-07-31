@@ -6,7 +6,7 @@ const VideoCard2 = ({data}) => {
     return (
         <Link href={`/video/${data.id}`}>
             <div className='grid col-span-1 row-span-1 justify-center cursor-pointer'>
-                <img src={data.miniatura || "/imgvideo.svg"} className='col-span-1 row-span-1 w-[330px] h-[180px] bg-gray-700' alt="" />
+                <img src={data.miniatura?.trim() || '/video-placeholder.svg'} className='col-span-1 row-span-1 w-[330px] h-[180px] bg-gray-700' alt="" />
                 <h1 className='text-gray-700 col-span-1 font-semibold mt-4 text-lg' style={{maxWidth:"330px"}}>{data.videoname}</h1>
                 <p className='text-gray-700 col-span-1 row-span-1 font-semibold text-lg'>{data.fecha}</p>
             </div>

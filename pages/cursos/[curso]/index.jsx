@@ -6,88 +6,123 @@ import { Cursocard } from "../../../minicomponents/cardVideo";
 import { useQuery } from 'react-query';
 import { Cursos } from "../../../db/Cursos";
 import { useAuth } from '../../../hooks/useAuth';
-import { Undo2 } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
+import Breadcrumb from '../../../components/Breadcrumb';
 
 const cursoCtrl = new Cursos();
 
+const HeroSkeleton = () => (
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 animate-pulse">
+    <div className="rounded-2xl overflow-hidden bg-gray-100 aspect-video md:aspect-[21/7] w-full mb-8" />
+  </div>
+)
+
+const VideoCardSkeleton = () => (
+  <div className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm animate-pulse">
+    <div className="aspect-video bg-gray-100" />
+    <div className="p-4 space-y-2">
+      <div className="h-4 bg-gray-100 rounded-full w-3/4" />
+      <div className="h-3 bg-gray-100 rounded-full w-full" />
+    </div>
+  </div>
+)
+
 const CursoPage = () => {
-    const [VideoFiltrados, setVideoFiltrados] = useState(null)
-    const router = useRouter()
-    const { User, loading } = useAuth()
+  const [videosOrdenados, setVideosOrdenados] = useState(null)
+  const router = useRouter()
+  const { User, loading } = useAuth()
+  const { curso: CursoID } = router.query
 
-    const { curso: CursoID } = router.query
+  useEffect(() => {
+    if (!loading && !User) router.push("/")
+  }, [User, loading])
 
-    useEffect(() => {
-        if (!loading && !User) {
-          router.push("/")
-        }
-      }, [User, loading])
+  const { data: CursosData, isLoading: isLoadingCurso } = useQuery(
+    ["curso", CursoID],
+    () => cursoCtrl.getCurso(CursoID),
+    { enabled: !!CursoID }
+  )
 
-    const { data: CursosData, isLoading: IsLoadingCurso, isError: isErrorCurso } = useQuery(["curso", CursoID], () => cursoCtrl.getCurso(CursoID), { enabled: !!CursoID })
-    const { data: VideosData, isLoading: IsLoadingVideos, isError: isErrorVideos } = useQuery(["videos", CursoID], () => cursoCtrl.getVideosCurso(CursoID), { enabled: !!CursoID });
+  const { data: VideosData, isLoading: isLoadingVideos } = useQuery(
+    ["videos", CursoID],
+    () => cursoCtrl.getVideosCurso(CursoID),
+    { enabled: !!CursoID }
+  )
 
+  useEffect(() => {
+    if (!VideosData) return
+    const ordenados = [...VideosData].sort((a, b) => a.Fecha.toDate() - b.Fecha.toDate())
+    setVideosOrdenados(ordenados)
+  }, [VideosData])
 
-    function filtrarCursosPorFecha(cursos) {
-        // Ordenar los cursos por fecha de manera ascendente
-        const cursosOrdenados = cursos.sort((curso1, curso2) => {
-            const fecha1 = curso1.Fecha.toDate();
-            const fecha2 = curso2.Fecha.toDate();
-            return fecha1 - fecha2;
-        });
+  const isLoading = isLoadingCurso || isLoadingVideos
+  const thumbnail = CursosData?.ImgUrl?.trim() ? CursosData.ImgUrl : '/video-placeholder.svg'
 
-        return cursosOrdenados;
-    }
+  return (
+    <>
+      <Navbar />
 
-    useEffect(() => {
-        if (VideosData) {
-            const cursosFiltrados = filtrarCursosPorFecha(VideosData);
-            
-            setVideoFiltrados(cursosFiltrados);
-        }
+      <Breadcrumb labels={{ [CursoID]: CursosData?.Titulo }} />
 
-    }, [VideosData])
-
-
-
-
-
-    return (
-        <>
-            <Navbar />
-
-            <div className='w-[80%] my-[1%] mx-auto'>
-                <button className='flex items-center justify-center text-gray-400 gap-x-2 cursor-pointer' onClick={() => { router.back() }}><Undo2 className='text-gray-400'/> Volver</button>
+      {/* ── Hero del curso ───────────────────────────────────────── */}
+      {isLoading ? <HeroSkeleton /> : (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4 mb-10">
+          <div className="relative w-full rounded-2xl overflow-hidden bg-gray-100">
+            <img
+              src={thumbnail}
+              alt={CursosData?.Titulo}
+              className="w-full max-h-[380px] object-cover"
+            />
+            {/* Overlay con info del curso */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-6 md:p-8">
+              <h1 className="text-white text-2xl md:text-3xl font-bold leading-tight mb-2">
+                {CursosData?.Titulo}
+              </h1>
+              <p className="text-white/80 text-sm md:text-base leading-relaxed max-w-2xl">
+                {CursosData?.Descripcion}
+              </p>
             </div>
+          </div>
+        </div>
+      )}
 
-            <div className='w-[80%] mx-auto flex md:flex-row flex-col'>
-                <div className='w-full md:w-1/2 h-full md:h-[50vh] '>
-                    <img src={CursosData?.ImgUrl ? CursosData?.ImgUrl : '/miniaturavideo.svg'} className='w-full h-full' alt="" />
-                </div>
-                <div className='w-full md:w-1/2 h-full md:h-[50vh] flex flex-col md:py-[5%] md:px-10'>
-                    <h3 className='text-gray-600 mt-5 md:mt-0 text-2xl'>{CursosData?.Titulo}</h3>
-                    <p className='text-gray-400 mt-5 mb-5 md:mb-0 text-base'>
-                        {CursosData?.Descripcion}
-                    </p>
-                </div>
-            </div>
+      {/* ── Encabezado del contenido ─────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-5 flex items-center gap-2">
+        <BookOpen className="w-5 h-5 text-gray-400" />
+        <h2 className="text-xl font-bold text-gray-700">Contenido del curso</h2>
+        {videosOrdenados && (
+          <span className="text-sm text-gray-400 ml-1">
+            · {videosOrdenados.length} clase{videosOrdenados.length !== 1 ? 's' : ''}
+          </span>
+        )}
+      </div>
 
-            <div className='w-[80%] mb-5 mx-auto'>
-                <h3 className='text-2xl text-gray-600 font-bold'>Contenido del curso</h3>
-            </div>
+      {/* ── Grid de videos ───────────────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-16">
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-4 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => <VideoCardSkeleton key={i} />)}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {videosOrdenados?.map((video, index) => (
+              <Cursocard
+                key={video.id}
+                index={index + 1}
+                slug={`/${CursoID}/video/${video.id}`}
+                img={video.ImgUrl}
+                imgSecond={thumbnail}
+                titulo={video.Titulo}
+                descripcion={video.Descripcion}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
-            <div className='w-[80%] grid md:grid-cols-3 transition-all grid-cols-1 grid-flow-row gap-4 mx-auto'>
-                {
-                    VideoFiltrados?.map((video) => (
-                        <Cursocard slug={`/${CursoID}/video/${video.id}`} img={video.ImgUrl} imgSecond={CursosData?.ImgUrl ? CursosData?.ImgUrl : "/miniaturavideo.svg"} titulo={video.Titulo} descripcion={video.Descripcion} />
-                    ))
-                }
-            </div>
-
-
-            <Footer />
-
-        </>
-    )
+      <Footer />
+    </>
+  )
 }
 
 export default CursoPage

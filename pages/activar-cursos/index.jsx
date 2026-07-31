@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
+import Breadcrumb from '../../components/Breadcrumb'
 import { useQuery } from 'react-query'
 import { Cursos } from "../../db/Cursos";
 import { useAuth } from '../../hooks/useAuth'
@@ -111,6 +112,7 @@ const index = () => {
     return (
         <div className='h-screen flex flex-col overflow-hidden'>
             <Navbar />
+            <Breadcrumb />
 
             <main className='flex-1 flex items-center justify-center py-6 overflow-y-auto'>
             <div className='lg:w-[30%] md:w-[60%] w-[90%] bg-white overflow-hidden rounded-xl shadow-md'>

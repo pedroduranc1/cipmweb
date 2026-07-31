@@ -1,4 +1,5 @@
 import {
+  addDoc,
   collection,
   deleteDoc,
   doc,
@@ -6,6 +7,7 @@ import {
   getDocs,
   orderBy,
   query,
+  serverTimestamp,
   setDoc,
   updateDoc,
   where,
@@ -248,5 +250,24 @@ export class Cursos {
       console.error("Error updating blog: ", error);
       return false;
     }
+  }
+
+  async getComments(videoId) {
+    const q = query(
+      collection(db, "videos", videoId, "comentarios"),
+      orderBy("creadoEn", "asc")
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
+  async addComment(videoId, { texto, autorId, autorNombre }) {
+    const ref = collection(db, "videos", videoId, "comentarios");
+    await addDoc(ref, {
+      texto,
+      autorId,
+      autorNombre,
+      creadoEn: serverTimestamp(),
+    });
   }
 }
