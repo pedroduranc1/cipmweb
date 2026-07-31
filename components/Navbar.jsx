@@ -1,332 +1,182 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
-
-import { Fragment } from 'react'
-import { Popover, Transition } from '@headlessui/react'
-import {
-  BookmarkAltIcon,
-  CalendarIcon,
-  FilmIcon,
-  ChatIcon,
-  HomeIcon,
-  MenuIcon,
-  PhoneIcon,
-  PlayIcon,
-  RefreshIcon,
-  ShieldCheckIcon,
-  SupportIcon,
-  ViewGridIcon,
-  XIcon,
-} from '@heroicons/react/outline'
+import { useRouter } from 'next/router'
 import { useAuth } from '../hooks/useAuth'
-import { LogIn, LogOut, LogOutIcon, User as UserImg, UserRoundPlus } from 'lucide-react'
+import { LogOut, User as UserIcon, Menu, X } from 'lucide-react'
 
-const solutions = [
-  {
-    name: 'Inicio',
-    description: 'Get a better understanding of where your traffic is coming from.',
-    href: '/',
-    icon: HomeIcon,
-  },
-  {
-    name: 'Videos',
-    description: 'Speak directly to your customers in a more meaningful way.',
-    href: '/videos/cipm',
-    icon: FilmIcon,
-  },
-  {
-    name: 'Contacto',
-    description: "Connect with third-party tools that you're already using.",
-    href: '/contactos',
-    icon: ChatIcon,
-  },
-
-  {
-    name: 'Login',
-    description: 'Speak directly to your customers in a more meaningful way.',
-    href: '/login',
-    icon: LogIn,
-  },
-  // {
-  //   name: 'Registrate',
-  //   description: 'Speak directly to your customers in a more meaningful way.',
-  //   href: '/registro',
-  //   icon: UserRoundPlus,
-  // },
+// Enlaces visibles para usuarios no autenticados
+const PUBLIC_LINKS = [
+  { label: 'Inicio',   href: '/' },
+  { label: 'Videos',   href: '/videos/cipm' },
+  { label: 'Contacto', href: '/contactos' },
+  { label: 'Login',    href: '/login' },
 ]
 
-const solutionsLog = [
-  {
-    name: 'Inicio',
-    description: 'Get a better understanding of where your traffic is coming from.',
-    href: '/',
-    icon: HomeIcon,
-  },
-  {
-    name: 'Videos',
-    description: 'Speak directly to your customers in a more meaningful way.',
-    href: '/videos/cipm',
-    icon: FilmIcon,
-  },
-  {
-    name: 'Contacto',
-    description: "Connect with third-party tools that you're already using.",
-    href: '/contactos',
-    icon: ChatIcon,
-  },
-  {
-    name: 'Cursos',
-    description: 'Speak directly to your customers in a more meaningful way.',
-    href: '/cursos',
-    icon: FilmIcon,
-  },
-  {
-    name: 'Perfil',
-    description: 'Speak directly to your customers in a more meaningful way.',
-    href: '/',
-    icon: UserImg,
-  }
-]
-const callsToAction = [
-  { name: 'Watch Demo', href: '#', icon: PlayIcon },
-  { name: 'Contact Sales', href: '#', icon: PhoneIcon },
-]
-const resources = [
-  {
-    name: 'Help Center',
-    description: 'Get all of your questions answered in our forums or contact support.',
-    href: '#',
-    icon: SupportIcon,
-  },
-  {
-    name: 'Guides',
-    description: 'Learn how to maximize our platform to get the most out of it.',
-    href: '#',
-    icon: BookmarkAltIcon,
-  },
-  {
-    name: 'Events',
-    description: 'See what meet-ups and other events we might be planning near you.',
-    href: '#',
-    icon: CalendarIcon,
-  },
-  { name: 'Security', description: 'Understand how we take your privacy seriously.', href: '#', icon: ShieldCheckIcon },
-]
-const recentPosts = [
-  { id: 1, name: 'Boost your conversion rate', href: '#' },
-  { id: 2, name: 'How to use search engine optimization to drive traffic to your site', href: '#' },
-  { id: 3, name: 'Improve your customer experience', href: '#' },
+// Enlaces visibles para usuarios autenticados
+const AUTH_LINKS = [
+  { label: 'Inicio',   href: '/' },
+  { label: 'Videos',   href: '/videos/cipm' },
+  { label: 'Cursos',   href: '/cursos' },
+  { label: 'Contacto', href: '/contactos' },
 ]
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
-
+const SOCIAL_LINKS = [
+  { label: 'WhatsApp', href: 'https://wa.link/sljtqs',                                          icon: '/ws.svg' },
+  { label: 'Facebook', href: 'https://www.facebook.com/Cursosdeinglesmty?mibextid=2JQ9oc',      icon: '/fb.svg' },
+  { label: 'TikTok',   href: 'https://www.tiktok.com/@adrianlealcaldera?lang=en',               icon: '/tiktok.svg' },
+  { label: 'YouTube',  href: 'https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA',           icon: '/youtube.svg' },
+]
 
 const Navbar = () => {
-  const [videoname, setvideoname] = useState("cimp")
   const { User, logout } = useAuth()
+  const router = useRouter()
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  const navLinks = User ? AUTH_LINKS : PUBLIC_LINKS
+
+  // Determina si un enlace corresponde a la ruta actual para resaltarlo
+  const isActive = (href) =>
+    href === '/' ? router.pathname === '/' : router.pathname.startsWith(href)
 
   return (
-    <Popover className="relative bg-white">
+    <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex justify-between items-center border-b-2 border-gray-100 py-6 md:justify-start md:space-x-10">
-          <div className="flex justify-start lg:w-0 lg:flex-1">
-            <Link href="/">
-              <a className='flex'>
-                <img
-                  className='h-14 w-auto sm:h-15'
-                  src="/logo.svg"
-                  alt="" ></img>
-                <h1 className='grid items-center font-bold ml-2'>C.I.P.M</h1>
-              </a>
-            </Link>
-          </div>
-          <div className="-mr-2 -my-2 md:hidden">
-            <Popover.Button className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
-              <span className="sr-only">Open menu</span>
-              <MenuIcon className="h-6 w-6" aria-hidden="true" />
-            </Popover.Button>
-          </div>
-          <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-            <Link href="/">
-              <a className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
-                Inicio
-              </a>
-            </Link>
-            <Link href="/videos/cipm">
-              <a className="whitespace-nowrap text-base font-medium ml-10 text-gray-500 hover:text-gray-900">
-                Videos
-              </a>
-            </Link>
-            <Link href="/contactos">
-              <a className="whitespace-nowrap text-base font-medium ml-10 text-gray-500 hover:text-gray-900">
-                Contacto
-              </a>
-            </Link>
+        <div className="flex items-center justify-between h-16">
 
-            {
-              !User ? (<>
-                <Link href="/login">
-                  <a className="whitespace-nowrap text-base font-medium ml-10 text-gray-500 hover:text-gray-900">
-                    Login
-                  </a>
-                </Link>
-                {/* <Link href="/registro">
-                  <a className="whitespace-nowrap text-base font-medium ml-10 text-gray-500 hover:text-gray-900">
-                    Registro
-                  </a>
-                </Link> */}
-              </>) : (<>
-                <Link href="/cursos">
-                  <a className="whitespace-nowrap text-base font-medium ml-10 text-gray-500 hover:text-gray-900">
-                    Cursos
-                  </a>
-                </Link>
-                <Link href="/">
-                  <a className="whitespace-nowrap text-base font-medium ml-10 text-gray-500 hover:text-gray-900">
-                    {User?.nombre} {User?.apellido}
-                  </a>
-                </Link>
-                <div
-                  className="whitespace-nowrap cursor-pointer flex justify-center items-center text-base font-medium ml-3 text-gray-500 hover:text-gray-900"
-                  onClick={() => logout()}
+          {/* ── Logo ───────────────────────────────────────────── */}
+          <Link href="/">
+            <a className="flex items-center gap-2 group">
+              <img src="/logo.svg" alt="Logo C.I.P.M" className="h-9 w-auto" />
+              <span className="font-bold text-gray-800 group-hover:text-gray-600 transition-colors">
+                C.I.P.M
+              </span>
+            </a>
+          </Link>
+
+          {/* ── Navegación desktop ─────────────────────────────── */}
+          <nav className="hidden md:flex items-center gap-6">
+            {navLinks.map(({ label, href }) => (
+              <Link key={href} href={href}>
+                <a className={`text-sm font-medium transition-colors
+                  ${isActive(href)
+                    ? 'text-gray-900 border-b-2 border-gray-800 pb-0.5'
+                    : 'text-gray-500 hover:text-gray-900'
+                  }`}>
+                  {label}
+                </a>
+              </Link>
+            ))}
+          </nav>
+
+          {/* ── Lado derecho desktop ───────────────────────────── */}
+          <div className="hidden md:flex items-center gap-4">
+
+            {/* Redes sociales */}
+            <div className="flex items-center gap-2">
+              {SOCIAL_LINKS.map(({ label, href, icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
                 >
-                  <LogOut />
-                </div>
-              </>)
-            }
-            {/*  */}
-
-            <div className="w-full h-full flex px-2 space-x-2">
-              <a target="_blank" className="w-8 h-8 inline-block " href="https://wa.link/sljtqs">
-                <img src="/ws.svg" alt="" />
-              </a>
-              <a target="_blank" className="w-8 h-8 inline-block " href="https://www.facebook.com/Cursosdeinglesmty?mibextid=2JQ9oc">
-                <img src="/fb.svg" alt="" />
-              </a>
-              <a target="_blank" className="w-8 h-8 inline-block " href="https://www.tiktok.com/@adrianlealcaldera?lang=en">
-                <img src="/tiktok.svg" alt="" />
-              </a>
-              <a target="_blank" className="w-8 h-8 inline-block " href="https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA">
-                <img src="/youtube.svg" alt="" />
-              </a>
+                  <img src={icon} alt={label} className="w-4 h-4" />
+                </a>
+              ))}
             </div>
 
-
+            {/* Info del usuario autenticado */}
+            {User && (
+              <div className="flex items-center gap-2 pl-3 border-l border-gray-100">
+                <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                  <UserIcon className="w-4 h-4 text-gray-400" />
+                  <span className="font-medium">{User.nombre} {User.apellido}</span>
+                </div>
+                <button
+                  onClick={logout}
+                  aria-label="Cerrar sesión"
+                  className="p-1.5 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
+
+          {/* ── Botón menú mobile ──────────────────────────────── */}
+          <button
+            className="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+
         </div>
       </div>
 
-      <Transition
-        as={Fragment}
-        enter="duration-200 ease-out"
-        enterFrom="opacity-0 scale-95"
-        enterTo="opacity-100 scale-100"
-        leave="duration-100 ease-in"
-        leaveFrom="opacity-100 scale-100"
-        leaveTo="opacity-0 scale-95"
-      >
-        <Popover.Panel focus className="absolute z-50 top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden">
-          <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50">
-            <div className="pt-5 pb-6 px-5">
-              <div className="flex items-center justify-between">
-                <div className='flex'>
-                  <img
-                    className="h-12 w-auto"
-                    src="/logo.svg"
-                    alt="Workflow"
-                  />
-                  <h1 className='grid items-center font-bold ml-2'>C.I.P.M</h1>
-                </div>
-                <div className="-mr-2">
-                  <Popover.Button className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
-                    <span className="sr-only">Close menu</span>
-                    <XIcon className="h-6 w-6" aria-hidden="true" />
-                  </Popover.Button>
-                </div>
-              </div>
-              <div className="mt-6">
-                <nav className="grid gap-y-8">
-                  {
-                    User ?
-                      (<>
-                        {solutionsLog.map((item) => (
-                          <div className="flex justify-between">
-                            <Link
-                              key={item.name}
-                              href={`${item.href}`}>
-                              <a
-                                className="-m-3 p-3 w-[95%] flex items-center rounded-md hover:bg-gray-50"
-                              >
-                                <item.icon className="flex-shrink-0 h-6 w-6 text-gray-600" aria-hidden="true" />
-                                <span className="ml-3 text-base font-medium text-gray-900">{item.name == "Perfil" ? (<>{User.nombre} {User.apellido}</>) : (<>{item.name}</>)}</span>
-                              </a>
-                            </Link>
-                            {
-                              item.name == "Perfil" && (<button className="w-[5%]" onClick={()=>logout()}><LogOutIcon/></button>)
-                            }
-                          </div>
-                        ))}
-                      </>)
-                      :
-                      (<>
-                        {solutions.map((item) => (
-                          <Link
-                            key={item.name}
-                            href={`${item.href}`}>
-                            <a
-                              className="-m-3 p-3 flex items-center rounded-md hover:bg-gray-50"
-                            >
-                              <item.icon className="flex-shrink-0 h-6 w-6 text-gray-600" aria-hidden="true" />
-                              <span className="ml-3 text-base font-medium text-gray-900">{item.name}</span>
-                            </a>
-                          </Link>
-                        ))}
-                      </>)
-                  }
+      {/* ── Menú mobile ────────────────────────────────────────── */}
+      {mobileOpen && (
+        <div className="md:hidden border-t border-gray-100 bg-white">
+          <div className="px-4 py-4 flex flex-col gap-1">
 
-                </nav>
-              </div>
-            </div>
-            <div className="py-6 px-5 space-y-6">
-              <div>
-                <div className="flex items-center w-full justify-center">
-                  <div className="flex w-full border-2 rounded">
-                    <input type="text" onChange={(e) => { setvideoname(e.target.value) }} className="px-4 py-2 w-full selection:border-gray-500" placeholder="Search..." />
-                    <Link href={`/videos/${encodeURIComponent(videoname)}`}>
-                      <a className="flex cursor-pointer items-center justify-center px-4 border-l">
-                        <svg className="w-4 h-4 text-gray-600" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24">
-                          <path
-                            d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" />
-                        </svg>
-                      </a>
-                    </Link>
+            {navLinks.map(({ label, href }) => (
+              <Link key={href} href={href}>
+                <a
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center px-3 py-2.5 rounded-md text-sm font-medium transition-colors
+                    ${isActive(href)
+                      ? 'bg-gray-100 text-gray-900'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                >
+                  {label}
+                </a>
+              </Link>
+            ))}
+
+            {/* Separador + datos del usuario en mobile */}
+            {User && (
+              <div className="mt-3 pt-3 border-t border-gray-100">
+                <div className="flex items-center justify-between px-3 py-2">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <UserIcon className="w-4 h-4 text-gray-400" />
+                    <span className="font-medium">{User.nombre} {User.apellido}</span>
                   </div>
-                </div>
-
-                <div className='grid place-items-center grid-cols-4 mt-6 gap-4'>
-                  <a target="_blank" className="w-8 h-8 inline-block " href="https://wa.link/sljtqs">
-                    <img src="/ws.svg" alt="" />
-                  </a>
-                  <a target="_blank" className="w-8 h-8 inline-block " href="https://www.facebook.com/Cursosdeinglesmty?mibextid=2JQ9oc">
-                    <img src="/fb.svg" alt="" />
-                  </a>
-                  <a target="_blank" className="w-8 h-8 inline-block " href="https://www.tiktok.com/@adrianlealcaldera?lang=en">
-                    <img src="/tiktok.svg" alt="" />
-                  </a>
-                  <a target="_blank" className="w-8 h-8 inline-block " href="https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA">
-                    <img src="/youtube.svg" alt="" />
-                  </a>
+                  <button
+                    onClick={() => { logout(); setMobileOpen(false) }}
+                    className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Salir
+                  </button>
                 </div>
               </div>
+            )}
+
+            {/* Redes sociales en mobile */}
+            <div className="mt-3 pt-3 border-t border-gray-100 px-3 flex gap-3">
+              {SOCIAL_LINKS.map(({ label, href, icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                >
+                  <img src={icon} alt={label} className="w-5 h-5" />
+                </a>
+              ))}
             </div>
+
           </div>
-        </Popover.Panel>
-      </Transition>
-    </Popover>
+        </div>
+      )}
+    </header>
   )
 }
 
-export default Navbar;
+export default Navbar

@@ -83,12 +83,8 @@ const CursoPage = () => {
                 }
             </div>
 
-            <div className='pb-[50vh] ' />
 
-            <div className='relative'>
-                <Footer />
-
-            </div>
+            <Footer />
 
         </>
     )

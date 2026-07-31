@@ -1,73 +1,99 @@
 import React from 'react'
 import Link from 'next/link'
+import { useAuth } from '../hooks/useAuth'
+
+const NAV_LINKS = [
+  { label: 'Inicio',    href: '/' },
+  { label: 'Videos',   href: '/videos/cipm' },
+  { label: 'Contacto', href: '/contactos' },
+]
+
+const SOCIAL_LINKS = [
+  { label: 'WhatsApp', href: 'https://wa.link/sljtqs',                                            icon: '/ws.svg' },
+  { label: 'Facebook', href: 'https://www.facebook.com/Cursosdeinglesmty?mibextid=2JQ9oc',        icon: '/fb.svg' },
+  { label: 'TikTok',   href: 'https://www.tiktok.com/@adrianlealcaldera?lang=en',                 icon: '/tiktok.svg' },
+  { label: 'YouTube',  href: 'https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA',             icon: '/youtube.svg' },
+]
 
 const Footer = () => {
-    const year = new Date(Date.now()).getFullYear();
-    return (
-        <div className='bg-gray-200 w-full absolute bottom-0 left-0'>
-            <div className="max-w-7xl mx-auto px-4  sm:px-6">
-                <div className="flex flex-col sm:flex-row  justify-between items-center py-6 md:justify-start md:space-x-10">
-                    <div className="flex justify-start lg:w-0 lg:flex-1">
-                        <Link href="">
-                            <a className='flex '>
-                                <img
-                                    className="h-14 w-auto sm:h-15"
-                                    src="/logo.svg"
-                                    alt=""
-                                    layout='fill'
-                                ></img>
-                                <h1 className='grid items-center font-bold ml-2'>C.I.P.M</h1>
-                            </a>
-                        </Link>
+  const year = new Date().getFullYear()
+  const { User } = useAuth()
 
-                    </div>
+  return (
+    <footer className="w-full border-t border-gray-100 bg-white">
+      <div className="max-w-7xl mx-auto px-6 py-10">
 
-                    <div className=" md:flex items-center justify-end md:flex-1 lg:w-0">
+        {/* ── Fila principal ─────────────────────────────────────── */}
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
 
-                        <div className='flex mt-6 space-x-6 justify-around'>
-                            <Link href="/">
-                                <a className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
-                                    Inicio
-                                </a>
-                            </Link>
+          {/* Logo + tagline */}
+          <Link href="/">
+            <a className="flex items-center gap-2 group w-fit">
+              <img src="/logo.svg" alt="Logo C.I.P.M" className="h-10 w-auto" />
+              <div className="flex flex-col leading-tight">
+                <span className="font-bold text-gray-800 group-hover:text-gray-600 transition-colors">
+                  C.I.P.M
+                </span>
+                <span className="text-xs text-gray-400">Cursos de Inglés Personalizados</span>
+              </div>
+            </a>
+          </Link>
 
-                            <Link href="/videos/cimp">
-                                <a className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
-                                    Videos
-                                </a>
-                            </Link>
+          {/* Navegación */}
+          <nav className="flex flex-col gap-2">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Navegación</p>
+            {NAV_LINKS.map(({ label, href }) => (
+              <Link key={href} href={href}>
+                <a className="text-sm text-gray-500 hover:text-gray-800 transition-colors w-fit">
+                  {label}
+                </a>
+              </Link>
+            ))}
+            {/* Cursos solo visible si el usuario está autenticado */}
+            {User && (
+              <Link href="/cursos">
+                <a className="text-sm text-gray-500 hover:text-gray-800 transition-colors w-fit">
+                  Cursos
+                </a>
+              </Link>
+            )}
+          </nav>
 
-                            <Link href="/contactos">
-                                <a className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
-                                    Contacto
-                                </a>
-                            </Link>
-                        </div>
-
-                        <div className='grid grid-cols-4 place-items-center gap-4 mt-6 md:ml-6'>
-                            <a target="_blank" className="w-8 h-8 inline-block " href="https://wa.link/sljtqs">
-                                <img src="/ws.svg" alt="" />
-                            </a>
-                            <a target="_blank" className="w-8 h-8 inline-block " href="https://www.facebook.com/Cursosdeinglesmty?mibextid=2JQ9oc">
-                                <img src="/fb.svg" alt="" />
-                            </a>
-                            <a target="_blank" className="w-8 h-8 inline-block " href="https://www.tiktok.com/@adrianlealcaldera?lang=en">
-                                <img src="/tiktok.svg" alt="" />
-                            </a>
-                            <a target="_blank" className="w-8 h-8 inline-block " href="https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA">
-                                <img src="/youtube.svg" alt="" />
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-                <div className='flex justify-center'>
-                    <h1 className='py-10 text-gray-900 font-semibold'>cursosdeinglespersonalizadosenmonterrey.com | Copyright {year} ©</h1>
-                </div>
+          {/* Redes sociales */}
+          <div className="flex flex-col gap-3">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Síguenos</p>
+            <div className="flex gap-3">
+              {SOCIAL_LINKS.map(({ label, href, icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                  className="w-8 h-8 flex items-center justify-center rounded-full
+                             hover:bg-gray-100 transition-colors"
+                >
+                  <img src={icon} alt={label} className="w-5 h-5" />
+                </a>
+              ))}
             </div>
+          </div>
+
         </div>
-    )
+
+        {/* ── Separador + copyright ───────────────────────────────── */}
+        <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-xs text-gray-400">
+            © {year} C.I.P.M — Todos los derechos reservados.
+          </p>
+          <p className="text-xs text-gray-400">
+            Monterrey, México
+          </p>
+        </div>
+
+      </div>
+    </footer>
+  )
 }
 
-export default Footer;
-
+export default Footer

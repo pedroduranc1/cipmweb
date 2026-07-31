@@ -161,10 +161,7 @@ const index = () => {
 
       </div>
 
-      <div className='pb-[40vh] ' />
-      <div className='relative'>
-        <Footer />
-      </div>
+      <Footer />
     </>
   )
 }

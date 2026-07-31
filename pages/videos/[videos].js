@@ -40,11 +40,9 @@ export default function Videos() {
         <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
       </Head>
       <Navbar />
-      <div className='relative'>
-        <Videofield videoslist={videosarr.length !== 0 ? videosarr : videoslist} />
-        <Contact />
-        <Footer />
-      </div>
+      <Videofield videoslist={videosarr.length !== 0 ? videosarr : videoslist} />
+      <Contact />
+      <Footer />
 
     </>
   )

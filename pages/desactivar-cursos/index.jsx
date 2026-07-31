@@ -96,9 +96,10 @@ const Index = () => {
     
 
     return (
-        <>
+        <div className='h-screen flex flex-col overflow-hidden'>
             <Navbar />
-            <div className='lg:w-[30%] md:w-[60%] w-[90%] h-fit mt-[5%] bg-white/90 overflow-hidden rounded-md shadow-md mx-auto'>
+            <main className='flex-1 flex items-center justify-center py-6 overflow-y-auto'>
+            <div className='lg:w-[30%] md:w-[60%] w-[90%] bg-white overflow-hidden rounded-xl shadow-md'>
                 <h2 className='text-2xl font-bold text-center text-gray-600 mt-2'>Desactivar Cursos a Clientes</h2>
                 <p className='text-gray-400 font-semibold text-center'>
                     Ingresa el correo del cliente
@@ -165,11 +166,9 @@ const Index = () => {
                     </button>
                 </div>
             </div>
-            <div className='pb-[40vh] ' />
-            <div className='relative'>
-                <Footer />
-            </div>
-        </>
+            </main>
+            <Footer />
+        </div>
     );
 };
 

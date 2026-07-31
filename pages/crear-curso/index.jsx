@@ -24,9 +24,9 @@ const index = () => {
   }, [User, loading])
 
   return (
-    <>
+    <div className='h-screen flex flex-col overflow-hidden'>
       <Navbar />
-
+      <main className='flex-1 flex items-center justify-center py-6 overflow-y-auto'>
 
       <Formik
         initialValues={{
@@ -72,7 +72,7 @@ const index = () => {
         }}
       >
         {({ errors, touched,isSubmitting,isValid }) => (
-          <Form className="flex flex-col lg:w-[30%] md:w-[60%] w-[90%] mt-10 mx-auto bg-white/70 p-5 shadow-md h-full ">
+          <Form className="flex flex-col lg:w-[30%] md:w-[60%] w-[90%] mx-auto bg-white rounded-xl p-6 shadow-md">
             <label className="font-bold text-gray-600" htmlFor="Titulo">Titulo</label>
             <Field className={`py-2 w-full ${errors.Titulo && touched.Titulo ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="Titulo" />
             {errors.Titulo && touched.Titulo ? (
@@ -117,11 +117,9 @@ const index = () => {
         )}
       </Formik>
 
-      <div className='pb-[50vh] ' />
-      <div className='relative'>
-        <Footer />
-      </div>
-    </>
+      </main>
+      <Footer />
+    </div>
   )
 }
 

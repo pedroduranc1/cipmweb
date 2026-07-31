@@ -36,9 +36,10 @@ const index = () => {
   const { data: DataCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
 
   return (
-    <>
+    <div className='h-screen flex flex-col overflow-hidden'>
       <Navbar />
-      <div className='lg:w-[30%] md:w-[60%] w-[90%] h-fit mt-[5%]  bg-white/90 overflow-hidden rounded-md shadow-md mx-auto'>
+      <main className='flex-1 flex items-center justify-center py-6 overflow-y-auto'>
+      <div className='lg:w-[30%] md:w-[60%] w-[90%] bg-white overflow-hidden rounded-xl shadow-md'>
         <div className='w-full px-5'>
           <h2 className='text-xl font-bold text-center text-gray-600 mt-2'>Selecciona el Curso</h2>
         </div>
@@ -63,11 +64,9 @@ const index = () => {
 
 
       </div>
-      <div className='pb-[55vh] ' />
-      <div className='relative'>
-        <Footer />
-      </div>
-    </>
+      </main>
+      <Footer />
+    </div>
   )
 }
 

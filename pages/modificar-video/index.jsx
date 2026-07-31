@@ -64,10 +64,7 @@ const index = () => {
 
       </div>
 
-      <div className='pb-[55vh] ' />
-      <div className='relative'>
-        <Footer />
-      </div>
+      <Footer />
     </>
   )
 }
