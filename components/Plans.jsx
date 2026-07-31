@@ -1,226 +1,201 @@
 import React, { useState } from 'react'
 import * as emailjs from '@emailjs/browser'
 import swal from 'sweetalert'
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
+import { Loader2, Send } from 'lucide-react'
+
+const PLANS = [
+  {
+    name: 'Personalizada',
+    price: '275',
+    unit: 'MXN / hora',
+    color: 'yellow',
+    border: 'border-yellow-400',
+    badge: 'bg-yellow-400/10 text-yellow-600',
+    hr: 'bg-yellow-400',
+    features: ['Clases individuales', 'Mín. 3 horas por semana', 'Lunes – Viernes', '12 semanas'],
+  },
+  {
+    name: 'Grupal',
+    price: '375',
+    unit: 'MXN / semana',
+    color: 'blue',
+    border: 'border-blue-500',
+    badge: 'bg-blue-500/10 text-blue-600',
+    hr: 'bg-blue-500',
+    features: ['Clases grupales', 'Lunes – Viernes', '12 semanas'],
+  },
+  {
+    name: 'Fin de semana',
+    price: '225',
+    unit: 'MXN / hora',
+    color: 'violet',
+    border: 'border-violet-600',
+    badge: 'bg-violet-600/10 text-violet-600',
+    hr: 'bg-violet-600',
+    features: ['Clases grupales', '3 horas por día', 'Sábado y domingo', '20 semanas'],
+  },
+  {
+    name: 'Super Intensivo',
+    price: '3,500',
+    unit: 'MXN total',
+    color: 'pink',
+    border: 'border-pink-500',
+    badge: 'bg-pink-500/10 text-pink-600',
+    hr: 'bg-pink-500',
+    features: ['1 semana intensiva', 'Lunes – Sábado', '9 am – 6 pm'],
+  },
+  {
+    name: 'Curso pregrabado',
+    price: '500',
+    unit: 'MXN total',
+    color: 'green',
+    border: 'border-green-500',
+    badge: 'bg-green-500/10 text-green-600',
+    hr: 'bg-green-500',
+    features: ['48 GB de contenido', '8.5 horas de video', '55 estructuras del lenguaje', '+500 palabras comunes'],
+  },
+]
+
+const SOCIAL_LINKS = [
+  { href: 'https://wa.link/jlznzn',                                     icon: '/ws.svg',      label: 'WhatsApp' },
+  { href: 'https://www.facebook.com/olympusgroupmx',                    icon: '/fb.svg',      label: 'Facebook' },
+  { href: 'https://www.tiktok.com/@adrianlealcaldera?lang=en',          icon: '/tiktok.svg',  label: 'TikTok' },
+  { href: 'https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA',      icon: '/youtube.svg', label: 'YouTube' },
+]
 
 const Plans = () => {
-  const [EnviandoCorreoPlans, setEnviandoCorreoPlans] = useState(false)
+  const [enviando, setEnviando] = useState(false)
 
   const formik = useFormik({
-    initialValues: {
-      nombrecompleto: '',
-      email: '',
-      message: '',
-      telefono: 'No Disponible'
-    },
+    initialValues: { nombrecompleto: '', email: '', message: '', telefono: 'No Disponible' },
     validationSchema: Yup.object({
-      nombrecompleto: Yup.string()
-        .required('Required'),
-      email: Yup.string()
-        .email('Invalid email address')
-        .required('Required'),
-      message: Yup.string()
-        .required('Required'),
+      nombrecompleto: Yup.string().required('Requerido'),
+      email: Yup.string().email('Correo inválido').required('Requerido'),
+      message: Yup.string().required('Requerido'),
     }),
     onSubmit: (values) => {
-
-      let valuesemaill = {
-        nombre: values.nombrecompleto,
-        from_name: values.email,
-        message: values.message,
-        telefono: values.telefono
-      }
-
-      setEnviandoCorreoPlans(true)
-      emailjs.send('service_5s7kuca', 'template_92ao3zk', valuesemaill, 'zqIzI2_ekxMdEySHy')
-        .then(function (response) {
-          swal(`Felicidades ${valuesemaill.nombre}`, "Tu correo a sido enviado con exito", "success");
-          limpiarinp()
-          setEnviandoCorreoPlans(false)
-        }, function (error) {
-          swal("Oops", "Ocurrio un error al enviar el correo", "error");
-          setEnviandoCorreoPlans(false)
-        });
+      setEnviando(true)
+      emailjs
+        .send('service_5s7kuca', 'template_92ao3zk', {
+          nombre: values.nombrecompleto,
+          from_name: values.email,
+          message: values.message,
+          telefono: values.telefono,
+        }, 'zqIzI2_ekxMdEySHy')
+        .then(() => {
+          swal(`¡Gracias, ${values.nombrecompleto}!`, 'Tu mensaje fue enviado con éxito', 'success')
+          formik.resetForm()
+        })
+        .catch(() => swal('Oops', 'Ocurrió un error al enviar el mensaje', 'error'))
+        .finally(() => setEnviando(false))
     },
-  });
+  })
 
-  const limpiarinp = () => {
-    formik.values.nombrecompleto = ""
-    formik.values.email = ""
-    formik.values.message = ""
-  }
+  const field = (name, type = 'text', placeholder) => ({
+    id: name, name, type, placeholder,
+    onChange: formik.handleChange,
+    onBlur: formik.handleBlur,
+    value: formik.values[name],
+    className: `w-full px-4 py-2.5 rounded-xl border text-sm outline-none transition-colors
+      ${formik.errors[name] && formik.touched[name]
+        ? 'border-red-400 focus:border-red-500'
+        : 'border-gray-200 focus:border-gray-400'}`,
+  })
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6">
-      <div className="flex flex-col justify-between py-6 px-10 md:px-20 md:justify-start md:space-x-10">
-        <h1 className='mt-8 mb-8 text-slate-800 text-center text-3xl font-semibold'>Nuestros planes</h1>
-        <div className='grid grid-cols-1  md:grid-cols-4 gap-4'>
-          <div className='p-6 flex flex-col border-2 border-yellow-400 rounded-2xl'>
-            <h1 className='text-center mt-4 text-lg text-yellow-400 font-semibold'>Personalizada</h1>
-            <h1 className='font-bold mt-6 uppercase text-center text-gray-600 text-3xl'>275 MXN</h1>
-            <p className='text-center text-xs mt-2'>Por hora</p>
-            <hr className='border-2 border-yellow-400 my-4' />
-            <p className='text-center mt-4 text-xs'>Clases individuales <br />
-              Minimo 3 horas por semana <br />
-              Lunes - Viernes
-            </p>
-            <p className='text-center mt-4 mb-8 text-xs'>
-              12 semanas
-            </p>
-          </div>
-          <div className='p-6 flex flex-col border-2 border-blue-600 rounded-2xl'>
-            <h1 className='text-center mt-4 text-lg text-blue-600 font-semibold'>Grupal</h1>
-            <h1 className='font-bold mt-6 uppercase text-center text-gray-600 text-3xl'>375 MXN</h1>
-            <p className='text-center text-xs mt-2'>Cuota semanal</p>
-            <hr className='border-2 border-blue-600 my-4' />
-            <p className='text-center mt-4 text-xs'>Clases Grupales <br />
-              Horario de Lunes - Viernas <br />
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
 
-            </p>
-            <p className='text-center mt-8 mb-8 text-xs'>
-              12 semanas
-            </p>
+      {/* Encabezado */}
+      <div className="text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-800">Nuestros planes</h2>
+        <p className="text-gray-400 mt-3">Elige el que mejor se adapte a ti</p>
+      </div>
+
+      {/* Grid de planes */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-16">
+        {PLANS.map((plan) => (
+          <div
+            key={plan.name}
+            className={`group flex flex-col p-6 rounded-2xl border-2 ${plan.border} bg-white hover:shadow-lg transition-all duration-200 hover:-translate-y-1`}
+          >
+            <span className={`self-center text-xs font-semibold px-3 py-1 rounded-full ${plan.badge} mb-4`}>
+              {plan.name}
+            </span>
+            <p className="text-center text-3xl font-bold text-gray-800">${plan.price}</p>
+            <p className="text-center text-xs text-gray-400 mt-1 mb-4">{plan.unit}</p>
+            <div className={`h-px w-full ${plan.hr} opacity-30 mb-4`} />
+            <ul className="flex flex-col gap-2 flex-1">
+              {plan.features.map((f) => (
+                <li key={f} className="flex items-start gap-1.5 text-xs text-gray-500">
+                  <span className="mt-0.5 text-gray-300">·</span>
+                  {f}
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className='p-6 flex flex-col border-2 border-violet-700 rounded-2xl'>
-            <h1 className='text-center mt-4 text-lg text-violet-700 font-semibold'>Grupal, Fin de semana</h1>
-            <h1 className='font-bold mt-6 uppercase text-center text-gray-600 text-3xl'>225 MXN</h1>
-            <p className='text-center text-xs mt-2'>Por hora</p>
-            <hr className='border-2 border-violet-700 my-4' />
-            <p className='text-center mt-4 text-xs'>Clases grupales <br />
-              3 horas por dia <br />
-              Fines de semana
-            </p>
-            <p className='text-center mt-4 mb-8 text-xs'>
-              20 semanas
-            </p>
-          </div>
-          <div className='p-6 flex flex-col border-2 border-pink-500 rounded-2xl'>
-            <h1 className='text-center mt-4 text-lg text-pink-500 font-semibold'>Super Intensivo</h1>
-            <h1 className='font-bold mt-6 uppercase text-center text-gray-600 text-3xl'>3.500 MXN</h1>
-            <p className='text-center text-xs mt-2'>Total</p>
-            <hr className='border-2 border-pink-500 my-4' />
-            <p className='text-center mt-4 text-xs'>Intensivo de 1 semana <br />
-              Lunes - Sabado <br />
-              9-6 pm + hora de comida
-            </p>
-            <p className='text-center mt-4 mb-8 text-xs'>
-              1 semana
-            </p>
-          </div>
+        ))}
+      </div>
+
+      {/* Contacto */}
+      <div className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-700">¿Estás interesado/a?</h3>
+          <p className="text-sm text-gray-400 mt-0.5">Envíanos un mensaje y te contactamos</p>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-4 gap-y-4 md:gap-y-0 md:gap-4 mt-8 mb-20'>
-          <div className='col-span-1 p-6 flex flex-col border-2 border-green-400 rounded-2xl'>
-            <h1 className='text-center mt-4 text-lg text-green-400 font-semibold'>Curso pregrabado</h1>
-            <h1 className='font-bold mt-6 uppercase text-center text-gray-600 text-3xl'>500 MXN</h1>
-            <p className='text-center text-xs mt-2'></p>
-            <hr className='border-2 border-green-400 my-4' />
-            <p className='text-center mt-4 text-xs'>48GB <br />
-              8.5 horas de video <br />
-              55 estructuras del lenguaje <br />
-              +500 palabras comunes <br />
-              interferencias de español
-            </p>
-            <p className='text-center mt-4 mb-8 text-xs'>
-              12 semanas
-            </p>
-          </div>
-          <div className='col-span-3 p-6 flex flex-col border-2 border-gray-700 rounded-2xl'>
-            <h1 className='text-center mt-4 text-lg text-gray-700 font-semibold'>Estoy interesado/a</h1>
-            <div className='grid grid-cols-1 md:grid-cols-2 md:gap-4 my-8'>
-              <form onSubmit={formik.handleSubmit}>
-                <div className='grid md:border-r-2 border-gray-700 items-center px-4 gap-y-4'>
-                  <input
-                    type="text"
-                    placeholder='Nombre y apellido'
-                    id="nombrecompleto"
-                    name="nombrecompleto"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.nombrecompleto}
-                    className={`w-full px-6 py-2 border-2 border-gray-700 ${formik.errors.nombrecompleto && 'border-red-500'}
-                    placeholder:text-gray-400 rounded-full`}
-                  />
-                  <input
-                    type="email"
-                    placeholder='Correo electronico'
-                    id="email"
-                    name="email"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.email}
-                    className={`w-full px-6 py-2 border-2 border-gray-700 ${formik.errors.email && 'border-red-500'}
-                    placeholder:text-gray-400 rounded-full`}  />
-                  <textarea
-                    className={`w-full px-6 py-2 border-2 border-gray-700 ${formik.errors.message && 'border-red-500'}
-                    placeholder:text-gray-400 rounded-full`}
-                    placeholder='mensaje'
-                    id="message"
-                    name="message"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.message}></textarea>
-                  {
-                    EnviandoCorreoPlans !== true && <button
-                      type='submit'
-                      className='w-full bg-yellow-500 py-2 font-semibold
-                   text-gray-700 rounded-full'>Enviar</button>
-                  }
+        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
 
-                </div>
-              </form>
+          {/* Formulario */}
+          <form onSubmit={formik.handleSubmit} className="p-6 flex flex-col gap-4">
+            <input {...field('nombrecompleto', 'text', 'Nombre y apellido')} />
+            <input {...field('email', 'email', 'Correo electrónico')} />
+            <textarea
+              {...field('message', 'text', 'Mensaje')}
+              rows={4}
+              className={`w-full px-4 py-2.5 rounded-xl border text-sm outline-none resize-none transition-colors
+                ${formik.errors.message && formik.touched.message
+                  ? 'border-red-400 focus:border-red-500'
+                  : 'border-gray-200 focus:border-gray-400'}`}
+            />
+            <button
+              type="submit"
+              disabled={enviando}
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-gray-700 disabled:opacity-50 transition-colors"
+            >
+              {enviando ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              {enviando ? 'Enviando...' : 'Enviar mensaje'}
+            </button>
+          </form>
 
-              <div className='grid items-center p-8'>
-                <h1 className='text-center mb-8 md:mb-0'>O Escribenos por cualquier red social</h1>
-                <div className='grid grid-cols-4 place-items-center gap-2'>
-                  <img
-                    className="h-8 w-auto sm:h-14 hover:cursor-pointer"
-                    src="/ws.svg"
-                    alt=""
-                    layout='fill'
-                    onClick={() => {
-                      window.location.href = "https://wa.link/jlznzn";
-                    }}
-                  ></img>
-
-                  <img
-                    className="h-8 w-auto sm:h-14 hover:cursor-pointer"
-                    src="/fb.svg"
-                    alt=""
-                    layout='fill'
-                    onClick={() => {
-                      window.location.href = "https://www.facebook.com/olympusgroupmx";
-                    }}
-                  ></img>
-
-                  <img
-                    className="h-8 w-auto sm:h-14 hover:cursor-pointer"
-                    src="/tiktok.svg"
-                    alt=""
-                    layout='fill'
-                    onClick={() => {
-                      window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
-                    }}
-                  ></img>
-
-                  <img
-                    className="h-8 w-auto sm:h-16 hover:cursor-pointer"
-                    src="/youtube.svg"
-                    alt=""
-                    layout='fill'
-                    onClick={() => {
-                      window.location.href = "https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA";
-                    }}
-                  ></img>
-                </div>
-              </div>
+          {/* Redes */}
+          <div className="p-6 flex flex-col items-center justify-center gap-6">
+            <div className="text-center">
+              <p className="text-gray-600 font-medium">O escríbenos por redes sociales</p>
+              <p className="text-gray-400 text-sm mt-1">Respondemos en menos de 24 h</p>
+            </div>
+            <div className="grid grid-cols-4 gap-4">
+              {SOCIAL_LINKS.map(({ href, icon, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                  className="w-14 h-14 flex items-center justify-center rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors hover:scale-110 duration-200"
+                >
+                  <img src={icon} alt={label} className="h-7 w-auto" />
+                </a>
+              ))}
             </div>
           </div>
+
         </div>
       </div>
-    </div>
+
+    </section>
   )
 }
 
-export default Plans;
+export default Plans
