@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import Breadcrumb from '../../components/Breadcrumb'
-import { Field, Form, Formik, useFormik } from 'formik'
+import { Field, Form, Formik } from 'formik'
 import * as Yup from "yup";
 import { Cursos } from "../../db/Cursos";
 import { uid } from 'uid';
@@ -12,117 +11,177 @@ import { Loader2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
 const cursoCtrl = new Cursos();
-const index = () => {
-  const { User, loading } = useAuth()
-  const router = useRouter();
 
-  const [ImgCurso, setImgCurso] = useState(false)
+const fieldClass = (error, touched) =>
+  `w-full px-3 py-2.5 rounded-lg border-2 outline-none text-sm transition-colors ${
+    error && touched
+      ? 'border-red-400 bg-red-50 focus:border-red-500'
+      : 'border-gray-200 bg-gray-50 focus:border-blue-400 focus:bg-white'
+  }`
+
+const FieldError = ({ error, touched }) =>
+  error && touched ? (
+    <p className="text-xs text-red-500 mt-0.5">⚠ {error}</p>
+  ) : null
+
+const CrearCurso = () => {
+  const { User, loading } = useAuth()
+  const router = useRouter()
+  const [ImgCurso, setImgCurso] = useState(null)
+  const [previewImg, setPreviewImg] = useState(null)
 
   useEffect(() => {
-    if (!loading && !User) {
-      router.push('/')
-    }
+    if (!loading && !User) router.push('/')
   }, [User, loading])
 
+  const handleImageChange = (e) => {
+    const file = e.currentTarget.files[0]
+    if (!file) return
+    setImgCurso(file)
+    setPreviewImg(URL.createObjectURL(file))
+  }
+
   return (
-    <div className='h-screen flex flex-col overflow-hidden'>
+    <>
       <Navbar />
-      <Breadcrumb />
-      <main className='flex-1 flex items-center justify-center py-6 overflow-y-auto'>
 
-      <Formik
-        initialValues={{
-          Titulo: '',
-          Descripcion: '',
-          precio: null,
-        }}
-        validationSchema={Yup.object({
-          Titulo: Yup.string().required("Porfavor. Ingrese un Titulo"),
-          Descripcion: Yup.string().required("Porfavor. Ingrese una Descripcion"),
-          precio: Yup.number().required("Porfavor. agrega un precio para el curso")
-        })}
-        onSubmit={async (values) => {
-          const Slug = uid(25);
-          let dataCurso = {
-            ...values,
-            ImgUrl: ImgCurso
-              ? await cursoCtrl.uploadCursoImage(ImgCurso, Slug, Slug)
-              : "",
-          }
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-10 px-4">
+        <div className="max-w-lg mx-auto">
 
-          const result = await cursoCtrl.createCurso(Slug, dataCurso);
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-600 rounded-2xl mb-4 shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+                stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800">Crear Nuevo Curso</h1>
+            <p className="text-sm text-gray-500 mt-1">Completa la información para publicar el curso</p>
+          </div>
 
-          if (result) {
-            // El blog se creó correctamente
-            toast({
-              title: "Curso Creado Exitosamente",
-            });
+          <Formik
+            initialValues={{ Titulo: '', Descripcion: '', precio: '' }}
+            validationSchema={Yup.object({
+              Titulo: Yup.string().required("El título es obligatorio"),
+              Descripcion: Yup.string().required("La descripción es obligatoria"),
+              precio: Yup.number()
+                .typeError("Debe ser un número")
+                .required("El precio es obligatorio")
+                .min(0, "El precio no puede ser negativo"),
+            })}
+            onSubmit={async (values, { resetForm }) => {
+              const Slug = uid(25)
+              const dataCurso = {
+                ...values,
+                precio: Number(values.precio),
+                ImgUrl: ImgCurso
+                  ? await cursoCtrl.uploadCursoImage(ImgCurso, Slug, Slug)
+                  : "",
+              }
 
+              const result = await cursoCtrl.createCurso(Slug, dataCurso)
 
-            formik.resetForm();
+              if (result) {
+                toast({ title: "Curso creado exitosamente" })
+                resetForm()
+                setImgCurso(null)
+                setPreviewImg(null)
+                router.push("/cursos")
+              } else {
+                toast({
+                  variant: "destructive",
+                  title: "Error al crear el curso",
+                  description: "Ocurrió un problema al guardar los datos.",
+                })
+              }
+            }}
+          >
+            {({ errors, touched, isSubmitting, isValid, dirty }) => (
+              <Form className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 
-            router.push("/cursos")
-          } else {
-            // Hubo un error al crear el blog
-            toast({
-              variant: "destructive",
-              title: "Ocurrio un error al subir el Curso",
-              description:
-                "algo paso al monento de registrar los datos suministrados.",
-            });
-          }
-        }}
-      >
-        {({ errors, touched,isSubmitting,isValid }) => (
-          <Form className="flex flex-col lg:w-[30%] md:w-[60%] w-[90%] mx-auto bg-white rounded-xl p-6 shadow-md">
-            <label className="font-bold text-gray-600" htmlFor="Titulo">Titulo</label>
-            <Field className={`py-2 w-full ${errors.Titulo && touched.Titulo ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="Titulo" />
-            {errors.Titulo && touched.Titulo ? (
-              <div>{errors.Titulo}</div>
-            ) : null}
+                {/* Preview imagen */}
+                {previewImg && (
+                  <div className="relative h-48 bg-gray-100">
+                    <img src={previewImg} alt="preview" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    <button
+                      type="button"
+                      onClick={() => { setImgCurso(null); setPreviewImg(null) }}
+                      className="absolute top-3 right-3 bg-white/90 hover:bg-white text-gray-700 rounded-full px-2 py-1 text-xs font-medium shadow transition-colors"
+                    >
+                      ✕ Quitar
+                    </button>
+                  </div>
+                )}
 
-            <label className="font-bold mt-3 text-gray-600" htmlFor="password">Descripcion</label>
-            <Field
-              className={`py-2 w-full ${errors.Descripcion && touched.Descripcion ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`}
-              name="Descripcion"
-              type="text" />
-            {errors.Descripcion && touched.Descripcion ? (
-              <div>{errors.Descripcion}</div>
-            ) : null}
+                <div className="p-6 flex flex-col gap-5">
 
-            <label className="font-bold mt-3 text-gray-600" htmlFor="password">Precio</label>
-            <Field
-              className={`py-2 w-full ${errors.precio && touched.precio ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`}
-              name="precio"
-              type="number" />
-            {errors.precio && touched.precio ? (
-              <div>{errors.precio}</div>
-            ) : null}
+                  {/* Título */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-semibold text-gray-700" htmlFor="Titulo">Título del curso</label>
+                    <Field id="Titulo" name="Titulo" placeholder="Ej: Diseño de interiores básico"
+                      className={fieldClass(errors.Titulo, touched.Titulo)} />
+                    <FieldError error={errors.Titulo} touched={touched.Titulo} />
+                  </div>
 
-            <label className="font-bold mt-3 text-gray-600" htmlFor="password">Miniatura del Curso</label>
-            <Field
-              className={`py-2 w-full ${errors.Descripcion && touched.Descripcion ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`}
-              name="imgCurso"
-              type="file"
-              onChange={(event) => {
-                setImgCurso(event.currentTarget.files[0]);
-              }}
-            />
+                  {/* Descripción */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-semibold text-gray-700" htmlFor="Descripcion">Descripción</label>
+                    <Field as="textarea" id="Descripcion" name="Descripcion" rows={4}
+                      placeholder="Describe de qué trata el curso, qué aprenderán los estudiantes..."
+                      className={`${fieldClass(errors.Descripcion, touched.Descripcion)} resize-none`} />
+                    <FieldError error={errors.Descripcion} touched={touched.Descripcion} />
+                  </div>
 
-            <button 
-            disabled={isValid || isSubmitting ? false : true} 
-            className="py-2 px-4 mt-5 disabled:opacity-20 transition-colors bg-blue-500 
-            rounded-md text-white hover:bg-blue-300 " 
-            type="submit">{isSubmitting ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin'/></div> : "Crear Curso"}</button>
+                  {/* Precio */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-semibold text-gray-700" htmlFor="precio">Precio (USD)</label>
+                    <Field id="precio" name="precio" type="number" min="0" step="0.01" placeholder="0.00"
+                      className={fieldClass(errors.precio, touched.precio)} />
+                    <FieldError error={errors.precio} touched={touched.precio} />
+                  </div>
 
-          </Form>
-        )}
-      </Formik>
+                  {/* Miniatura */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-semibold text-gray-700">
+                      Miniatura del curso <span className="text-gray-400 font-normal">(opcional)</span>
+                    </label>
+                    <label className={`flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-lg cursor-pointer transition-colors
+                      ${previewImg ? 'border-blue-300 bg-blue-50' : 'border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-gray-400'}`}>
+                      <div className="flex flex-col items-center text-sm">
+                        <span className="text-xl mb-1">🖼️</span>
+                        {previewImg
+                          ? <span className="text-blue-600 font-medium text-xs">Imagen seleccionada ✓</span>
+                          : <><span className="font-medium text-gray-600 text-xs">Haz clic para subir</span><span className="text-xs text-gray-400">PNG, JPG hasta 5MB</span></>
+                        }
+                      </div>
+                      <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                    </label>
+                  </div>
 
-      </main>
+                  <button
+                    type="submit"
+                    disabled={!(isValid && dirty) || isSubmitting}
+                    className="w-full py-3 rounded-xl font-semibold text-sm transition-all
+                      bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98]
+                      disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    {isSubmitting
+                      ? <><Loader2 size={16} className="animate-spin" /> Creando curso...</>
+                      : '✓ Crear Curso'
+                    }
+                  </button>
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </div>
+      </div>
+
       <Footer />
-    </div>
+    </>
   )
 }
 
-export default index
+export default CrearCurso

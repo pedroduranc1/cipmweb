@@ -30,9 +30,11 @@ export const Cursocard = ({ titulo, descripcion, slug, precio, img, active = fal
           alt={titulo}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        <span className={`absolute top-3 left-3 text-xs font-medium px-2.5 py-1 rounded-full
-          ${active ? 'bg-green-500 text-white' : 'bg-black/50 text-white'}`}>
-          {active ? 'Activo' : 'Disponible'}
+        <span className={`absolute top-2 left-3 text-xs font-medium px-2.5 py-1 rounded-full
+          ${active ? 'bg-blue-500 px-3 text-white' : 'bg-black/50 text-white'}`}>
+          <p>
+            {active ? 'Activo' : 'Disponible'}</p>
+
         </span>
       </div>
 

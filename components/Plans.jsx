@@ -4,6 +4,8 @@ import swal from 'sweetalert'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { Loader2, Send } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useInView } from '../hooks/useInView'
 
 const PLANS = [
   {
@@ -67,6 +69,8 @@ const SOCIAL_LINKS = [
 
 const Plans = () => {
   const [enviando, setEnviando] = useState(false)
+  const [plansRef, plansInView] = useInView()
+  const [contactRef, contactInView] = useInView()
 
   const formik = useFormik({
     initialValues: { nombrecompleto: '', email: '', message: '', telefono: 'No Disponible' },
@@ -105,20 +109,30 @@ const Plans = () => {
   })
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20 overflow-hidden">
 
       {/* Encabezado */}
-      <div className="text-center mb-12">
+      <motion.div
+        className="text-center mb-12"
+        ref={plansRef}
+        initial={{ opacity: 0, y: 30 }}
+        animate={plansInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      >
         <h2 className="text-3xl md:text-4xl font-bold text-gray-800">Nuestros planes</h2>
         <p className="text-gray-400 mt-3">Elige el que mejor se adapte a ti</p>
-      </div>
+      </motion.div>
 
       {/* Grid de planes */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-16">
-        {PLANS.map((plan) => (
-          <div
+        {PLANS.map((plan, i) => (
+          <motion.div
             key={plan.name}
-            className={`group flex flex-col p-6 rounded-2xl border-2 ${plan.border} bg-white hover:shadow-lg transition-all duration-200 hover:-translate-y-1`}
+            initial={{ opacity: 0, y: 50 }}
+            animate={plansInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -6, boxShadow: '0 16px 40px -8px rgba(0,0,0,0.12)' }}
+            className={`group flex flex-col p-6 rounded-2xl border-2 ${plan.border} bg-white transition-colors duration-200`}
           >
             <span className={`self-center text-xs font-semibold px-3 py-1 rounded-full ${plan.badge} mb-4`}>
               {plan.name}
@@ -134,12 +148,18 @@ const Plans = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       {/* Contacto */}
-      <div className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <motion.div
+        ref={contactRef}
+        initial={{ opacity: 0, y: 40 }}
+        animate={contactInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+      >
         <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
           <h3 className="text-lg font-semibold text-gray-700">¿Estás interesado/a?</h3>
           <p className="text-sm text-gray-400 mt-0.5">Envíanos un mensaje y te contactamos</p>
@@ -176,23 +196,28 @@ const Plans = () => {
               <p className="text-gray-400 text-sm mt-1">Respondemos en menos de 24 h</p>
             </div>
             <div className="grid grid-cols-4 gap-4">
-              {SOCIAL_LINKS.map(({ href, icon, label }) => (
-                <a
+              {SOCIAL_LINKS.map(({ href, icon, label }, i) => (
+                <motion.a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noreferrer"
                   aria-label={label}
-                  className="w-14 h-14 flex items-center justify-center rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors hover:scale-110 duration-200"
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={contactInView ? { opacity: 1, scale: 1 } : {}}
+                  transition={{ duration: 0.4, delay: 0.3 + i * 0.08 }}
+                  whileHover={{ scale: 1.18, rotate: 4 }}
+                  whileTap={{ scale: 0.93 }}
+                  className="w-14 h-14 flex items-center justify-center rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors"
                 >
                   <img src={icon} alt={label} className="h-7 w-auto" />
-                </a>
+                </motion.a>
               ))}
             </div>
           </div>
 
         </div>
-      </div>
+      </motion.div>
 
     </section>
   )

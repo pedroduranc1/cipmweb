@@ -134,14 +134,12 @@ export class Cursos {
     );
 
     const querySnapshot = await getDocs(q);
-    const blogData = querySnapshot.docs.map((doc) => {
-      return {
-        id: doc.id,
-        ...doc.data(),
-      };
-    });
+    const blogData = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-    return blogData;
+    return blogData.sort((a, b) => (a.orden ?? 9999) - (b.orden ?? 9999));
   }
 
   async getVideo(id) {

@@ -21,26 +21,30 @@ const Videofield = ({videoslist}) => {
     
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-12">
-            <div className="flex flex-col  justify-between mt-4 md:justify-start ">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <div className="flex flex-col  justify-between my-16 md:justify-start md:space-x-10">
                 <div className='flex flex-col md:flex-row items-center justify-between w-full pb-10'>
                     <h1 className='text-2xl md:text-4xl text-gray-700 font-bold'>Videos que pueden ayudarte</h1>
                     
                 </div>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5'>
-                    {videos.map((video) =>
-                      <Videocard key={video.id} data={video} />
-                    )}
+                <div className='grid grid-cols-1 translate-x-0 md:-translate-x-10 w-full 
+                justify-items-center
+                md:grid-cols-4'>
+                    {
+                        videos.map((video) =>
+                            <Videocard
+                                key={video.id}
+                                data={video}
+                            />
+                        )
+                    }
                 </div>
 
-                <div className='flex justify-center mt-6'>
-                  <button
+                <div className='flex justify-center py-6'>
+                    <h1 className='text-gray-700 text-xl font-bold border-b-2 border-gray-700 cursor-pointer text-center'
                     onClick={aumentarrange}
-                    className='px-6 py-2 rounded-xl border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50 hover:border-gray-400 transition-colors'
-                  >
-                    Ver más
-                  </button>
+                    >Ver mas</h1>
                 </div>
             </div>
         </div>
