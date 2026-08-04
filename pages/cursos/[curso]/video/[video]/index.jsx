@@ -1,311 +1,232 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Navbar from '../../../../../components/Navbar'
 import Footer from '../../../../../components/Footer'
 import { useRouter } from 'next/router'
 import ReactPlayer from 'react-player'
-import { useQuery, useMutation, useQueryClient } from 'react-query'
+import { useQuery } from 'react-query'
 import { Cursos } from "../../../../../db/Cursos";
 import { useAuth } from '../../../../../hooks/useAuth'
-import Breadcrumb from '../../../../../components/Breadcrumb'
-import { CheckCircle2, ChevronRight, Loader2, MessageCircle, PlayCircle, Send } from 'lucide-react'
-import Link from 'next/link'
+import { Loader2, Maximize, Minimize, Pause, Play, Undo2, Volume2, VolumeX } from 'lucide-react'
 
 const cursoCtrl = new Cursos();
 
-// ── Skeleton ────────────────────────────────────────────────────────────────
-const PageSkeleton = () => (
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 animate-pulse">
-    <div className="flex flex-col lg:flex-row gap-6">
-      <div className="flex-1">
-        <div className="rounded-2xl bg-gray-100 w-full aspect-video mb-5" />
-        <div className="h-7 bg-gray-100 rounded-full w-2/3 mb-3" />
-        <div className="h-4 bg-gray-100 rounded-full w-full mb-2" />
-        <div className="h-4 bg-gray-100 rounded-full w-4/5" />
-      </div>
-      <div className="lg:w-72 xl:w-80 space-y-3">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-16 bg-gray-100 rounded-xl" />
-        ))}
-      </div>
-    </div>
-  </div>
-)
+// ── Player Custom ─────────────────────────────────────────────────────────────
 
-// ── Item de la lista lateral de videos ──────────────────────────────────────
-const VideoListItem = ({ video, index, isCurrent, cursoId }) => (
-  <Link href={`/cursos/${cursoId}/video/${video.id}`}>
-    <a className={`flex items-center gap-3 p-3 rounded-xl transition-all group
-      ${isCurrent
-        ? 'bg-gray-900 text-white shadow-sm'
-        : 'hover:bg-gray-50 text-gray-600 hover:text-gray-900'
-      }`}>
-      <span className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold
-        ${isCurrent ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'}`}>
-        {isCurrent
-          ? <PlayCircle className="w-3.5 h-3.5" />
-          : String(index).padStart(2, '0')}
-      </span>
-      <span className="text-sm leading-tight line-clamp-2 flex-1">{video.Titulo}</span>
-      {isCurrent && <ChevronRight className="w-4 h-4 flex-shrink-0 opacity-60" />}
-    </a>
-  </Link>
-)
+const formatTime = (secs) => {
+  if (!secs || isNaN(secs)) return '0:00'
+  const h = Math.floor(secs / 3600)
+  const m = Math.floor((secs % 3600) / 60)
+  const s = Math.floor(secs % 60)
+  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  return `${m}:${String(s).padStart(2, '0')}`
+}
 
-// ── Sección de comentarios ───────────────────────────────────────────────────
-const CommentsSection = ({ videoId, User }) => {
-  const queryClient = useQueryClient()
-  const [texto, setTexto] = useState('')
-  const textareaRef = useRef(null)
+const VideoPlayer = ({ url }) => {
+  const playerRef = useRef(null)
+  const containerRef = useRef(null)
+  const hideTimer = useRef(null)
 
-  const { data: comentarios = [], isLoading } = useQuery(
-    ['comentarios', videoId],
-    () => cursoCtrl.getComments(videoId),
-    { enabled: !!videoId }
-  )
+  const [playing, setPlaying] = useState(false)
+  const [played, setPlayed] = useState(0)
+  const [loaded, setLoaded] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [volume, setVolume] = useState(1)
+  const [muted, setMuted] = useState(false)
+  const [playbackRate, setPlaybackRate] = useState(1)
+  const [fullscreen, setFullscreen] = useState(false)
+  const [showControls, setShowControls] = useState(true)
+  const [seeking, setSeeking] = useState(false)
+  const [buffering, setBuffering] = useState(false)
+  const [showRateMenu, setShowRateMenu] = useState(false)
 
-  const { mutate: enviar, isLoading: enviando } = useMutation(
-    () => cursoCtrl.addComment(videoId, {
-      texto: texto.trim(),
-      autorId: User.uid,
-      autorNombre: `${User.nombre} ${User.apellido}`.trim(),
-    }),
-    {
-      onSuccess: () => {
-        setTexto('')
-        queryClient.invalidateQueries(['comentarios', videoId])
-      },
+  const RATES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
+
+  const resetHideTimer = useCallback(() => {
+    setShowControls(true)
+    clearTimeout(hideTimer.current)
+    if (playing) hideTimer.current = setTimeout(() => setShowControls(false), 3000)
+  }, [playing])
+
+  useEffect(() => { resetHideTimer(); return () => clearTimeout(hideTimer.current) }, [playing, resetHideTimer])
+
+  useEffect(() => {
+    const handler = () => setFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', handler)
+    return () => document.removeEventListener('fullscreenchange', handler)
+  }, [])
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) containerRef.current?.requestFullscreen()
+    else document.exitFullscreen()
+  }
+
+  const skip = (secs) => {
+    const current = playerRef.current?.getCurrentTime() || 0
+    playerRef.current?.seekTo(current + secs)
+  }
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return
+      if (e.key === ' ' || e.key === 'k') { e.preventDefault(); setPlaying(p => !p) }
+      if (e.key === 'ArrowRight') { e.preventDefault(); skip(10) }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); skip(-10) }
+      if (e.key === 'ArrowUp')    { e.preventDefault(); setVolume(v => Math.min(1, v + 0.1)) }
+      if (e.key === 'ArrowDown')  { e.preventDefault(); setVolume(v => Math.max(0, v - 0.1)) }
+      if (e.key === 'm') setMuted(m => !m)
+      if (e.key === 'f') toggleFullscreen()
     }
-  )
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (!texto.trim() || enviando) return
-    enviar()
-  }
-
-  const formatFecha = (ts) => {
-    if (!ts) return ''
-    const date = ts.toDate ? ts.toDate() : new Date(ts)
-    return date.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })
-  }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
 
   return (
-    <div className="mt-10 border-t border-gray-100 pt-8">
-      <h2 className="flex items-center gap-2 text-lg font-bold text-gray-700 mb-6">
-        <MessageCircle className="w-5 h-5 text-gray-400" />
-        Comentarios
-        {comentarios.length > 0 && (
-          <span className="text-sm font-normal text-gray-400">· {comentarios.length}</span>
-        )}
-      </h2>
+    <div
+      ref={containerRef}
+      className="relative w-full h-full bg-black overflow-hidden select-none"
+      onMouseMove={resetHideTimer}
+      onMouseLeave={() => playing && setShowControls(false)}
+    >
+      <ReactPlayer
+        ref={playerRef}
+        url={url}
+        playing={playing}
+        volume={volume}
+        muted={muted}
+        playbackRate={playbackRate}
+        width="100%"
+        height="100%"
+        onDuration={setDuration}
+        onProgress={({ played, loaded }) => { if (!seeking) setPlayed(played); setLoaded(loaded) }}
+        onBuffer={() => setBuffering(true)}
+        onBufferEnd={() => setBuffering(false)}
+        onReady={() => setBuffering(false)}
+        config={{ file: { attributes: { controlsList: 'nodownload' } } }}
+        style={{ pointerEvents: 'none' }}
+      />
 
-      {/* Input de nuevo comentario */}
-      <form onSubmit={handleSubmit} className="mb-8">
-        <div className="flex gap-3">
-          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gray-900 flex items-center justify-center text-white text-sm font-bold">
-            {User.nombre?.[0]?.toUpperCase()}
-          </div>
-          <div className="flex-1">
-            <textarea
-              ref={textareaRef}
-              value={texto}
-              onChange={(e) => setTexto(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSubmit(e)
-              }}
-              placeholder="Escribe un comentario..."
-              rows={3}
-              className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder-gray-300 outline-none focus:border-gray-400 focus:ring-0 transition-colors"
-            />
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-xs text-gray-300">Cmd+Enter para enviar</span>
-              <button
-                type="submit"
-                disabled={!texto.trim() || enviando}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-gray-900 text-white text-sm font-medium disabled:opacity-40 hover:bg-gray-700 transition-colors"
-              >
-                {enviando ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                Enviar
-              </button>
-            </div>
-          </div>
-        </div>
-      </form>
-
-      {/* Lista de comentarios */}
-      {isLoading ? (
-        <div className="space-y-4">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="flex gap-3 animate-pulse">
-              <div className="w-9 h-9 rounded-full bg-gray-100 flex-shrink-0" />
-              <div className="flex-1 space-y-2">
-                <div className="h-3 bg-gray-100 rounded-full w-32" />
-                <div className="h-3 bg-gray-100 rounded-full w-full" />
-                <div className="h-3 bg-gray-100 rounded-full w-3/4" />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : comentarios.length === 0 ? (
-        <p className="text-sm text-gray-300 text-center py-8">Sé el primero en comentar esta clase</p>
-      ) : (
-        <div className="space-y-6">
-          {comentarios.map((c) => (
-            <div key={c.id} className="flex gap-3">
-              <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-sm font-bold">
-                {c.autorNombre?.[0]?.toUpperCase()}
-              </div>
-              <div>
-                <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-sm font-semibold text-gray-700">{c.autorNombre}</span>
-                  <span className="text-xs text-gray-300">{formatFecha(c.creadoEn)}</span>
-                </div>
-                <p className="text-sm text-gray-500 leading-relaxed">{c.texto}</p>
-              </div>
-            </div>
-          ))}
+      {buffering && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <Loader2 className="w-10 h-10 text-white animate-spin opacity-70" />
         </div>
       )}
+
+      <div
+        className="absolute inset-0 grid grid-cols-2"
+        onDoubleClick={(e) => {
+          const rect = containerRef.current.getBoundingClientRect()
+          e.clientX - rect.left < rect.width / 2 ? skip(-10) : skip(10)
+        }}
+      />
+
+      <div className={`absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`} />
+
+      <div className={`absolute inset-x-0 bottom-0 px-4 pb-4 pt-2 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="relative w-full h-1 mb-3">
+          <div className="absolute top-0 left-0 h-full bg-white/25 rounded-full" style={{ width: `${loaded * 100}%` }} />
+          <div className="absolute top-0 left-0 h-full bg-blue-500 rounded-full pointer-events-none" style={{ width: `${played * 100}%` }} />
+          <input
+            type="range" min={0} max={1} step={0.0001} value={played}
+            onChange={(e) => setPlayed(parseFloat(e.target.value))}
+            onMouseDown={() => setSeeking(true)}
+            onMouseUp={(e) => { setSeeking(false); playerRef.current?.seekTo(parseFloat(e.target.value)) }}
+            className="absolute inset-0 w-full opacity-0 cursor-pointer h-full"
+          />
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1">
+            <button onClick={() => setPlaying(p => !p)} className="p-2 rounded-lg text-white hover:bg-white/10 transition-colors">
+              {playing ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-white" />}
+            </button>
+            <button onClick={() => skip(-10)} className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors hidden sm:block">
+              <span className="text-xs font-bold">-10</span>
+            </button>
+            <button onClick={() => skip(10)} className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors hidden sm:block">
+              <span className="text-xs font-bold">+10</span>
+            </button>
+            <div className="flex items-center gap-1 group/vol">
+              <button onClick={() => setMuted(m => !m)} className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors">
+                {muted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              </button>
+              <input
+                type="range" min={0} max={1} step={0.01} value={muted ? 0 : volume}
+                onChange={(e) => { setVolume(parseFloat(e.target.value)); setMuted(false) }}
+                className="w-0 group-hover/vol:w-16 transition-all duration-200 accent-white cursor-pointer"
+              />
+            </div>
+            <span className="text-white/70 text-xs font-mono ml-1 hidden sm:block">
+              {formatTime(played * duration)} / {formatTime(duration)}
+            </span>
+          </div>
+          <div className="flex items-center gap-1 relative">
+            <div className="relative">
+              <button onClick={() => setShowRateMenu(r => !r)} className="px-2 py-1 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors text-xs font-bold">
+                {playbackRate}x
+              </button>
+              {showRateMenu && (
+                <div className="absolute bottom-9 right-0 bg-gray-900/95 backdrop-blur-sm rounded-xl overflow-hidden shadow-xl border border-white/10 min-w-[80px]">
+                  {RATES.map(rate => (
+                    <button key={rate} onClick={() => { setPlaybackRate(rate); setShowRateMenu(false) }}
+                      className={`w-full px-4 py-2 text-xs text-left transition-colors ${playbackRate === rate ? 'bg-blue-600 text-white font-bold' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}>
+                      {rate}x
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <button onClick={toggleFullscreen} className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors">
+              {fullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
 
-// ── Página principal ─────────────────────────────────────────────────────────
+// ── Página ────────────────────────────────────────────────────────────────────
+
 const VideoPage = () => {
-  const { User, loading } = useAuth()
-  const router = useRouter()
-  const { video, curso } = router.query
+    const { User, loading } = useAuth()
+    const router = useRouter()
 
-  useEffect(() => {
-    if (!loading && !User) router.push("/")
-  }, [User, loading])
+    useEffect(() => {
+        if (!loading && !User) {
+            router.push("/")
+        }
+    }, [User, loading])
 
-  const { data: videoData, isLoading: isLoadingVideo } = useQuery(
-    ["video", video],
-    () => cursoCtrl.getVideo(video),
-    { enabled: !!video }
-  )
+    const { video } = router.query
 
-  const { data: cursoData } = useQuery(
-    ["curso", curso],
-    () => cursoCtrl.getCurso(curso),
-    { enabled: !!curso }
-  )
+    const { data: videoData, isLoading, isError } = useQuery(["video", video], () => cursoCtrl.getVideo(video), { enabled: !!video })
 
-  const { data: videosData } = useQuery(
-    ["videos", curso],
-    () => cursoCtrl.getVideosCurso(curso),
-    { enabled: !!curso }
-  )
+    return (
+        <>
+            <Navbar />
 
-  const videosOrdenados = videosData
-    ? [...videosData].sort((a, b) => a.Fecha.toDate() - b.Fecha.toDate())
-    : []
-
-  const currentIndex = videosOrdenados.findIndex(v => v.id === video)
-  const nextVideo = videosOrdenados[currentIndex + 1]
-
-  if (isLoadingVideo || !User) return (
-    <>
-      <Navbar />
-      <Breadcrumb />
-      <div className="mt-6"><PageSkeleton /></div>
-      <Footer />
-    </>
-  )
-
-  return (
-    <>
-      <Navbar />
-
-      <Breadcrumb labels={{
-          [curso]: cursoData?.Titulo,
-          [video]: videoData?.Titulo,
-        }} />
-
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4 mb-16">
-
-        <div className="flex flex-col lg:flex-row gap-6">
-
-          {/* ── Columna principal ───────────────────────────────── */}
-          <div className="flex-1 min-w-0">
-
-            {/* Player */}
-            <div className="rounded-2xl overflow-hidden bg-black w-full aspect-video shadow-lg mb-5">
-              <ReactPlayer
-                url={videoData?.VideoUrl}
-                controls
-                playing
-                width="100%"
-                height="100%"
-                config={{
-                  file: { attributes: { controlsList: 'nodownload' } },
-                }}
-              />
+            <div className='w-[80%] my-[1%] mx-auto'>
+                <button className='flex items-center justify-center text-gray-400 gap-x-2 cursor-pointer' onClick={() => { router.back() }}><Undo2 className='text-gray-400' /> Volver</button>
             </div>
 
-            {/* Info + navegación */}
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-2">
-              <div>
-                {currentIndex >= 0 && (
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">
-                    Clase {String(currentIndex + 1).padStart(2, '0')} · {videosOrdenados.length} en total
-                  </p>
-                )}
-                <h1 className="text-gray-800 text-xl font-bold leading-snug">{videoData?.Titulo}</h1>
-              </div>
-
-              {/* Botón siguiente video */}
-              {nextVideo && (
-                <Link href={`/cursos/${curso}/video/${nextVideo.id}`}>
-                  <a className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-gray-700 transition-colors">
-                    Siguiente
-                    <ChevronRight className="w-4 h-4" />
-                  </a>
-                </Link>
-              )}
-            </div>
-
-            {videoData?.Descripcion && (
-              <p className="text-gray-400 text-sm leading-relaxed mt-3">{videoData.Descripcion}</p>
-            )}
-
-            {/* Comentarios */}
-            {User && <CommentsSection videoId={video} User={User} />}
-          </div>
-
-          {/* ── Sidebar: lista de videos ────────────────────────── */}
-          <aside className="lg:w-72 xl:w-80 flex-shrink-0">
-            <div className="lg:sticky lg:top-24">
-              <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <h2 className="text-sm font-semibold text-gray-700">Contenido del curso</h2>
-                  {videosOrdenados.length > 0 && (
-                    <p className="text-xs text-gray-400 mt-0.5">{videosOrdenados.length} clases</p>
-                  )}
+            <div className='w-[80%] flex md:flex-row flex-col mx-auto'>
+                <div className='md:w-fit w-full flex h-full md:h-[50vh]'>
+                    <VideoPlayer url={videoData?.VideoUrl} />
                 </div>
-                <div className="p-2 max-h-[60vh] overflow-y-auto">
-                  {videosOrdenados.map((v, i) => (
-                    <VideoListItem
-                      key={v.id}
-                      video={v}
-                      index={i + 1}
-                      isCurrent={v.id === video}
-                      cursoId={curso}
-                    />
-                  ))}
+
+                <div className='w-full md:w-1/2 h-full md:h-[50vh] flex flex-col md:py-[5%] md:px-10'>
+                    <h3 className='text-gray-600 mt-5 md:mt-0 text-2xl'>{videoData?.Titulo}</h3>
+                    <p className='text-gray-400 mt-5 mb-5 md:mb-0 text-base'>
+                        {videoData?.Descripcion}
+                    </p>
                 </div>
-              </div>
             </div>
-          </aside>
 
-        </div>
-      </div>
-
-      <Footer />
-    </>
-  )
+            <div className='pb-[50vh] ' />
+            <div className='relative'>
+                <Footer />
+            </div>
+        </>
+    )
 }
 
 export default VideoPage
