@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import { Loader2 } from 'lucide-react';
 
 const userCtrl = new User();
-const index = () => {
+const Registro = () => {
     const router = useRouter();
     return (
         <>
@@ -115,4 +115,4 @@ const index = () => {
     )
 }
 
-export default index
+export default Registro
