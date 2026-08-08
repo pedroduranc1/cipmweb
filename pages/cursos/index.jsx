@@ -130,13 +130,11 @@ const CursosPage = () => {
                       </p>
                       <div className="flex flex-col gap-2">
                         {actions.map(({ label, href, Icon }) => (
-                          <Link key={href} href={href}>
-                            <a className="inline-flex items-center gap-2 px-3 py-2 rounded-md
+                          <Link key={href} href={href} className="inline-flex items-center gap-2 px-3 py-2 rounded-md
                                           bg-white border border-gray-200 text-sm text-gray-700
                                           hover:bg-gray-100 hover:border-gray-300 transition-all shadow-sm w-full">
                               <Icon className="w-4 h-4 shrink-0" />
                               {label}
-                            </a>
                           </Link>
                         ))}
                       </div>

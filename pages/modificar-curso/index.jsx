@@ -5,13 +5,13 @@ import {
   Select, SelectContent, SelectGroup,
   SelectItem, SelectTrigger, SelectValue,
 } from "../../src/components/ui/select";
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { Cursos } from "../../db/Cursos";
 import { useRouter } from 'next/router';
 import { Field, Form, Formik } from 'formik';
 import { toast } from '../../src/components/ui/use-toast';
 import * as Yup from "yup";
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
 const cursoCtrl = new Cursos();
@@ -35,7 +35,8 @@ const ModificarCurso = () => {
     if (!loading && !User) router.push('/')
   }, [User, loading])
 
-  const { data: DataCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
+  const queryClient = useQueryClient()
+  const { data: DataCursos, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
 
   const cursosOrdenados = DataCursos
     ? [...DataCursos].sort((a, b) => a.Titulo?.localeCompare(b.Titulo))
@@ -64,21 +65,35 @@ const ModificarCurso = () => {
           {/* Selector de curso */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
             <label className="text-sm font-semibold text-gray-700 mb-2 block">Selecciona el curso</label>
-            <Select onValueChange={(val) => {
-              const curso = cursosOrdenados.find(c => c.id === val)
-              setCursoSeleccionado(curso)
-            }}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Elige un curso..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {cursosOrdenados.map((curso) => (
-                    <SelectItem key={curso.id} value={curso.id}>{curso.Titulo}</SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+
+            {errorCursos ? (
+              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                <AlertCircle size={16} className="shrink-0" />
+                No se pudieron cargar los cursos. Recarga la página.
+              </div>
+            ) : loadingCursos ? (
+              <div className="flex flex-col gap-2">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-10 bg-gray-100 rounded-lg animate-pulse" />
+                ))}
+              </div>
+            ) : (
+              <Select onValueChange={(val) => {
+                const curso = cursosOrdenados.find(c => c.id === val)
+                setCursoSeleccionado(curso)
+              }}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Elige un curso..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {cursosOrdenados.map((curso) => (
+                      <SelectItem key={curso.id} value={curso.id}>{curso.Titulo}</SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Formulario de edición */}
@@ -86,7 +101,10 @@ const ModificarCurso = () => {
             <CursoFormUpdate
               key={CursoSeleccionado.id}
               data={CursoSeleccionado}
-              onSuccess={() => router.push('/cursos')}
+              onSuccess={() => {
+                queryClient.invalidateQueries("cursos")
+                router.push('/cursos')
+              }}
             />
           )}
 

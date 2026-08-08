@@ -53,18 +53,14 @@ export const Cursocard = ({ titulo, descripcion, slug, precio, img, active = fal
         )}
 
         {active ? (
-          <Link href={`/cursos/${slug}`}>
-            <a className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
-              <PlayCircle className="w-4 h-4" />
-              Ver Curso
-            </a>
+          <Link href={`/cursos/${slug}`} className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
+            <PlayCircle className="w-4 h-4" />
+            Ver Curso
           </Link>
         ) : (
-          <Link href="/comprarCursos">
-            <a className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
-              <ShoppingCart className="w-4 h-4" />
-              Adquirir
-            </a>
+          <Link href="/comprarCursos" className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
+            <ShoppingCart className="w-4 h-4" />
+            Adquirir
           </Link>
         )}
       </div>

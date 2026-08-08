@@ -82,7 +82,7 @@ const Heros = () => {
             >
               Agendar clase de prueba
             </motion.a>
-            <Link href="/contactos">
+            <Link href="/contactos" legacyBehavior>
               <motion.a
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.97 }}

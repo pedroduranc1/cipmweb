@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { Cursos } from "../../db/Cursos";
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import {
   Select,
   SelectContent,
@@ -17,7 +17,7 @@ import { useRouter } from 'next/router';
 import { uid } from 'uid';
 import { toast } from '../../src/components/ui/use-toast';
 import { Timestamp } from 'firebase/firestore';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
 const cursoCtrl = new Cursos();
@@ -42,6 +42,7 @@ const FieldError = ({ error, touched }) =>
 const AgregarVideo = () => {
   const { User, loading } = useAuth()
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const [tipoVideo, setTipoVideo] = useState(null)
   const [CursoID, setCursoID] = useState(null)
@@ -52,7 +53,7 @@ const AgregarVideo = () => {
     if (!loading && !User) router.push('/')
   }, [User, loading])
 
-  const { data: DataCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
+  const { data: DataCursos, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
 
   const { data: VideosCurso } = useQuery(
     ["videos-curso", CursoID],
@@ -153,22 +154,38 @@ const AgregarVideo = () => {
               <label className="text-sm font-semibold text-gray-700 mb-2 block">
                 Selecciona el curso
               </label>
-              <Select onValueChange={setCursoID} value={CursoID}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Elige un curso..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {cursosOrdenados.map((curso) => (
-                      <SelectItem key={curso.id} value={curso.id}>
-                        {curso.Titulo}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              {!CursoID && (
-                <p className="text-xs text-amber-600 mt-2">⚠ Debes seleccionar un curso para continuar</p>
+
+              {errorCursos ? (
+                <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                  <AlertCircle size={16} className="shrink-0" />
+                  No se pudieron cargar los cursos. Recarga la página.
+                </div>
+              ) : loadingCursos ? (
+                <div className="flex flex-col gap-2">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-10 bg-gray-100 rounded-lg animate-pulse" />
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <Select onValueChange={setCursoID} value={CursoID}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Elige un curso..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {cursosOrdenados.map((curso) => (
+                          <SelectItem key={curso.id} value={curso.id}>
+                            {curso.Titulo}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {!CursoID && (
+                    <p className="text-xs text-amber-600 mt-2">⚠ Debes seleccionar un curso para continuar</p>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -200,6 +217,8 @@ const AgregarVideo = () => {
 
                 if (result) {
                   toast({ title: "Video agregado exitosamente" })
+                  queryClient.invalidateQueries("cursos")
+                  if (CursoID) queryClient.invalidateQueries(["videos-curso", CursoID])
                   resetForm()
                   setImgVideo(null)
                   setPreviewImg(null)

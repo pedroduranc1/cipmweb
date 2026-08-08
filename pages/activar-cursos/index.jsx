@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import { useQuery } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 import { Cursos } from "../../db/Cursos";
 import { useAuth } from '../../hooks/useAuth'
 import { User } from '../../db/User'
@@ -13,7 +13,7 @@ import {
 } from "../../src/components/ui/popover"
 import { useRouter } from 'next/router';
 import { toast } from '../../src/components/ui/use-toast';
-import { ChevronsUpDown, Loader2 } from 'lucide-react';
+import { AlertCircle, ChevronsUpDown, Loader2 } from 'lucide-react';
 
 const cursoCtrl = new Cursos();
 const userCtrl = new User();
@@ -21,6 +21,7 @@ const userCtrl = new User();
 const ActivarCursos = () => {
   const { User: AuthUser, loading } = useAuth()
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null)
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null)
@@ -35,8 +36,8 @@ const ActivarCursos = () => {
     if (!loading && !AuthUser) router.push('/')
   }, [AuthUser, loading])
 
-  const { data: CursosData } = useQuery("cursos", () => cursoCtrl.getCursos())
-  const { data: Clientes } = useQuery("clientes", () => userCtrl.getUsers())
+  const { data: CursosData, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
+  const { data: Clientes, isLoading: loadingClientes, isError: errorClientes } = useQuery("clientes", () => userCtrl.getUsers())
 
   const cursosOrdenados = CursosData
     ? [...CursosData].sort((a, b) => a.Titulo?.localeCompare(b.Titulo))
@@ -83,6 +84,7 @@ const ActivarCursos = () => {
       })
 
       toast({ title: "Curso activado exitosamente" })
+      queryClient.invalidateQueries("clientes")
       router.push("/")
     } catch {
       toast({ variant: "destructive", title: "Error al activar el curso" })
@@ -193,45 +195,60 @@ const ActivarCursos = () => {
                 <label className="text-sm font-semibold text-gray-700">Selecciona el curso a activar</label>
               </div>
 
-              <div className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden max-h-64 overflow-y-auto">
-                {cursosOrdenados.map(curso => {
-                  const activo = cursosDelCliente?.some(c => c.id === curso.id)
-                  const seleccionado = cursoSeleccionado?.id === curso.id
+              {(errorCursos || errorClientes) && (
+                <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-3">
+                  <AlertCircle size={16} className="shrink-0" />
+                  No se pudieron cargar los cursos. Recarga la página.
+                </div>
+              )}
 
-                  return (
-                    <button
-                      key={curso.id}
-                      type="button"
-                      disabled={activo}
-                      onClick={() => { setCursoSeleccionado(curso); setConfirmando(false) }}
-                      className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors
-                        ${activo ? 'bg-green-50 cursor-not-allowed opacity-70' :
-                          seleccionado ? 'bg-green-50 border-l-2 border-green-500' :
-                          'hover:bg-gray-50'}`}
-                    >
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0
-                        ${activo ? 'bg-green-400 border-green-400' :
-                          seleccionado ? 'border-green-500 bg-green-500' :
-                          'border-gray-300'}`}>
-                        {(activo || seleccionado) && (
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-                            <polyline points="20 6 9 17 4 12"/>
-                          </svg>
+              {loadingCursos ? (
+                <div className="flex flex-col gap-2">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                  ))}
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden max-h-64 overflow-y-auto">
+                  {cursosOrdenados.map(curso => {
+                    const activo = cursosDelCliente?.some(c => c.id === curso.id)
+                    const seleccionado = cursoSeleccionado?.id === curso.id
+
+                    return (
+                      <button
+                        key={curso.id}
+                        type="button"
+                        disabled={activo}
+                        onClick={() => { setCursoSeleccionado(curso); setConfirmando(false) }}
+                        className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors
+                          ${activo ? 'bg-green-50 cursor-not-allowed opacity-70' :
+                            seleccionado ? 'bg-green-50 border-l-2 border-green-500' :
+                            'hover:bg-gray-50'}`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0
+                          ${activo ? 'bg-green-400 border-green-400' :
+                            seleccionado ? 'border-green-500 bg-green-500' :
+                            'border-gray-300'}`}>
+                          {(activo || seleccionado) && (
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                              <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-800 truncate">{curso.Titulo}</p>
+                          {curso.precio != null && (
+                            <p className="text-xs text-gray-400">${curso.precio} USD</p>
+                          )}
+                        </div>
+                        {activo && (
+                          <span className="text-xs text-green-600 font-semibold shrink-0">Ya activo</span>
                         )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-800 truncate">{curso.Titulo}</p>
-                        {curso.precio != null && (
-                          <p className="text-xs text-gray-400">${curso.precio} USD</p>
-                        )}
-                      </div>
-                      {activo && (
-                        <span className="text-xs text-green-600 font-semibold shrink-0">Ya activo</span>
-                      )}
-                    </button>
-                  )
-                })}
-              </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           )}
 

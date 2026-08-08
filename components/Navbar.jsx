@@ -44,26 +44,22 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
 
           {/* ── Logo ───────────────────────────────────────────── */}
-          <Link href="/">
-            <a className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center gap-2 group">
               <img src="/logo.svg" alt="Logo C.I.P.M" className="h-9 w-auto" />
               <span className="font-bold text-gray-800 group-hover:text-gray-600 transition-colors">
                 C.I.P.M
               </span>
-            </a>
           </Link>
 
           {/* ── Navegación desktop ─────────────────────────────── */}
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map(({ label, href }) => (
-              <Link key={href} href={href}>
-                <a className={`text-sm font-medium transition-colors
+              <Link key={href} href={href} className={`text-sm font-medium transition-colors
                   ${isActive(href)
                     ? 'text-gray-900 border-b-2 border-gray-800 pb-0.5'
                     : 'text-gray-500 hover:text-gray-900'
                   }`}>
                   {label}
-                </a>
               </Link>
             ))}
           </nav>
@@ -123,8 +119,7 @@ const Navbar = () => {
           <div className="px-4 py-4 flex flex-col gap-1">
 
             {navLinks.map(({ label, href }) => (
-              <Link key={href} href={href}>
-                <a
+              <Link key={href} href={href}
                   onClick={() => setMobileOpen(false)}
                   className={`flex items-center px-3 py-2.5 rounded-md text-sm font-medium transition-colors
                     ${isActive(href)
@@ -133,7 +128,6 @@ const Navbar = () => {
                     }`}
                 >
                   {label}
-                </a>
               </Link>
             ))}
 

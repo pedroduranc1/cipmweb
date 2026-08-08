@@ -4,8 +4,7 @@ import { PlayCircle } from 'lucide-react'
 
 const Videocard = ({ data }) => {
   return (
-    <Link href={`/video/${data.id}`}>
-      <a className="group flex flex-col rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer">
+    <Link href={`/video/${data.id}`} className="group flex flex-col rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer">
 
         {/* Thumbnail */}
         <div className="relative aspect-video overflow-hidden bg-gray-100">
@@ -27,7 +26,6 @@ const Videocard = ({ data }) => {
           )}
         </div>
 
-      </a>
     </Link>
   )
 }

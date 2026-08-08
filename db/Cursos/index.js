@@ -131,15 +131,14 @@ export class Cursos {
     const q = query(
       collection(db, "videos"),
       where("CursoID", "==", id),
+      orderBy("orden", "asc"),
     );
 
     const querySnapshot = await getDocs(q);
-    const blogData = querySnapshot.docs.map((doc) => ({
+    return querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-
-    return blogData.sort((a, b) => (a.orden ?? 9999) - (b.orden ?? 9999));
   }
 
   async getVideo(id) {
@@ -199,22 +198,13 @@ export class Cursos {
 
       if (docSnap.exists()) {
         return docSnap.data();
-      } 
-
-      if(!docSnap.exists()){
-        let cursoData = {
-          cursos:[]
-        };
-        const blogRef = doc(db, "cursosCliente", userID);
-        await setDoc(blogRef, cursoData);
-
-        return cursoData
       }
+
+      return { cursos: [] };
     } catch (error) {
       console.log(error)
-      return "Error"
+      return { cursos: [] }
     }
-
   }
 
   async getCursoCli(id) {

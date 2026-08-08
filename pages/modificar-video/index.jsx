@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { Cursos } from '../../db/Cursos';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import {
   Select, SelectContent, SelectGroup,
   SelectItem, SelectTrigger, SelectValue,
@@ -11,7 +11,7 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from "yup";
 import { useRouter } from 'next/router';
 import { toast } from '../../src/components/ui/use-toast';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
 const cursoCtrl = new Cursos();
@@ -29,6 +29,7 @@ const FieldError = ({ error, touched }) =>
 const ModificarVideo = () => {
   const { User, loading } = useAuth()
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [CursoID, setCursoID] = useState(null)
   const [VideoSeleccionado, setVideoSeleccionado] = useState(null)
 
@@ -36,8 +37,8 @@ const ModificarVideo = () => {
     if (!loading && !User) router.push('/')
   }, [User, loading])
 
-  const { data: DataCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
-  const { data: DataVideos } = useQuery(
+  const { data: DataCursos, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
+  const { data: DataVideos, isLoading: loadingVideos, isError: errorVideos } = useQuery(
     ["videos-curso", CursoID],
     () => cursoCtrl.getVideosCurso(CursoID),
     { enabled: !!CursoID }
@@ -79,18 +80,32 @@ const ModificarVideo = () => {
               <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold">1</span>
               <label className="text-sm font-semibold text-gray-700">Selecciona el curso</label>
             </div>
-            <Select onValueChange={(val) => { setCursoID(val); setVideoSeleccionado(null) }}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Elige un curso..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {cursosOrdenados.map((curso) => (
-                    <SelectItem key={curso.id} value={curso.id}>{curso.Titulo}</SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+
+            {errorCursos ? (
+              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                <AlertCircle size={16} className="shrink-0" />
+                No se pudieron cargar los cursos. Recarga la página.
+              </div>
+            ) : loadingCursos ? (
+              <div className="flex flex-col gap-2">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-10 bg-gray-100 rounded-lg animate-pulse" />
+                ))}
+              </div>
+            ) : (
+              <Select onValueChange={(val) => { setCursoID(val); setVideoSeleccionado(null) }}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Elige un curso..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {cursosOrdenados.map((curso) => (
+                      <SelectItem key={curso.id} value={curso.id}>{curso.Titulo}</SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Paso 2 — Selector de video con lista de orden */}
@@ -101,8 +116,21 @@ const ModificarVideo = () => {
                 <label className="text-sm font-semibold text-gray-700">Selecciona el video</label>
               </div>
 
+              {errorVideos && (
+                <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-3">
+                  <AlertCircle size={16} className="shrink-0" />
+                  No se pudieron cargar los videos. Recarga la página.
+                </div>
+              )}
+
               {/* Lista de videos con orden visual */}
-              {videosOrdenados.length > 0 ? (
+              {loadingVideos ? (
+                <div className="flex flex-col gap-2">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                  ))}
+                </div>
+              ) : videosOrdenados.length > 0 ? (
                 <>
                   <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden mb-3">
                     <p className="text-xs font-semibold text-gray-500 px-3 py-2 border-b border-gray-200 bg-gray-100 uppercase tracking-wide">
@@ -164,6 +192,7 @@ const ModificarVideo = () => {
                   Este curso no tiene videos aún
                 </p>
               )}
+
             </div>
           )}
 
@@ -173,7 +202,11 @@ const ModificarVideo = () => {
               key={VideoSeleccionado.id}
               data={VideoSeleccionado}
               videosDelCurso={videosOrdenados}
-              onSuccess={() => router.push('/cursos')}
+              onSuccess={() => {
+                queryClient.invalidateQueries("cursos")
+                queryClient.invalidateQueries(["videos-curso", CursoID])
+                router.push('/cursos')
+              }}
             />
           )}
 

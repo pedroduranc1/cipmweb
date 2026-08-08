@@ -4,6 +4,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  orderBy,
   query,
   setDoc,
   updateDoc,
@@ -68,15 +69,14 @@ export class User {
 
   async getUsers() {
     const q = query(
-      collection(db, "users")
+      collection(db, "users"),
+      orderBy("email", "asc"),
     );
     const dataSnapshot = await getDocs(q);
-    const newData = dataSnapshot.docs.map((doc) => ({
+    return dataSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-
-    return newData;
   }
 
   async createUserWeb(uid, cursoData) {

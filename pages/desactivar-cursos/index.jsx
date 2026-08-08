@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { Popover, PopoverContent, PopoverTrigger } from '../../src/components/ui/popover';
-import { ChevronsUpDown, Loader2 } from 'lucide-react';
+import { AlertCircle, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../../src/components/ui/command';
 import { Cursos } from '../../db/Cursos';
 import { User } from '../../db/User';
 import { useAuth } from '../../hooks/useAuth';
 import { useRouter } from 'next/router';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { toast } from '../../src/components/ui/use-toast';
 
 const cursoCtrl = new Cursos();
@@ -17,6 +17,7 @@ const userCtrl = new User();
 const DesactivarCursos = () => {
   const { User: AuthUser, loading } = useAuth();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null)
   const [cursosDelCliente, setCursosDelCliente] = useState(null)
@@ -31,8 +32,8 @@ const DesactivarCursos = () => {
     if (!loading && !AuthUser) router.push('/');
   }, [AuthUser, loading]);
 
-  const { data: Clientes } = useQuery("clientes", () => userCtrl.getUsers());
-  const { data: CursosData } = useQuery("cursos", () => cursoCtrl.getCursos());
+  const { data: Clientes, isLoading: loadingClientes, isError: errorClientes } = useQuery("clientes", () => userCtrl.getUsers());
+  const { data: CursosData, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos", () => cursoCtrl.getCursos());
 
   const clientesFiltrados = Clientes
     ? Clientes.filter(c => c.email?.toLowerCase().includes(search.toLowerCase()))
@@ -66,6 +67,7 @@ const DesactivarCursos = () => {
       await cursoCtrl.desactivarCurso(clienteSeleccionado.id, { cursos: cursosActualizados })
 
       toast({ title: "Curso desactivado exitosamente" })
+      queryClient.invalidateQueries("clientes")
       router.push("/")
     } catch {
       toast({ variant: "destructive", title: "Error al desactivar el curso" })
@@ -151,7 +153,20 @@ const DesactivarCursos = () => {
                 <label className="text-sm font-semibold text-gray-700">Selecciona el curso a desactivar</label>
               </div>
 
-              {cursosDelCliente.length > 0 ? (
+              {(errorCursos || errorClientes) && (
+                <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-3">
+                  <AlertCircle size={16} className="shrink-0" />
+                  No se pudieron cargar los datos. Recarga la página.
+                </div>
+              )}
+
+              {loadingCursos ? (
+                <div className="flex flex-col gap-2">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                  ))}
+                </div>
+              ) : cursosDelCliente.length > 0 ? (
                 <div className="border border-gray-200 rounded-lg overflow-hidden divide-y divide-gray-100 max-h-64 overflow-y-auto">
                   {cursosDelCliente.map(curso => {
                     const seleccionado = cursoSeleccionado?.id === curso.id
