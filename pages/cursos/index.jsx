@@ -70,6 +70,7 @@ const MasonrySection = ({ cursos, activeSlugs, title, count }) => (
           descripcion={curso.Descripcion}
           precio={curso.precio}
           active={activeSlugs.has(curso.id)}
+          publicado={curso.publicado ?? true}
         />
       ))}
     </div>
@@ -80,9 +81,12 @@ const CursosPage = () => {
   const { User, loading } = useAuth();
   const router = useRouter();
 
+  const isAdmin = User?.role === "admin"
+
   const { data: CursosData, isLoading: isLoadingCursos, isError } = useQuery(
-    "Cursos",
-    () => cursoCtrl.getCursos()
+    ["Cursos", isAdmin],
+    () => cursoCtrl.getCursos(isAdmin),
+    { enabled: !loading }
   )
 
   const { data: clienteData, isLoading: isLoadingCliente } = useQuery(
@@ -94,8 +98,6 @@ const CursosPage = () => {
   useEffect(() => {
     if (!loading && !User) router.push("/")
   }, [User, loading])
-
-  const isAdmin = User?.role === "admin"
   const isLoading = isLoadingCursos || isLoadingCliente
 
   // Set de slugs adquiridos para lookup O(1)

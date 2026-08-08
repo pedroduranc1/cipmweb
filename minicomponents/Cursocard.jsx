@@ -15,7 +15,7 @@ export const CardSkeleton = () => (
 )
 
 // active se resuelve en el padre (pages/cursos/index.jsx) para dividir secciones
-export const Cursocard = ({ titulo, descripcion, slug, precio, img, active = false }) => {
+export const Cursocard = ({ titulo, descripcion, slug, precio, img, active = false, publicado = true }) => {
   // string vacío de Firestore también cae al fallback
   const thumbnail = img?.trim() ? img : '/video-placeholder.svg'
   const tienePrecio = !active && precio != null && Number(precio) > 0
@@ -32,10 +32,13 @@ export const Cursocard = ({ titulo, descripcion, slug, precio, img, active = fal
         />
         <span className={`absolute top-2 left-3 text-xs font-medium px-2.5 py-1 rounded-full
           ${active ? 'bg-blue-500 px-3 text-white' : 'bg-black/50 text-white'}`}>
-          <p>
-            {active ? 'Activo' : 'Disponible'}</p>
-
+          {active ? 'Activo' : 'Disponible'}
         </span>
+        {publicado === false && (
+          <span className="absolute top-2 right-2 bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+            No publicado
+          </span>
+        )}
       </div>
 
       {/* Texto */}

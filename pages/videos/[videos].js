@@ -7,22 +7,51 @@ import videoslist from '../../db/videos'
 import { useRouter } from 'next/router'
 import { Search, X } from 'lucide-react'
 import Breadcrumb from '../../components/Breadcrumb'
+import { useQuery } from 'react-query'
+import { Cursos } from '../../db/Cursos'
+import { useAuth } from '../../hooks/useAuth'
 
+const cursoCtrl = new Cursos()
 const PAGE_SIZE = 8
 
 export default function Videos() {
   const router = useRouter()
   const { videos: query } = router.query
+  const { User } = useAuth()
+
+  const isAdmin = User?.role === 'admin'
 
   const initialSearch = query && query !== 'cipm' ? query.replace(/%20/g, ' ') : ''
   const [search, setSearch] = useState(initialSearch)
   const [page, setPage] = useState(1)
 
+  const { data: videosSolitarios = [] } = useQuery(
+    ["videos-solitarios", isAdmin],
+    () => cursoCtrl.getVideosSolitarios(isAdmin),
+    { staleTime: 1000 * 60 * 5 }
+  )
+
+  const videosFirestore = videosSolitarios.map(v => ({
+    id: v.id,
+    videoname: v.Titulo,
+    miniatura: v.ImgUrl || '/miniaturavideo.svg',
+    fecha: v.Fecha?.toDate?.().toLocaleDateString('es-MX') ?? '',
+    descripcion: v.Descripcion ?? '',
+    publicado: v.publicado ?? false,
+    _source: 'firestore',
+  }))
+
+  const allVideos = useMemo(() => {
+    const firestoreIds = new Set(videosFirestore.map(v => v.id))
+    const staticFiltered = videoslist.filter(v => !firestoreIds.has(String(v.id)))
+    return [...videosFirestore, ...staticFiltered]
+  }, [videosFirestore])
+
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
-    if (!term) return videoslist
-    return videoslist.filter(v => v.videoname.toLowerCase().includes(term))
-  }, [search])
+    if (!term) return allVideos
+    return allVideos.filter(v => v.videoname.toLowerCase().includes(term))
+  }, [search, allVideos])
 
   const visible = filtered.slice(0, page * PAGE_SIZE)
   const hasMore = visible.length < filtered.length

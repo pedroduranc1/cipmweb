@@ -36,7 +36,7 @@ const ActivarCursos = () => {
     if (!loading && !AuthUser) router.push('/')
   }, [AuthUser, loading])
 
-  const { data: CursosData, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
+  const { data: CursosData, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos-admin", () => cursoCtrl.getCursos(true))
   const { data: Clientes, isLoading: loadingClientes, isError: errorClientes } = useQuery("clientes", () => userCtrl.getUsers())
 
   const cursosOrdenados = CursosData

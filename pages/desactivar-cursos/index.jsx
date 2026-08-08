@@ -33,7 +33,7 @@ const DesactivarCursos = () => {
   }, [AuthUser, loading]);
 
   const { data: Clientes, isLoading: loadingClientes, isError: errorClientes } = useQuery("clientes", () => userCtrl.getUsers());
-  const { data: CursosData, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos", () => cursoCtrl.getCursos());
+  const { data: CursosData, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos-admin", () => cursoCtrl.getCursos(true));
 
   const clientesFiltrados = Clientes
     ? Clientes.filter(c => c.email?.toLowerCase().includes(search.toLowerCase()))

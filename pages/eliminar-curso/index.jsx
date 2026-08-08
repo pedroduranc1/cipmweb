@@ -24,7 +24,7 @@ const EliminarCurso = () => {
     if (!loading && !User) router.push('/')
   }, [User, loading])
 
-  const { data: DataCursos, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
+  const { data: DataCursos, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos-admin", () => cursoCtrl.getCursos(true))
   const { data: VideosDelCurso } = useQuery(
     ["videos-curso", CursoSeleccionado?.id],
     () => cursoCtrl.getVideosCurso(CursoSeleccionado.id),
