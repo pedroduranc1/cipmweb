@@ -4,8 +4,7 @@ import { PlayCircle } from 'lucide-react'
 
 const Videocard = ({ data }) => {
   return (
-    <Link href={`/video/${data.id}`}>
-      <a className="group flex flex-col rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer">
+    <Link href={`/video/${data.id}`} className="group flex flex-col rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer">
 
         {/* Thumbnail */}
         <div className="relative aspect-video overflow-hidden bg-gray-100">
@@ -17,6 +16,11 @@ const Videocard = ({ data }) => {
           <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/25 transition-colors duration-200">
             <PlayCircle className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 drop-shadow-lg" />
           </div>
+          {data._source === 'firestore' && data.publicado === false && (
+            <span className="absolute top-2 left-2 bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              No publicado
+            </span>
+          )}
         </div>
 
         {/* Contenido */}
@@ -27,7 +31,6 @@ const Videocard = ({ data }) => {
           )}
         </div>
 
-      </a>
     </Link>
   )
 }

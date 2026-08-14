@@ -4,6 +4,7 @@ import Contact from '../components/Contact'
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
 import Heros from '../components/Heros'
+import Breadcrumb from '../components/Breadcrumb'
 
 const Contactos = () => {
   return (
@@ -16,6 +17,7 @@ const Contactos = () => {
       </Head>
       <div className="relative">
         <Navbar />
+        <Breadcrumb />
         <Heros />
         <Contact />
         <Footer />

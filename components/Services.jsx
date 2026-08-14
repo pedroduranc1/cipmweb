@@ -59,7 +59,7 @@ const Services = () => {
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          <Link href="/contactos">
+          <Link href="/contactos" legacyBehavior>
             <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}

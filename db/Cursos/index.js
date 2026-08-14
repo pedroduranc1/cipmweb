@@ -22,17 +22,12 @@ import {
 
 export class Cursos {
 
-  async getCursos() {
-    const q = query(
-      collection(db, "cursos")
-    );
+  async getCursos(isAdmin = false) {
+    const q = isAdmin
+      ? query(collection(db, "cursos"))
+      : query(collection(db, "cursos"), where("publicado", "==", true));
     const dataSnapshot = await getDocs(q);
-    const newData = dataSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    return newData;
+    return dataSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   }
 
   async getCurso(id) {
@@ -134,12 +129,8 @@ export class Cursos {
     );
 
     const querySnapshot = await getDocs(q);
-    const blogData = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    return blogData.sort((a, b) => (a.orden ?? 9999) - (b.orden ?? 9999));
+    const docs = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return docs.sort((a, b) => (a.orden ?? 9999) - (b.orden ?? 9999));
   }
 
   async getVideo(id) {
@@ -199,22 +190,13 @@ export class Cursos {
 
       if (docSnap.exists()) {
         return docSnap.data();
-      } 
-
-      if(!docSnap.exists()){
-        let cursoData = {
-          cursos:[]
-        };
-        const blogRef = doc(db, "cursosCliente", userID);
-        await setDoc(blogRef, cursoData);
-
-        return cursoData
       }
+
+      return { cursos: [] };
     } catch (error) {
       console.log(error)
-      return "Error"
+      return { cursos: [] }
     }
-
   }
 
   async getCursoCli(id) {
@@ -248,6 +230,21 @@ export class Cursos {
       console.error("Error updating blog: ", error);
       return false;
     }
+  }
+
+  async getTodosVideosCurso() {
+    const q = query(collection(db, "videos"), where("tipo", "==", "curso"));
+    const snap = await getDocs(q);
+    return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  }
+
+  async getVideosSolitarios(isAdmin = false) {
+    const q = isAdmin
+      ? query(collection(db, "videos"), where("tipo", "==", "solitario"))
+      : query(collection(db, "videos"), where("tipo", "==", "solitario"), where("publicado", "==", true));
+    const snap = await getDocs(q);
+    const docs = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return docs.sort((a, b) => (b.Fecha?.seconds ?? 0) - (a.Fecha?.seconds ?? 0));
   }
 
   async getComments(videoId) {

@@ -1,118 +1,150 @@
 import React from 'react'
-
-import Link from 'next/link';
+import Link from 'next/link'
 import Head from 'next/head'
-
 import { Form, Field, Formik } from 'formik'
-import * as Yup from "yup";
-import { useRouter } from 'next/router';
-import { Auth } from '../db/Auth';
-import { useAuth } from '../hooks/useAuth';
+import * as Yup from 'yup'
+import { useRouter } from 'next/router'
+import { Auth } from '../db/Auth'
+import { useAuth } from '../hooks/useAuth'
+import { useToast } from '../src/components/ui/use-toast'
+import { Loader2, Lock, Mail } from 'lucide-react'
 
-import { useToast } from "../src/components/ui/use-toast"
-import { Loader2 } from 'lucide-react';
+const AuthCtrl = new Auth()
 
+const Login = () => {
+  const { login } = useAuth()
+  const router = useRouter()
+  const { toast } = useToast()
 
-const AuthCtrl = new Auth();
+  return (
+    <>
+      <Head>
+        <title>Login - CIPM</title>
+        <link rel="icon" href="/logo.svg" />
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      </Head>
 
-const login = () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { login } = useAuth();
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const router = useRouter();
+      <div className="min-h-screen flex">
 
-    const { toast } = useToast()
-    return (
-        <>
-            <Head>
-                <title>Login - CIPM</title>
-                <link rel="icon" href="logo.svg" />
-                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+        {/* ── Panel izquierdo (visual) ─────────────────────────── */}
+        <div className="hidden lg:flex lg:w-1/2 bg-blue-600 flex-col justify-between p-12">
+          <img src="/logo.svg" alt="CIPM" className="h-12 w-auto" />
 
-            </Head>
+          <div>
+            <h1 className="text-4xl font-bold text-white leading-tight mb-4">
+              Aprende inglés<br />a tu ritmo
+            </h1>
+            <p className="text-blue-200 text-base leading-relaxed max-w-sm">
+              Accede a todos tus cursos y videos desde cualquier lugar, en cualquier momento.
+            </p>
+          </div>
 
-            <div className="w-full h-full min-h-screen bg-blue-500 flex flex-col space-y-3 justify-center items-center">
-                {/* Imagen CIPM */}
-                <img src="/logo.svg" alt="" />
+          <p className="text-blue-300 text-sm">© {new Date().getFullYear()} C.I.P.M — Monterrey, México</p>
+        </div>
 
-                {/* Formularion de login */}
-                <div className="bg-white shadow-md w-[90%] md:w-[30%] transition-all h-fit rounded-md p-4 flex flex-col">
-                    <h1 className="text-center font-bold text-2xl py-3">Login</h1>
-                    <Formik
-                        initialValues={{
-                            email: '',
-                            password: '',
-                        }}
-                        validationSchema={Yup.object({
-                            email: Yup.string().required("Porfavor. Ingrese el correo"),
-                            password: Yup.string().required("Porfavor. Ingrese la contraseña")
-                        })}
-                        onSubmit={async (values) => {
-                            // same shape as initial values
-                            const { email, password } = values
+        {/* ── Panel derecho (formulario) ───────────────────────── */}
+        <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-white">
 
-                            const data = await AuthCtrl.login(email, password);
+          {/* Logo mobile */}
+          <img src="/logo.svg" alt="CIPM" className="h-10 w-auto mb-8 lg:hidden" />
 
-                            if (typeof data === 'string' && data.startsWith("Firebase:")) {
-                                // Es un error de Firebase
-                                if (data == "Firebase: Error (auth/wrong-password).") {
-                                    toast({
-                                        variant: "destructive",
-                                        title: "Login Error",
-                                        description: "Contraseña Incorrecta",
-                                    })
-                                }
+          <div className="w-full max-w-sm">
+            <h2 className="text-2xl font-bold text-gray-800 mb-1">Iniciar sesión</h2>
+            <p className="text-gray-400 text-sm mb-8">Ingresa tus datos para continuar</p>
 
-                                if (data == "Firebase: Error (auth/user-not-found).") {
-                                    toast({
-                                        variant: "destructive",
-                                        title: "Login Error",
-                                        description: "Su correo no existe",
-                                    })
-                                }
+            <Formik
+              initialValues={{ email: '', password: '' }}
+              validationSchema={Yup.object({
+                email: Yup.string().required('Ingresa tu correo'),
+                password: Yup.string().required('Ingresa tu contraseña'),
+              })}
+              onSubmit={async (values) => {
+                const { email, password } = values
+                const data = await AuthCtrl.login(email, password)
 
-                            }
-                            else {
-                                const { accessToken, uid } = data;
-                                await login(accessToken, uid);
-                                router.push("/")
-                            }
+                if (typeof data === 'string' && data.startsWith('Firebase:')) {
+                  if (data.includes('wrong-password')) {
+                    toast({ variant: 'destructive', title: 'Error', description: 'Contraseña incorrecta' })
+                  } else if (data.includes('user-not-found')) {
+                    toast({ variant: 'destructive', title: 'Error', description: 'El correo no existe' })
+                  } else {
+                    toast({ variant: 'destructive', title: 'Error', description: 'Error al iniciar sesión' })
+                  }
+                } else {
+                  const { accessToken, uid } = data
+                  await login(accessToken, uid)
+                  router.push('/')
+                }
+              }}
+            >
+              {({ errors, touched, isSubmitting }) => (
+                <Form className="flex flex-col gap-4">
 
-                        }}
-                    >
-                        {({ errors, touched, isValid, isSubmitting }) => (
-                            <Form className="flex flex-col h-full p-4">
-                                <label className="font-bold text-gray-600" htmlFor="password">Correo</label>
-                                <Field className={`py-2 w-full ${errors.email && touched.email ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="email" />
-                                {errors.email && touched.email ? (
-                                    <div>{errors.email}</div>
-                                ) : null}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-gray-600" htmlFor="email">
+                      Correo electrónico
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      <Field
+                        id="email" name="email" type="email"
+                        placeholder="tu@correo.com"
+                        className={`w-full pl-9 pr-4 py-2.5 rounded-xl border text-sm text-gray-700 placeholder-gray-400
+                          focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-colors
+                          ${errors.email && touched.email ? 'border-red-400 bg-red-50' : 'border-gray-200'}`}
+                      />
+                    </div>
+                    {errors.email && touched.email && (
+                      <p className="text-xs text-red-500">{errors.email}</p>
+                    )}
+                  </div>
 
-                                <label className="font-bold mt-3 text-gray-600" htmlFor="password">Contraseña</label>
-                                <Field
-                                    className={`py-2 w-full ${errors.password && touched.password ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`}
-                                    name="password"
-                                    type="password" />
-                                {errors.password && touched.password ? (
-                                    <div>{errors.password}</div>
-                                ) : null}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-gray-600" htmlFor="password">
+                      Contraseña
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      <Field
+                        id="password" name="password" type="password"
+                        placeholder="••••••••"
+                        className={`w-full pl-9 pr-4 py-2.5 rounded-xl border text-sm text-gray-700 placeholder-gray-400
+                          focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-colors
+                          ${errors.password && touched.password ? 'border-red-400 bg-red-50' : 'border-gray-200'}`}
+                      />
+                    </div>
+                    {errors.password && touched.password && (
+                      <p className="text-xs text-red-500">{errors.password}</p>
+                    )}
+                  </div>
 
-                                <button
-                                    disabled={isValid || isSubmitting ? false : true}
-                                    className="py-2 px-4 mt-5 disabled:opacity-20 transition-colors bg-blue-500 
-            rounded-md text-white hover:bg-blue-300 "
-                                    type="submit">{isSubmitting ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Login"}</button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex items-center justify-center gap-2 w-full py-2.5 mt-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isSubmitting
+                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Entrando...</>
+                      : 'Iniciar sesión'
+                    }
+                  </button>
 
-                                <Link className="mt-3 inline-block" href="/registro" >No tienes cuenta? haz click aqui</Link>
-                            </Form>
-                        )}
-                    </Formik>
-                </div>
+                  <p className="text-center text-sm text-gray-400 mt-1">
+                    ¿No tienes cuenta?{' '}
+                    <Link href="/registro" className="text-blue-600 hover:text-blue-700 font-medium transition-colors">
+                      Regístrate
+                    </Link>
+                  </p>
 
-            </div>
-        </>
-    )
+                </Form>
+              )}
+            </Formik>
+          </div>
+        </div>
+
+      </div>
+    </>
+  )
 }
 
-export default login
+export default Login

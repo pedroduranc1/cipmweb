@@ -35,14 +35,12 @@ const Footer = () => {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5 }}
           >
-            <Link href="/">
-              <a className="flex items-center gap-2 group w-fit">
+            <Link href="/" className="flex items-center gap-2 group w-fit">
                 <img src="/logo.svg" alt="Logo C.I.P.M" className="h-10 w-auto" />
                 <div className="flex flex-col leading-tight">
                   <span className="font-bold text-gray-800 group-hover:text-gray-600 transition-colors">C.I.P.M</span>
                   <span className="text-xs text-gray-400">Cursos de Inglés Personalizados</span>
                 </div>
-              </a>
             </Link>
           </motion.div>
 
@@ -55,14 +53,10 @@ const Footer = () => {
           >
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Navegación</p>
             {NAV_LINKS.map(({ label, href }) => (
-              <Link key={href} href={href}>
-                <a className="text-sm text-gray-500 hover:text-gray-800 transition-colors w-fit">{label}</a>
-              </Link>
+              <Link key={href} href={href} className="text-sm text-gray-500 hover:text-gray-800 transition-colors w-fit">{label}</Link>
             ))}
             {User && (
-              <Link href="/cursos">
-                <a className="text-sm text-gray-500 hover:text-gray-800 transition-colors w-fit">Cursos</a>
-              </Link>
+              <Link href="/cursos" className="text-sm text-gray-500 hover:text-gray-800 transition-colors w-fit">Cursos</Link>
             )}
           </motion.nav>
 

@@ -29,6 +29,7 @@ const CrearCurso = () => {
   const router = useRouter()
   const [ImgCurso, setImgCurso] = useState(null)
   const [previewImg, setPreviewImg] = useState(null)
+  const [publicado, setPublicado] = useState(false)
 
   useEffect(() => {
     if (!loading && !User) router.push('/')
@@ -75,6 +76,7 @@ const CrearCurso = () => {
               const dataCurso = {
                 ...values,
                 precio: Number(values.precio),
+                publicado,
                 ImgUrl: ImgCurso
                   ? await cursoCtrl.uploadCursoImage(ImgCurso, Slug, Slug)
                   : "",
@@ -140,6 +142,26 @@ const CrearCurso = () => {
                     <Field id="precio" name="precio" type="number" min="0" step="0.01" placeholder="0.00"
                       className={fieldClass(errors.precio, touched.precio)} />
                     <FieldError error={errors.precio} touched={touched.precio} />
+                  </div>
+
+                  {/* Visibilidad */}
+                  <div className="flex items-center justify-between p-4 rounded-xl border-2 border-dashed transition-colors
+                    border-gray-200 bg-gray-50">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-700">Visible al público</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {publicado ? 'El curso aparecerá en la lista de cursos' : 'Solo visible para administradores (modo prueba)'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPublicado(p => !p)}
+                      className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 cursor-pointer
+                        ${publicado ? 'bg-blue-600' : 'bg-gray-300'}`}
+                    >
+                      <span className={`inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform duration-200
+                        ${publicado ? 'translate-x-5' : 'translate-x-0'}`} />
+                    </button>
                   </div>
 
                   {/* Miniatura */}

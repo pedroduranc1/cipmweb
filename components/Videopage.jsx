@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import VideoCard2 from '../minicomponents/VideoCard2'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import videoslist from '../db/videos'
 import ReactPlayer from 'react-player'
-import { Loader2, Maximize, Minimize, Pause, Play, Volume2, VolumeX } from 'lucide-react'
+import { ChevronRight, Film, Loader2, Maximize, Minimize, Pause, Play, Volume2, VolumeX } from 'lucide-react'
 
 const BASE = 'https://adrianlealcaldera.com'
 
@@ -15,6 +16,8 @@ const formatTime = (secs) => {
   if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
   return `${m}:${String(s).padStart(2, '0')}`
 }
+
+// ── Player ────────────────────────────────────────────────────────────────────
 
 const VideoPlayer = ({ url }) => {
   const playerRef = useRef(null)
@@ -78,7 +81,7 @@ const VideoPlayer = ({ url }) => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-video bg-black rounded-xl overflow-hidden select-none"
+      className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden select-none shadow-lg"
       onMouseMove={resetHideTimer}
       onMouseLeave={() => playing && setShowControls(false)}
     >
@@ -117,8 +120,9 @@ const VideoPlayer = ({ url }) => {
       <div className={`absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`} />
 
       <div className={`absolute inset-x-0 bottom-0 px-4 pb-4 pt-2 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="relative w-full h-1 mb-3">
-          <div className="absolute top-0 left-0 h-full bg-white/25 rounded-full" style={{ width: `${loaded * 100}%` }} />
+        <div className="relative w-full h-1.5 mb-3">
+          <div className="absolute inset-0 bg-white/20 rounded-full" />
+          <div className="absolute top-0 left-0 h-full bg-white/30 rounded-full" style={{ width: `${loaded * 100}%` }} />
           <div className="absolute top-0 left-0 h-full bg-blue-500 rounded-full pointer-events-none" style={{ width: `${played * 100}%` }} />
           <input
             type="range" min={0} max={1} step={0.0001} value={played}
@@ -128,10 +132,11 @@ const VideoPlayer = ({ url }) => {
             className="absolute inset-0 w-full opacity-0 cursor-pointer h-full"
           />
         </div>
+
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1">
             <button onClick={() => setPlaying(p => !p)} className="p-2 rounded-lg text-white hover:bg-white/10 transition-colors">
-              {playing ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-white" />}
+              {playing ? <Pause className="w-5 h-5 fill-white" /> : <Play className="w-5 h-5 fill-white" />}
             </button>
             <button onClick={() => skip(-10)} className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors hidden sm:block">
               <span className="text-xs font-bold">-10</span>
@@ -153,6 +158,7 @@ const VideoPlayer = ({ url }) => {
               {formatTime(played * duration)} / {formatTime(duration)}
             </span>
           </div>
+
           <div className="flex items-center gap-1 relative">
             <div className="relative">
               <button onClick={() => setShowRateMenu(r => !r)} className="px-2 py-1 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors text-xs font-bold">
@@ -179,84 +185,84 @@ const VideoPlayer = ({ url }) => {
   )
 }
 
+// ── Página ────────────────────────────────────────────────────────────────────
+
 const Videopage = () => {
+  const router = useRouter()
+  const { video: videoId } = router.query
 
-    const router = useRouter()
-    const { video } = router.query
+  const videoselec = videoslist[videoId - 1]
+  const relacionados = videoslist.filter(v => v.id !== videoselec?.id).slice(0, 6)
 
-    const videoselec = videoslist[video - 1]
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-4 mb-16">
+      <div className="flex flex-col lg:flex-row gap-6">
 
-    let arr = videoselec?.videoname.split(' ');
-    //console.log(arr)
+        {/* ── Columna principal ──────────────────────────────────── */}
+        <div className="flex-1 min-w-0">
 
-    let videos = []
-    let min = 0
+          {/* Player */}
+          <VideoPlayer url={BASE + videoselec?.videourl} />
 
-
-    if (arr !== "") {
-        const videosdiferente = videoslist.filter(videof => videof.id !== videoselec?.id);
-
-        videosdiferente.map((video) => {
-            if(videos.length <= 3){
-                videos.push(video)
-            }
-        })
-    }
-
-    return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="">
-                <div className='grid grid-cols-1 md:grid-cols-2 items-center justify-between py-10 '>
-                    <h1 className='text-3xl w-full text-gray-700 font-semibold'>Videos que pueden ayudarte</h1>
-
-                </div>
-            </div>
-            <div className='grid grid-cols-1 md:space-x-6 grid-rows-4 md:grid-cols-4'>
-
-                <div className='col-span-3 row-span-4'>
-                    <div className='col-span-3 justify-items-center row-span-2'>
-                        <VideoPlayer url={BASE + videoselec?.videourl} />
-                    </div>
-
-                    <div className='col-span-3 row-span-2'>
-                        <h1 className='text-3xl font-semibold text-gray-700 pt-10'>{videoselec?.videoname}</h1>
-                        <h2 className='text-lg text-gray-700 pt-3'>{videoselec?.fecha}</h2>
-                        <h2 className='text-lg text-gray-700 pt-3 pb-6'>{videoselec?.descripcion === "" ? "Este video no posee descripcion" : videoselec?.descripcion} </h2>
-                        <div className='flex justify-center md:justify-start pt-6 pb-6 space-x-6'>
-                            <img
-                                className="h-8 w-auto sm:h-12 hover:cursor-pointer"
-                                src="/ws.svg"
-                                alt=""
-                            />
-
-                            <img
-                                className="h-8 w-auto sm:h-12 hover:cursor-pointer "
-                                src="/fb.svg"
-                                alt=""
-                            />
-
-                            <img
-                                className="h-8 w-auto sm:h-12 hover:cursor-pointer"
-                                src="/tiktok.svg"
-                                alt=""
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div className='col-span-1 space-y-6 pb-10 row-span-4'>
-                    {
-                        videos.map((video) =>
-                            <VideoCard2
-                                key={video.id}
-                                data={video}
-                            />
-                        )
-                    }
-                </div>
-            </div>
+          {/* Info */}
+          <div className="mt-4">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800 leading-snug">
+              {videoselec?.videoname}
+            </h1>
+            <p className="text-gray-400 text-sm mt-1">{videoselec?.fecha}</p>
+            {videoselec?.descripcion && (
+              <p className="mt-3 text-gray-500 text-sm leading-relaxed">
+                {videoselec.descripcion}
+              </p>
+            )}
+          </div>
         </div>
-    )
+
+        {/* ── Sidebar: videos relacionados ───────────────────────── */}
+        <div className="w-full lg:w-72 shrink-0">
+          <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+
+            <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Film className="w-4 h-4 text-gray-400" />
+                <span className="text-sm font-semibold text-gray-700">Más videos</span>
+              </div>
+              <Link href="/videos/cipm" className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors">
+                Ver todos
+              </Link>
+            </div>
+
+            <div className="divide-y divide-gray-50">
+              {relacionados.map(v => (
+                <Link
+                  key={v.id}
+                  href={`/video/${v.id}`}
+                  className="flex gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                >
+                  <div className="relative w-20 h-14 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                    <img
+                      src={v.miniatura?.trim() || '/miniaturavideo.svg'}
+                      alt={v.videoname}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+                    <p className="text-sm text-gray-700 font-medium line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
+                      {v.videoname}
+                    </p>
+                    {v.fecha && <p className="text-xs text-gray-400 mt-0.5">{v.fecha}</p>}
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-gray-300 shrink-0 self-center" />
+                </Link>
+              ))}
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
 }
 
 export default Videopage

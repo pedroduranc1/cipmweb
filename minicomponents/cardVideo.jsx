@@ -6,8 +6,7 @@ export const Cursocard = ({ titulo, descripcion, slug, img, imgSecond, index }) 
   const thumbnail = img?.trim() ? img : (imgSecond?.trim() ? imgSecond : '/miniaturavideo.svg');
 
   return (
-    <Link href={`/cursos${slug}`}>
-      <a className="group flex flex-col rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer">
+    <Link href={`/cursos${slug}`} className="group flex flex-col rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer">
 
         {/* Thumbnail */}
         <div className="relative aspect-video overflow-hidden bg-gray-100 flex-shrink-0">
@@ -36,7 +35,6 @@ export const Cursocard = ({ titulo, descripcion, slug, img, imgSecond, index }) 
           )}
         </div>
 
-      </a>
     </Link>
   )
 }

@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from 'react-query'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../../src/components/ui/select'
 import { toast } from '../../src/components/ui/use-toast'
 import { useRouter } from 'next/router'
-import { Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 
 const cursoCtrl = new Cursos();
@@ -25,8 +25,8 @@ const EliminarVideo = () => {
     if (!loading && !User) router.push('/')
   }, [User, loading])
 
-  const { data: DataCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
-  const { data: DataVideos } = useQuery(
+  const { data: DataCursos, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos-admin", () => cursoCtrl.getCursos(true))
+  const { data: DataVideos, isLoading: loadingVideos, isError: errorVideos } = useQuery(
     ["videos-curso", CursoID],
     () => cursoCtrl.getVideosCurso(CursoID),
     { enabled: !!CursoID }
@@ -87,18 +87,32 @@ const EliminarVideo = () => {
               <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500 text-white text-xs font-bold">1</span>
               <label className="text-sm font-semibold text-gray-700">Selecciona el curso</label>
             </div>
-            <Select onValueChange={(val) => { setCursoID(val); setVideoSeleccionado(null); setConfirmando(false) }}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Elige un curso..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {cursosOrdenados.map((curso) => (
-                    <SelectItem key={curso.id} value={curso.id}>{curso.Titulo}</SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+
+            {errorCursos ? (
+              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                <AlertCircle size={16} className="shrink-0" />
+                No se pudieron cargar los cursos. Recarga la página.
+              </div>
+            ) : loadingCursos ? (
+              <div className="flex flex-col gap-2">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-10 bg-gray-100 rounded-lg animate-pulse" />
+                ))}
+              </div>
+            ) : (
+              <Select onValueChange={(val) => { setCursoID(val); setVideoSeleccionado(null); setConfirmando(false) }}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Elige un curso..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {cursosOrdenados.map((curso) => (
+                      <SelectItem key={curso.id} value={curso.id}>{curso.Titulo}</SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Paso 2 — Lista de videos con orden */}
@@ -109,7 +123,20 @@ const EliminarVideo = () => {
                 <label className="text-sm font-semibold text-gray-700">Selecciona el video a eliminar</label>
               </div>
 
-              {videosOrdenados.length > 0 ? (
+              {errorVideos && (
+                <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-3">
+                  <AlertCircle size={16} className="shrink-0" />
+                  No se pudieron cargar los videos. Recarga la página.
+                </div>
+              )}
+
+              {loadingVideos ? (
+                <div className="flex flex-col gap-2">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="h-14 bg-gray-100 rounded-lg animate-pulse" />
+                  ))}
+                </div>
+              ) : videosOrdenados.length > 0 ? (
                 <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
                   <p className="text-xs font-semibold text-gray-500 px-3 py-2 border-b border-gray-200 bg-gray-100 uppercase tracking-wide">
                     Videos de {cursoActual?.Titulo} ({videosOrdenados.length})
@@ -149,6 +176,7 @@ const EliminarVideo = () => {
               )}
             </div>
           )}
+
 
           {/* Info del video seleccionado */}
           {VideoSeleccionado && !confirmando && (

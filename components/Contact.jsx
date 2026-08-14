@@ -1,245 +1,115 @@
-import React, { useEffect, useState } from 'react'
-import * as emailjs from '@emailjs/browser'
-import swal from 'sweetalert'
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import React from 'react'
+import { Mail, MapPin, Clock } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useInView } from '../hooks/useInView'
 
+const SOCIAL_LINKS = [
+  { label: 'WhatsApp', href: 'https://wa.link/sljtqs',                                        icon: '/ws.svg' },
+  { label: 'Facebook', href: 'https://www.facebook.com/Cursosdeinglesmty?mibextid=2JQ9oc',    icon: '/fb.svg' },
+  { label: 'TikTok',   href: 'https://www.tiktok.com/@adrianlealcaldera?lang=en',             icon: '/tiktok.svg' },
+  { label: 'YouTube',  href: 'https://youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA',         icon: '/youtube.svg' },
+]
 
-const Contact = ({ fullpage }) => {
+const INFO = [
+  { icon: MapPin, text: 'Monterrey, México' },
+  { icon: Clock,  text: 'Lunes – Viernes · 9 am – 5 pm' },
+  { icon: Mail,   text: 'Contáctanos por WhatsApp o redes sociales' },
+]
 
-  const [EnviandoCorreoContac, setEnviandoCorreoContac] = useState(false)
-
-  const formik = useFormik({
-    initialValues: {
-      nombrecompleto: '',
-      email: '',
-      message: '',
-      telefono: ''
-    },
-    validationSchema: Yup.object({
-      nombrecompleto: Yup.string()
-        .required('Required'),
-      email: Yup.string()
-        .email('Invalid email address')
-        .required('Required'),
-      message: Yup.string()
-        .required('Required'),
-      telefono: Yup.number()
-        .required('Required'),
-    }),
-    onSubmit: (values) => {
-
-      let valuesemaill = {
-        nombre: values.nombrecompleto,
-        from_name: values.email,
-        message: values.message,
-        telefono: values.telefono
-      }
-
-      setEnviandoCorreoContac(true)
-      emailjs.send('service_5s7kuca', 'template_92ao3zk', valuesemaill, 'zqIzI2_ekxMdEySHy')
-        .then(function (response) {
-          swal(`Felicidades ${valuesemaill.nombre}`, "Tu correo a sido enviado con exito", "success");
-          limpiarinp()
-          setEnviandoCorreoContac(false)
-        }, function (error) {
-          swal("Oops", "Ocurrio un error al enviar el correo", "error");
-          setEnviandoCorreoContac(false)
-        });
-    },
-  });
-
-  const limpiarinp = () => {
-    formik.values.nombrecompleto = ""
-    formik.values.email = ""
-    formik.values.telefono = ""
-    formik.values.message = ""
-  }
-
+const Contact = () => {
+  const [ref, inView] = useInView({ threshold: 0.1 })
 
   return (
-    <div className='flex flex-col md:flex-row w-full'>
-      {/* <div className='hidden flex flex-col justify-end w-full md:w-1/2 bg-blue-600'>
-        <form onSubmit={formik.handleSubmit}>
-          <div className='flex flex-col px-5 sm:px-0 md:translate-x-[10%]'>
-            <h1 className='text-center text-white text-2xl font-semibold pt-10 pb-7'>Contacto</h1>
-            <div className='w-full flex justify-center'>
-              <input
-                placeholder='Nombre y Apellido'
-                id="nombrecompleto"
-                name="nombrecompleto"
-                type="text"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.nombrecompleto}
-                className={`bg-white border-2 ${formik.errors.nombrecompleto && 'border-red-500'} w-full sm:w-1/2 px-5 py-4 rounded-lg my-1`} />
-            </div>
-            <div className='w-full flex justify-center'>
-              <input
-                placeholder='Numero de telefono'
-                id="telefono"
-                name="telefono"
-                type="number"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.telefono}
-                className={`bg-white border-2 ${formik.errors.telefono && 'border-red-500'} w-full sm:w-1/2 px-5 py-4 rounded-lg my-1`} />
-            </div>
-            <div className='w-full flex justify-center'>
-              <input
-                type="email"
-                placeholder='Correo electronico'
-                id="email"
-                name="email"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.email}
-                className={`bg-white border-2 ${formik.errors.email && 'border-red-500'} w-full sm:w-1/2 px-5 py-4 rounded-lg my-1`} />
-            </div>
-            <div className='w-full flex justify-center'>
-              <textarea
-                id="message"
-                name="message"
-                type="text"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.message}
-                placeholder='Mensaje'
-                className={`bg-white border-2 ${formik.errors.message && 'border-red-500'} w-full sm:w-1/2 px-5 py-4 rounded-lg my-1`}
-              ></textarea>
-            </div>
+    <section className="bg-gray-50 w-full py-20 overflow-hidden" ref={ref}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
-            <div className='flex justify-center mt-8 mb-20 w-full'>
-              <div className='w-full sm:w-1/2 flex justify-center bg-blue-600'>
-                <div className='flex w-full justify-between items-center'>
-                  {
-                    EnviandoCorreoContac !== true && <button
-                      type="submit"
-                      // onClick={limpiarinp}
-                      className='px-8 py-2 border-2 cursor-pointer border-white rounded-lg text-white font-semibold'
-                    >Enviar</button>
-                  }
+        <motion.div
+          className="text-center mb-14"
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800">Contáctanos</h2>
+          <p className="text-gray-400 mt-3 text-base">Estamos aquí para responder tus preguntas</p>
+        </motion.div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-                  <div className='grid grid-cols-4 place-items-center gap-4'>
-                    <img
-                      className="h-8 w-auto sm:h-7 hover:cursor-pointer"
-                      src="/ws.svg"
-                      alt=""
-                      layout='fill'
-                      onClick={() => {
-                        window.location.href = "https://wa.link/sljtqs";
-                      }}
-                    ></img>
-
-                    <img
-                      className="h-8 w-auto sm:h-7 hover:cursor-pointer"
-                      src="/fb.svg"
-                      alt=""
-                      layout='fill'
-                      onClick={() => {
-                        window.location.href = "https://www.facebook.com/olympusgroupmx";
-                      }}
-                    ></img>
-
-                    <img
-                      className="h-8 w-auto sm:h-7 hover:cursor-pointer"
-                      src="/tiktok.svg"
-                      alt=""
-                      layout='fill'
-                      onClick={() => {
-                        window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
-                      }}
-                    ></img>
-
-                    <img
-                      className="h-8 w-auto sm:h-9 hover:cursor-pointer"
-                      src="/youtube.svg"
-                      alt=""
-                      layout='fill'
-                      onClick={() => {
-                        window.location.href = "https://www.youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA";
-                      }}
-                    ></img>
+          {/* ── Info de contacto ──────────────────────────────────── */}
+          <motion.div
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 flex flex-col gap-6"
+            initial={{ opacity: 0, x: -30 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <div>
+              <h3 className="text-lg font-bold text-gray-700 mb-4">Información de contacto</h3>
+              <div className="flex flex-col gap-4">
+                {INFO.map(({ icon: Icon, text }) => (
+                  <div key={text} className="flex items-center gap-3 text-sm text-gray-500">
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                      <Icon className="w-4 h-4 text-blue-500" />
+                    </div>
+                    {text}
                   </div>
-
-                </div>
+                ))}
               </div>
             </div>
-          </div>
-        </form>
 
-      </div> */}
-      <div className='flex flex-col h-fit justify-center w-full md:w-full mx-auto'>
-        <div className='flex flex-col'>
-          <h1 className='text-center text-gray-600  
-          text-2xl font-semibold pt-10 pb-7'>Ubicación</h1>
-
-          <div className='flex justify-center w-full'>
-            <div className='w-1/2'>
-              <img src="/googlemap.svg"
-                className='w-screen h-auto'
-                layout='fill'
-                alt="" ></img>
+            <div className="border-t border-gray-100 pt-5">
+              <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-4">Síguenos</p>
+              <div className="flex gap-3">
+                {SOCIAL_LINKS.map(({ label, href, icon }, i) => (
+                  <motion.a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={label}
+                    initial={{ opacity: 0, scale: 0.6 }}
+                    animate={inView ? { opacity: 1, scale: 1 } : {}}
+                    transition={{ duration: 0.3, delay: 0.3 + i * 0.07 }}
+                    whileHover={{ scale: 1.2, rotate: 6 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+                  >
+                    <img src={icon} alt={label} className="w-5 h-5" />
+                  </motion.a>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className='flex justify-center w-full'>
-            <div className='sm:w-1/2 w-full px-5 sm:px-0'>
-              <h1 className='text-center mt-10 text-xl pb-10 md:pb-0 text-gray-600'>
-                Monterrey - Mexico <br />
-                Horario de trabajo 9 - 5 pm / Lunes - Viernes <br />
-                
-              </h1>
-              <div className='grid grid-cols-4 mt-3 max-w-[30%] mx-auto place-items-center gap-4'>
-                    <img
-                      className="h-8 w-auto sm:h-7 hover:cursor-pointer"
-                      src="/ws.svg"
-                      alt=""
-                      layout='fill'
-                      onClick={() => {
-                        window.location.href = "https://wa.link/sljtqs";
-                      }}
-                    ></img>
+            <motion.a
+              href="https://wa.link/sljtqs"
+              target="_blank"
+              rel="noreferrer"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-gray-800 font-semibold text-sm transition-colors mt-auto"
+            >
+              <img src="/ws.svg" alt="WhatsApp" className="w-5 h-5" />
+              Agendar clase de prueba
+            </motion.a>
+          </motion.div>
 
-                    <img
-                      className="h-8 w-auto sm:h-7 hover:cursor-pointer"
-                      src="/fb.svg"
-                      alt=""
-                      layout='fill'
-                      onClick={() => {
-                        window.location.href = "https://www.facebook.com/olympusgroupmx";
-                      }}
-                    ></img>
-
-                    <img
-                      className="h-8 w-auto sm:h-7 hover:cursor-pointer"
-                      src="/tiktok.svg"
-                      alt=""
-                      layout='fill'
-                      onClick={() => {
-                        window.location.href = "https://www.tiktok.com/@adrianlealcaldera?lang=en";
-                      }}
-                    ></img>
-
-                    <img
-                      className="h-8 w-auto sm:h-9 hover:cursor-pointer"
-                      src="/youtube.svg"
-                      alt=""
-                      layout='fill'
-                      onClick={() => {
-                        window.location.href = "https://www.youtube.com/channel/UCV2OnDpkWlcIdpNoilCBiYA";
-                      }}
-                    ></img>
-                  </div>
-            </div>
-          </div>
+          {/* ── Mapa ─────────────────────────────────────────────── */}
+          <motion.div
+            className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm min-h-[300px]"
+            initial={{ opacity: 0, x: 30 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <img
+              src="/googlemap.svg"
+              alt="Ubicación CIPM Monterrey"
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
 
         </div>
       </div>
-
-    </div>
+    </section>
   )
 }
 
-export default Contact;
+export default Contact

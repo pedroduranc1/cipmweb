@@ -2,22 +2,15 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { Cursos } from "../../db/Cursos";
-import { useQuery } from 'react-query';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../src/components/ui/select";
+import { useQuery, useQueryClient } from 'react-query';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from "yup";
 import { useRouter } from 'next/router';
 import { uid } from 'uid';
 import { toast } from '../../src/components/ui/use-toast';
 import { Timestamp } from 'firebase/firestore';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, Search, X } from 'lucide-react';
+import { useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
 const cursoCtrl = new Cursos();
@@ -42,17 +35,20 @@ const FieldError = ({ error, touched }) =>
 const AgregarVideo = () => {
   const { User, loading } = useAuth()
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const [tipoVideo, setTipoVideo] = useState(null)
   const [CursoID, setCursoID] = useState(null)
   const [ImgVideo, setImgVideo] = useState(null)
   const [previewImg, setPreviewImg] = useState(null)
+  const [publicado, setPublicado] = useState(false)
+  const [searchCurso, setSearchCurso] = useState('')
 
   useEffect(() => {
     if (!loading && !User) router.push('/')
   }, [User, loading])
 
-  const { data: DataCursos } = useQuery("cursos", () => cursoCtrl.getCursos())
+  const { data: DataCursos, isLoading: loadingCursos, isError: errorCursos } = useQuery("cursos-admin", () => cursoCtrl.getCursos(true))
 
   const { data: VideosCurso } = useQuery(
     ["videos-curso", CursoID],
@@ -80,9 +76,15 @@ const AgregarVideo = () => {
     }),
   })
 
-  const cursosOrdenados = DataCursos
-    ? [...DataCursos].sort((a, b) => a.Titulo?.localeCompare(b.Titulo))
-    : []
+  const cursosOrdenados = useMemo(() =>
+    DataCursos ? [...DataCursos].sort((a, b) => a.Titulo?.localeCompare(b.Titulo)) : []
+  , [DataCursos])
+
+  const cursosFiltrados = useMemo(() => {
+    const term = searchCurso.trim().toLowerCase()
+    if (!term) return cursosOrdenados
+    return cursosOrdenados.filter(c => c.Titulo?.toLowerCase().includes(term))
+  }, [cursosOrdenados, searchCurso])
 
   return (
     <>
@@ -106,7 +108,7 @@ const AgregarVideo = () => {
           <div className="grid grid-cols-2 gap-3 mb-6">
             <button
               type="button"
-              onClick={() => { setTipoVideo(TIPO_VIDEO.CURSO); setCursoID(null) }}
+              onClick={() => { setTipoVideo(TIPO_VIDEO.CURSO); setCursoID(null); setSearchCurso('') }}
               className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all text-sm font-medium
                 ${tipoVideo === TIPO_VIDEO.CURSO
                   ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm'
@@ -127,7 +129,7 @@ const AgregarVideo = () => {
 
             <button
               type="button"
-              onClick={() => { setTipoVideo(TIPO_VIDEO.SOLITARIO); setCursoID(null) }}
+              onClick={() => { setTipoVideo(TIPO_VIDEO.SOLITARIO); setCursoID(null); setSearchCurso('') }}
               className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all text-sm font-medium
                 ${tipoVideo === TIPO_VIDEO.SOLITARIO
                   ? 'border-purple-500 bg-purple-50 text-purple-700 shadow-sm'
@@ -153,22 +155,74 @@ const AgregarVideo = () => {
               <label className="text-sm font-semibold text-gray-700 mb-2 block">
                 Selecciona el curso
               </label>
-              <Select onValueChange={setCursoID} value={CursoID}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Elige un curso..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {cursosOrdenados.map((curso) => (
-                      <SelectItem key={curso.id} value={curso.id}>
-                        {curso.Titulo}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              {!CursoID && (
-                <p className="text-xs text-amber-600 mt-2">⚠ Debes seleccionar un curso para continuar</p>
+
+              {errorCursos ? (
+                <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                  <AlertCircle size={16} className="shrink-0" />
+                  No se pudieron cargar los cursos. Recarga la página.
+                </div>
+              ) : loadingCursos ? (
+                <div className="flex flex-col gap-2">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-10 bg-gray-100 rounded-lg animate-pulse" />
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div className="relative mb-3">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={searchCurso}
+                      onChange={e => { setSearchCurso(e.target.value); setCursoID(null) }}
+                      placeholder="Buscar curso por título..."
+                      className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400 transition-colors"
+                    />
+                    {searchCurso && (
+                      <button
+                        type="button"
+                        onClick={() => { setSearchCurso(''); setCursoID(null) }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  {cursosFiltrados.length === 0 ? (
+                    <p className="text-sm text-gray-400 text-center py-3">Sin resultados</p>
+                  ) : (
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                      <div className="divide-y divide-gray-100 max-h-52 overflow-y-auto">
+                        {cursosFiltrados.map((curso) => (
+                          <button
+                            key={curso.id}
+                            type="button"
+                            onClick={() => setCursoID(curso.id)}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors
+                              ${CursoID === curso.id
+                                ? 'bg-blue-50 border-l-2 border-blue-500'
+                                : 'hover:bg-gray-50'}`}
+                          >
+                            <div className="flex flex-col min-w-0">
+                              <span className="text-sm text-gray-800 font-medium truncate">{curso.Titulo}</span>
+                              {curso.Descripcion && (
+                                <span className="text-xs text-gray-400 truncate">{curso.Descripcion}</span>
+                              )}
+                            </div>
+                            {CursoID === curso.id && (
+                              <span className="ml-auto text-blue-500 text-xs font-semibold shrink-0">Seleccionado</span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {!CursoID && (
+                    <p className="text-xs text-amber-600 mt-2">⚠ Debes seleccionar un curso para continuar</p>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -189,6 +243,7 @@ const AgregarVideo = () => {
                     ? await cursoCtrl.uploadCursoImage(ImgVideo, Slug, Slug)
                     : "",
                   tipo: tipoVideo,
+                  publicado: tipoVideo === TIPO_VIDEO.SOLITARIO ? publicado : true,
                   Fecha: Timestamp.now(),
                   ...(tipoVideo === TIPO_VIDEO.CURSO && {
                     CursoID,
@@ -200,6 +255,8 @@ const AgregarVideo = () => {
 
                 if (result) {
                   toast({ title: "Video agregado exitosamente" })
+                  queryClient.invalidateQueries("cursos")
+                  if (CursoID) queryClient.invalidateQueries(["videos-curso", CursoID])
                   resetForm()
                   setImgVideo(null)
                   setPreviewImg(null)
@@ -326,6 +383,27 @@ const AgregarVideo = () => {
                         <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                       </label>
                     </div>
+
+                    {/* Visibilidad — solo para videos solitarios */}
+                    {tipoVideo === TIPO_VIDEO.SOLITARIO && (
+                      <div className="flex items-center justify-between p-4 rounded-xl border-2 border-dashed transition-colors border-gray-200 bg-gray-50">
+                        <div>
+                          <p className="text-sm font-semibold text-gray-700">Visible al público</p>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            {publicado ? 'El video aparecerá en la sección de videos' : 'Solo visible para administradores (modo prueba)'}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setPublicado(p => !p)}
+                          className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 cursor-pointer
+                            ${publicado ? 'bg-purple-600' : 'bg-gray-300'}`}
+                        >
+                          <span className={`inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform duration-200
+                            ${publicado ? 'translate-x-5' : 'translate-x-0'}`} />
+                        </button>
+                      </div>
+                    )}
 
                     <button
                       type="submit"

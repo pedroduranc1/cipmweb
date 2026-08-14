@@ -70,6 +70,7 @@ const MasonrySection = ({ cursos, activeSlugs, title, count }) => (
           descripcion={curso.Descripcion}
           precio={curso.precio}
           active={activeSlugs.has(curso.id)}
+          publicado={curso.publicado ?? true}
         />
       ))}
     </div>
@@ -80,9 +81,12 @@ const CursosPage = () => {
   const { User, loading } = useAuth();
   const router = useRouter();
 
+  const isAdmin = User?.role === "admin"
+
   const { data: CursosData, isLoading: isLoadingCursos, isError } = useQuery(
-    "Cursos",
-    () => cursoCtrl.getCursos()
+    ["Cursos", isAdmin],
+    () => cursoCtrl.getCursos(isAdmin),
+    { enabled: !loading }
   )
 
   const { data: clienteData, isLoading: isLoadingCliente } = useQuery(
@@ -94,8 +98,6 @@ const CursosPage = () => {
   useEffect(() => {
     if (!loading && !User) router.push("/")
   }, [User, loading])
-
-  const isAdmin = User?.role === "admin"
   const isLoading = isLoadingCursos || isLoadingCliente
 
   // Set de slugs adquiridos para lookup O(1)
@@ -130,13 +132,11 @@ const CursosPage = () => {
                       </p>
                       <div className="flex flex-col gap-2">
                         {actions.map(({ label, href, Icon }) => (
-                          <Link key={href} href={href}>
-                            <a className="inline-flex items-center gap-2 px-3 py-2 rounded-md
+                          <Link key={href} href={href} className="inline-flex items-center gap-2 px-3 py-2 rounded-md
                                           bg-white border border-gray-200 text-sm text-gray-700
                                           hover:bg-gray-100 hover:border-gray-300 transition-all shadow-sm w-full">
                               <Icon className="w-4 h-4 shrink-0" />
                               {label}
-                            </a>
                           </Link>
                         ))}
                       </div>

@@ -1,118 +1,167 @@
-import { Field, Form, Formik } from 'formik';
-import Head from 'next/head'
-import Link from 'next/link';
 import React from 'react'
-import * as Yup from "yup";
-import { User } from "../../db/User";
-import { toast } from '../../src/components/ui/use-toast';
-import { useRouter } from 'next/router';
-import { Loader2 } from 'lucide-react';
+import { Field, Form, Formik } from 'formik'
+import Head from 'next/head'
+import Link from 'next/link'
+import * as Yup from 'yup'
+import { User } from '../../db/User'
+import { toast } from '../../src/components/ui/use-toast'
+import { useRouter } from 'next/router'
+import { Loader2, Lock, Mail, UserRound } from 'lucide-react'
 
-const userCtrl = new User();
+const userCtrl = new User()
+
 const Registro = () => {
-    const router = useRouter();
-    return (
-        <>
-            <Head>
-                <title>Registro - CIPM</title>
-                <link rel="icon" href="logo.svg" />
-                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+  const router = useRouter()
 
-            </Head>
+  return (
+    <>
+      <Head>
+        <title>Registro - CIPM</title>
+        <link rel="icon" href="/logo.svg" />
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      </Head>
 
-            <div className="w-full h-full min-h-screen bg-blue-500 flex flex-col space-y-3 justify-center items-center">
-                {/* Imagen CIPM */}
-                <img src="/logo.svg" alt="" />
+      <div className="min-h-screen flex">
 
-                {/* Formularion de registro */}
-                <div className="bg-white shadow-md w-[90%] md:w-[30%] h-fit rounded-md p-4 flex flex-col">
-                    <h1 className="text-center font-bold text-2xl py-3">Registro</h1>
-                    <Formik
-                        initialValues={{
-                            name: '',
-                            lastName: "",
-                            email: '',
-                            password: '',
-                        }}
-                        validationSchema={Yup.object({
-                            name: Yup.string().required("Porfavor. Ingrese el nombre completo"),
-                            email: Yup.string().required("Porfavor. Ingrese el correo"),
-                            password: Yup.string().required("Porfavor. Ingrese la contraseña")
-                        })}
-                        onSubmit={async (values) => {
-                            // same shape as initial values
-                            //console.log(values);
+        {/* ── Panel izquierdo (visual) ─────────────────────────── */}
+        <div className="hidden lg:flex lg:w-1/2 bg-blue-600 flex-col justify-between p-12">
+          <img src="/logo.svg" alt="CIPM" className="h-12 w-auto" />
 
-                            let UserData = {
-                                nombre: values.name,
-                                apellido: values.lastName,
-                                email: values.email,
-                                password: values.password
-                            }
+          <div>
+            <h1 className="text-4xl font-bold text-white leading-tight mb-4">
+              Comienza tu<br />aprendizaje hoy
+            </h1>
+            <p className="text-blue-200 text-base leading-relaxed max-w-sm">
+              Crea tu cuenta y accede a cursos y videos diseñados para hispanohablantes.
+            </p>
+          </div>
 
-                            const result = await userCtrl.createUser(UserData)
+          <p className="text-blue-300 text-sm">© {new Date().getFullYear()} C.I.P.M — Monterrey, México</p>
+        </div>
 
-                            if (!result) {
-                                toast({
-                                    variant: "destructive",
-                                    title: "Error al registrarte",
-                                })
-                            } else {
-                                router.push("/login")
-                            }
+        {/* ── Panel derecho (formulario) ───────────────────────── */}
+        <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-white">
 
-                        }}
-                    >
-                        {({ errors, touched, isValid, isSubmitting }) => (
-                            <Form className="flex flex-col h-full p-4">
+          {/* Logo mobile */}
+          <img src="/logo.svg" alt="CIPM" className="h-10 w-auto mb-8 lg:hidden" />
 
-                                <div className='flex space-x-3'>
-                                    <div>
-                                        <label className="font-bold text-gray-600" htmlFor="name">Nombre</label>
-                                        <Field className={`py-2 w-full ${errors.name && touched.name ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="name" />
-                                        {errors.name && touched.name ? (
-                                            <div>{errors.name}</div>
-                                        ) : null}
-                                    </div>
+          <div className="w-full max-w-sm">
+            <h2 className="text-2xl font-bold text-gray-800 mb-1">Crear cuenta</h2>
+            <p className="text-gray-400 text-sm mb-8">Completa tus datos para registrarte</p>
 
-                                    <div>
-                                        <label className="font-bold text-gray-600" htmlFor="lastName">Apellido</label>
-                                        <Field className={`py-2 w-full ${errors.lastName && touched.lastName ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="lastName" />
-                                        {errors.lastName && touched.lastName ? (
-                                            <div>{errors.lastName}</div>
-                                        ) : null}
-                                    </div>
+            <Formik
+              initialValues={{ name: '', lastName: '', email: '', password: '' }}
+              validationSchema={Yup.object({
+                name: Yup.string().required('Ingresa tu nombre'),
+                email: Yup.string().email('Correo inválido').required('Ingresa tu correo'),
+                password: Yup.string().min(6, 'Mínimo 6 caracteres').required('Ingresa una contraseña'),
+              })}
+              onSubmit={async (values) => {
+                const result = await userCtrl.createUser({
+                  nombre: values.name,
+                  apellido: values.lastName,
+                  email: values.email,
+                  password: values.password,
+                })
+                if (!result) {
+                  toast({ variant: 'destructive', title: 'Error al registrarte' })
+                } else {
+                  router.push('/login')
+                }
+              }}
+            >
+              {({ errors, touched, isSubmitting }) => (
+                <Form className="flex flex-col gap-4">
 
-                                </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-sm font-medium text-gray-600" htmlFor="name">Nombre</label>
+                      <div className="relative">
+                        <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                        <Field
+                          id="name" name="name"
+                          placeholder="Juan"
+                          className={`w-full pl-9 pr-3 py-2.5 rounded-xl border text-sm text-gray-700 placeholder-gray-400
+                            focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-colors
+                            ${errors.name && touched.name ? 'border-red-400 bg-red-50' : 'border-gray-200'}`}
+                        />
+                      </div>
+                      {errors.name && touched.name && (
+                        <p className="text-xs text-red-500">{errors.name}</p>
+                      )}
+                    </div>
 
+                    <div className="flex flex-col gap-1">
+                      <label className="text-sm font-medium text-gray-600" htmlFor="lastName">Apellido</label>
+                      <Field
+                        id="lastName" name="lastName"
+                        placeholder="Pérez"
+                        className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-colors"
+                      />
+                    </div>
+                  </div>
 
-                                <label className="font-bold text-gray-600" htmlFor="email">Correo</label>
-                                <Field className={`py-2 w-full ${errors.email && touched.email ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="email" />
-                                {errors.email && touched.email ? (
-                                    <div>{errors.email}</div>
-                                ) : null}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-gray-600" htmlFor="email">Correo electrónico</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      <Field
+                        id="email" name="email" type="email"
+                        placeholder="tu@correo.com"
+                        className={`w-full pl-9 pr-4 py-2.5 rounded-xl border text-sm text-gray-700 placeholder-gray-400
+                          focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-colors
+                          ${errors.email && touched.email ? 'border-red-400 bg-red-50' : 'border-gray-200'}`}
+                      />
+                    </div>
+                    {errors.email && touched.email && (
+                      <p className="text-xs text-red-500">{errors.email}</p>
+                    )}
+                  </div>
 
-                                <label className="font-bold text-gray-600" htmlFor="password">Contraseña</label>
-                                <Field type="password" className={`py-2 w-full ${errors.password && touched.password ? "border-red-500" : "border-gray-200"}  border-2 px-2 rounded-md outline-none focus:border-gray-400`} name="password" />
-                                {errors.password && touched.password ? (
-                                    <div>{errors.password}</div>
-                                ) : null}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-gray-600" htmlFor="password">Contraseña</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      <Field
+                        id="password" name="password" type="password"
+                        placeholder="Mínimo 6 caracteres"
+                        className={`w-full pl-9 pr-4 py-2.5 rounded-xl border text-sm text-gray-700 placeholder-gray-400
+                          focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-colors
+                          ${errors.password && touched.password ? 'border-red-400 bg-red-50' : 'border-gray-200'}`}
+                      />
+                    </div>
+                    {errors.password && touched.password && (
+                      <p className="text-xs text-red-500">{errors.password}</p>
+                    )}
+                  </div>
 
-                                <button
-                                    disabled={isValid || isSubmitting ? false : true}
-                                    className="py-2 px-4 mt-5 disabled:opacity-20 transition-colors bg-blue-500 
-            rounded-md text-white hover:bg-blue-300 "
-                                    type="submit">{isSubmitting ? <div className='w-full h-full flex justify-center items-center'><Loader2 className='animate-spin' /></div> : "Registrame"}</button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex items-center justify-center gap-2 w-full py-2.5 mt-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isSubmitting
+                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Creando cuenta...</>
+                      : 'Crear cuenta'
+                    }
+                  </button>
 
-                                <Link className="mt-3 inline-block" href="/login" >tienes cuenta? haz click aqui</Link>
-                            </Form>
-                        )}
-                    </Formik>
-                </div>
-            </div>
-        </>
-    )
+                  <p className="text-center text-sm text-gray-400 mt-1">
+                    ¿Ya tienes cuenta?{' '}
+                    <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium transition-colors">
+                      Inicia sesión
+                    </Link>
+                  </p>
+
+                </Form>
+              )}
+            </Formik>
+          </div>
+        </div>
+
+      </div>
+    </>
+  )
 }
 
 export default Registro
