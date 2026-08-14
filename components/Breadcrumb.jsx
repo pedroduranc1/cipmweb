@@ -18,7 +18,12 @@ const STATIC_LABELS = {
   'activar-cursos':    'Activar Cursos',
   'desactivar-cursos': 'Desactivar Cursos',
   'comprarCursos':     'Comprar Curso',
-  video:               'Video',
+  video:               'Videos',
+}
+
+// Segmentos cuyo href debe apuntar a una ruta distinta de la construida
+const HREF_OVERRIDES = {
+  video: '/videos',
 }
 
 const HIDDEN_SEGMENTS = new Set(['cipm'])
@@ -45,7 +50,7 @@ const Breadcrumb = ({ labels = {} }) => {
 
   const crumbs = segments.map((segment, i) => ({
     label: getLabel(segment),
-    href: '/' + segments.slice(0, i + 1).join('/'),
+    href: HREF_OVERRIDES[segment] ?? '/' + segments.slice(0, i + 1).join('/'),
   }))
 
   return (

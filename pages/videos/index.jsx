@@ -3,8 +3,6 @@ import Head from 'next/head'
 import Footer from '../../components/Footer'
 import Navbar from '../../components/Navbar'
 import Videocard from '../../minicomponents/Videocard'
-import videoslist from '../../db/videos'
-import { useRouter } from 'next/router'
 import { Search, X } from 'lucide-react'
 import Breadcrumb from '../../components/Breadcrumb'
 import { useQuery } from 'react-query'
@@ -15,14 +13,9 @@ const cursoCtrl = new Cursos()
 const PAGE_SIZE = 8
 
 export default function Videos() {
-  const router = useRouter()
-  const { videos: query } = router.query
   const { User } = useAuth()
-
   const isAdmin = User?.role === 'admin'
-
-  const initialSearch = query && query !== 'cipm' ? query.replace(/%20/g, ' ') : ''
-  const [search, setSearch] = useState(initialSearch)
+  const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
 
   const { data: videosSolitarios = [] } = useQuery(
@@ -41,11 +34,7 @@ export default function Videos() {
     _source: 'firestore',
   }))
 
-  const allVideos = useMemo(() => {
-    const firestoreIds = new Set(videosFirestore.map(v => v.id))
-    const staticFiltered = videoslist.filter(v => !firestoreIds.has(String(v.id)))
-    return [...videosFirestore, ...staticFiltered]
-  }, [videosFirestore])
+  const allVideos = useMemo(() => videosFirestore, [videosFirestore])
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()

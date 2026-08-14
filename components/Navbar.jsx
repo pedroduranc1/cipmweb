@@ -7,7 +7,7 @@ import { LogOut, User as UserIcon, Menu, X } from 'lucide-react'
 // Enlaces visibles para usuarios no autenticados
 const PUBLIC_LINKS = [
   { label: 'Inicio',   href: '/' },
-  { label: 'Videos',   href: '/videos/cipm' },
+  { label: 'Videos',   href: '/videos' },
   { label: 'Contacto', href: '/contactos' },
   { label: 'Login',    href: '/login' },
 ]
@@ -15,7 +15,7 @@ const PUBLIC_LINKS = [
 // Enlaces visibles para usuarios autenticados
 const AUTH_LINKS = [
   { label: 'Inicio',   href: '/' },
-  { label: 'Videos',   href: '/videos/cipm' },
+  { label: 'Videos',   href: '/videos' },
   { label: 'Cursos',   href: '/cursos' },
   { label: 'Contacto', href: '/contactos' },
 ]

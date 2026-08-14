@@ -227,7 +227,7 @@ const Videopage = () => {
                 <Film className="w-4 h-4 text-gray-400" />
                 <span className="text-sm font-semibold text-gray-700">Más videos</span>
               </div>
-              <Link href="/videos/cipm" className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors">
+              <Link href="/videos" className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors">
                 Ver todos
               </Link>
             </div>

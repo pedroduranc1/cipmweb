@@ -11,7 +11,7 @@ import Link from 'next/link'
 import {
   Loader2, Maximize, Minimize, Pause, Play,
   Volume2, VolumeX, BookOpen, Send, MessageCircle,
-  ChevronRight
+  ChevronRight, Pencil, Trash2, Reply, ChevronDown, ChevronUp, Check, X
 } from 'lucide-react'
 
 const cursoCtrl = new Cursos();
@@ -216,9 +216,234 @@ const VideoPlayer = ({ url }) => {
 
 // ── Comentarios ───────────────────────────────────────────────────────────────
 
+const Avatar = ({ nombre, size = 8, color = 'blue' }) => (
+  <div className={`w-${size} h-${size} rounded-full bg-${color}-100 flex items-center justify-center shrink-0`}>
+    <span className={`text-${color}-600 text-xs font-bold`}>
+      {nombre?.charAt(0).toUpperCase()}
+    </span>
+  </div>
+)
+
+const Respuestas = ({ videoId, commentId, User, isAdmin }) => {
+  const queryClient = useQueryClient()
+  const [texto, setTexto] = useState('')
+  const [editandoId, setEditandoId] = useState(null)
+  const [textoEdit, setTextoEdit] = useState('')
+
+  const { data: respuestas = [], isLoading } = useQuery(
+    ['respuestas', videoId, commentId],
+    () => cursoCtrl.getReplies(videoId, commentId),
+  )
+
+  const { mutate: enviar, isLoading: enviando } = useMutation(
+    () => cursoCtrl.addReply(videoId, commentId, {
+      texto: texto.trim(),
+      autorId: User.uid,
+      autorNombre: `${User.nombre} ${User.apellido}`,
+    }),
+    { onSuccess: () => { setTexto(''); queryClient.invalidateQueries(['respuestas', videoId, commentId]) } }
+  )
+
+  const { mutate: editar, isLoading: editando } = useMutation(
+    (replyId) => cursoCtrl.updateReply(videoId, commentId, replyId, textoEdit.trim()),
+    { onSuccess: () => { setEditandoId(null); queryClient.invalidateQueries(['respuestas', videoId, commentId]) } }
+  )
+
+  const { mutate: eliminar } = useMutation(
+    (replyId) => cursoCtrl.deleteReply(videoId, commentId, replyId),
+    { onSuccess: () => queryClient.invalidateQueries(['respuestas', videoId, commentId]) }
+  )
+
+  return (
+    <div className="mt-3 pl-4 border-l-2 border-gray-100 space-y-3">
+      {isLoading ? (
+        <div className="h-3 bg-gray-100 rounded-full w-1/3 animate-pulse" />
+      ) : respuestas.map(r => (
+        <div key={r.id} className="flex gap-2.5">
+          <Avatar nombre={r.autorNombre} size={7} color="purple" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-xs font-semibold text-gray-700">{r.autorNombre}</p>
+              {r.editado && <span className="text-xs text-gray-400">(editado)</span>}
+              {(isAdmin || r.autorId === User?.uid) && editandoId !== r.id && (
+                <div className="flex items-center gap-1 ml-auto">
+                  {r.autorId === User?.uid && (
+                    <button
+                      onClick={() => { setEditandoId(r.id); setTextoEdit(r.texto) }}
+                      className="p-1 text-gray-400 hover:text-blue-500 transition-colors rounded"
+                    >
+                      <Pencil className="w-3 h-3" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => eliminar(r.id)}
+                    className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {editandoId === r.id ? (
+              <div className="flex gap-1.5 mt-1">
+                <input
+                  value={textoEdit}
+                  onChange={e => setTextoEdit(e.target.value)}
+                  className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
+                  autoFocus
+                />
+                <button
+                  onClick={() => editar(r.id)}
+                  disabled={!textoEdit.trim() || editando}
+                  className="p-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setEditandoId(null)}
+                  className="p-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <p className="text-xs text-gray-500 mt-0.5">{r.texto}</p>
+            )}
+          </div>
+        </div>
+      ))}
+
+      {/* Input nueva respuesta */}
+      <form
+        onSubmit={e => { e.preventDefault(); if (texto.trim()) enviar() }}
+        className="flex gap-2 pt-1"
+      >
+        <input
+          value={texto}
+          onChange={e => setTexto(e.target.value)}
+          placeholder="Responder..."
+          className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-colors"
+        />
+        <button
+          type="submit"
+          disabled={!texto.trim() || enviando}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-purple-600 text-white text-xs font-medium hover:bg-purple-700 disabled:opacity-50 transition-colors"
+        >
+          {enviando ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
+          <span className="hidden sm:inline">Enviar</span>
+        </button>
+      </form>
+    </div>
+  )
+}
+
+const ComentarioItem = ({ c, videoId, User, isAdmin }) => {
+  const queryClient = useQueryClient()
+  const [editando, setEditando] = useState(false)
+  const [textoEdit, setTextoEdit] = useState(c.texto)
+  const [mostrarRespuestas, setMostrarRespuestas] = useState(false)
+
+  const { mutate: editar, isLoading: guardando } = useMutation(
+    () => cursoCtrl.updateComment(videoId, c.id, textoEdit.trim()),
+    { onSuccess: () => { setEditando(false); queryClient.invalidateQueries(['comentarios', videoId]) } }
+  )
+
+  const { mutate: eliminar } = useMutation(
+    () => cursoCtrl.deleteComment(videoId, c.id),
+    { onSuccess: () => queryClient.invalidateQueries(['comentarios', videoId]) }
+  )
+
+  const puedeEditar = c.autorId === User?.uid
+  const puedeEliminar = isAdmin || c.autorId === User?.uid
+
+  return (
+    <div className="flex gap-3">
+      <Avatar nombre={c.autorNombre} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="text-sm font-semibold text-gray-700">{c.autorNombre}</p>
+          {c.editado && <span className="text-xs text-gray-400">(editado)</span>}
+          {(puedeEditar || puedeEliminar) && !editando && (
+            <div className="flex items-center gap-1 ml-auto">
+              {puedeEditar && (
+                <button
+                  onClick={() => { setEditando(true); setTextoEdit(c.texto) }}
+                  className="p-1 text-gray-400 hover:text-blue-500 transition-colors rounded"
+                  title="Editar"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+              )}
+              {puedeEliminar && (
+                <button
+                  onClick={() => eliminar()}
+                  className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded"
+                  title="Eliminar"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {editando ? (
+          <div className="flex gap-1.5 mt-1">
+            <input
+              value={textoEdit}
+              onChange={e => setTextoEdit(e.target.value)}
+              className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
+              autoFocus
+            />
+            <button
+              onClick={() => editar()}
+              disabled={!textoEdit.trim() || guardando}
+              className="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              <Check className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setEditando(false)}
+              className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500 mt-0.5">{c.texto}</p>
+        )}
+
+        {/* Botón responder */}
+        {!editando && (
+          <button
+            onClick={() => setMostrarRespuestas(r => !r)}
+            className="flex items-center gap-1 mt-1.5 text-xs text-gray-400 hover:text-blue-500 transition-colors"
+          >
+            {mostrarRespuestas
+              ? <><ChevronUp className="w-3 h-3" /> Ocultar respuestas</>
+              : <><Reply className="w-3 h-3" /> Responder</>
+            }
+          </button>
+        )}
+
+        {mostrarRespuestas && (
+          <Respuestas
+            videoId={videoId}
+            commentId={c.id}
+            User={User}
+            isAdmin={isAdmin}
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
 const Comentarios = ({ videoId, User }) => {
   const queryClient = useQueryClient()
   const [texto, setTexto] = useState('')
+  const isAdmin = User?.role === 'admin'
 
   const { data: comments = [], isLoading } = useQuery(
     ['comentarios', videoId],
@@ -258,7 +483,7 @@ const Comentarios = ({ videoId, User }) => {
         </h3>
       </div>
 
-      {/* Formulario */}
+      {/* Formulario nuevo comentario */}
       <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
         <input
           value={texto}
@@ -292,19 +517,15 @@ const Comentarios = ({ videoId, User }) => {
       ) : comments.length === 0 ? (
         <p className="text-sm text-gray-400 text-center py-6">Sé el primero en comentar</p>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {comments.map(c => (
-            <div key={c.id} className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                <span className="text-blue-600 text-xs font-bold">
-                  {c.autorNombre?.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-700">{c.autorNombre}</p>
-                <p className="text-sm text-gray-500 mt-0.5">{c.texto}</p>
-              </div>
-            </div>
+            <ComentarioItem
+              key={c.id}
+              c={c}
+              videoId={videoId}
+              User={User}
+              isAdmin={isAdmin}
+            />
           ))}
         </div>
       )}

@@ -1,12 +1,32 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import Videocard from '../minicomponents/Videocard'
-import videoslist from '../db/videos'
 import { motion } from 'framer-motion'
 import { useInView } from '../hooks/useInView'
+import { useQuery } from 'react-query'
+import { Cursos } from '../db/Cursos'
+
+const cursoCtrl = new Cursos()
 
 const Videosfield = () => {
   const [ref, inView] = useInView()
-  const videos = videoslist.slice(0, 4)
+
+  const { data: videosSolitarios = [] } = useQuery(
+    ['videos-solitarios', false],
+    () => cursoCtrl.getVideosSolitarios(false),
+    { staleTime: 1000 * 60 * 5 }
+  )
+
+  const videos = useMemo(() =>
+    videosSolitarios.slice(0, 4).map(v => ({
+      id: v.id,
+      videoname: v.Titulo,
+      miniatura: v.ImgUrl || '/miniaturavideo.svg',
+      fecha: v.Fecha?.toDate?.().toLocaleDateString('es-MX') ?? '',
+      descripcion: v.Descripcion ?? '',
+      publicado: v.publicado ?? true,
+      _source: 'firestore',
+    }))
+  , [videosSolitarios])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 overflow-hidden" ref={ref}>
