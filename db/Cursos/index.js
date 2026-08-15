@@ -23,11 +23,10 @@ import {
 export class Cursos {
 
   async getCursos(isAdmin = false) {
-    const q = isAdmin
-      ? query(collection(db, "cursos"))
-      : query(collection(db, "cursos"), where("publicado", "==", true));
-    const dataSnapshot = await getDocs(q);
-    return dataSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const dataSnapshot = await getDocs(query(collection(db, "cursos")));
+    const docs = dataSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    if (isAdmin) return docs;
+    return docs.filter(c => c.publicado !== false);
   }
 
   async getCurso(id) {
