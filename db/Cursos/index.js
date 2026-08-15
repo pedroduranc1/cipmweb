@@ -23,11 +23,10 @@ import {
 export class Cursos {
 
   async getCursos(isAdmin = false) {
-    const q = isAdmin
-      ? query(collection(db, "cursos"))
-      : query(collection(db, "cursos"), where("publicado", "==", true));
-    const dataSnapshot = await getDocs(q);
-    return dataSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const dataSnapshot = await getDocs(query(collection(db, "cursos")));
+    const docs = dataSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    if (isAdmin) return docs;
+    return docs.filter(c => c.publicado !== false);
   }
 
   async getCurso(id) {
@@ -264,5 +263,46 @@ export class Cursos {
       autorNombre,
       creadoEn: serverTimestamp(),
     });
+  }
+
+  async updateComment(videoId, commentId, texto) {
+    const ref = doc(db, "videos", videoId, "comentarios", commentId);
+    await updateDoc(ref, { texto, editado: true });
+  }
+
+  async deleteComment(videoId, commentId) {
+    const respuestasRef = collection(db, "videos", videoId, "comentarios", commentId, "respuestas");
+    const snap = await getDocs(respuestasRef);
+    await Promise.all(snap.docs.map(d => deleteDoc(d.ref)));
+    await deleteDoc(doc(db, "videos", videoId, "comentarios", commentId));
+  }
+
+  async addReply(videoId, commentId, { texto, autorId, autorNombre }) {
+    const ref = collection(db, "videos", videoId, "comentarios", commentId, "respuestas");
+    await addDoc(ref, {
+      texto,
+      autorId,
+      autorNombre,
+      creadoEn: serverTimestamp(),
+    });
+  }
+
+  async getReplies(videoId, commentId) {
+    const q = query(
+      collection(db, "videos", videoId, "comentarios", commentId, "respuestas"),
+      orderBy("creadoEn", "asc")
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
+  async updateReply(videoId, commentId, replyId, texto) {
+    const ref = doc(db, "videos", videoId, "comentarios", commentId, "respuestas", replyId);
+    await updateDoc(ref, { texto, editado: true });
+  }
+
+  async deleteReply(videoId, commentId, replyId) {
+    const ref = doc(db, "videos", videoId, "comentarios", commentId, "respuestas", replyId);
+    await deleteDoc(ref);
   }
 }

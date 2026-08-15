@@ -6,7 +6,7 @@ import { useInView } from '../hooks/useInView'
 
 const NAV_LINKS = [
   { label: 'Inicio',    href: '/' },
-  { label: 'Videos',   href: '/videos/cipm' },
+  { label: 'Videos',   href: '/videos' },
   { label: 'Contacto', href: '/contactos' },
 ]
 
