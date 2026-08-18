@@ -23,7 +23,7 @@ const ActivarCursos = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  const [cursoSeleccionado, setCursoSeleccionado] = useState(null)
+  const [cursosSeleccionados, setCursosSeleccionados] = useState([])
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null)
   const [cursosDelCliente, setCursosDelCliente] = useState(null)
   const [loadingCliente, setLoadingCliente] = useState(false)
@@ -51,7 +51,7 @@ const ActivarCursos = () => {
     setClienteSeleccionado(cliente)
     setSearch(cliente.email)
     setOpen(false)
-    setCursoSeleccionado(null)
+    setCursosSeleccionados([])
     setConfirmando(false)
     setLoadingCliente(true)
 
@@ -59,6 +59,8 @@ const ActivarCursos = () => {
       const data = await cursoCtrl.getCursosCliente(cliente.id)
       const activos = CursosData?.filter(c => data.cursos?.includes(c.id)) || []
       setCursosDelCliente(activos)
+      setCursosSeleccionados([])
+      setConfirmando(false)
     } catch {
       setCursosDelCliente([])
     } finally {
@@ -66,28 +68,36 @@ const ActivarCursos = () => {
     }
   }
 
-  const yaInscrito = cursosDelCliente?.some(c => c.id === cursoSeleccionado?.id)
+  const toggleCurso = (curso) => {
+    setCursosSeleccionados(prev =>
+      prev.some(c => c.id === curso.id)
+        ? prev.filter(c => c.id !== curso.id)
+        : [...prev, curso]
+    )
+    setConfirmando(false)
+  }
 
   const handleActivar = async () => {
     setIsLoading(true)
     try {
       const data = await cursoCtrl.getCursosCliente(clienteSeleccionado.id)
       const cursosActuales = data.cursos || []
+      const nuevos = cursosSeleccionados.map(c => c.id).filter(id => !cursosActuales.includes(id))
 
-      if (cursosActuales.includes(cursoSeleccionado.id)) {
-        toast({ title: "Este cliente ya tiene el curso activo" })
+      if (nuevos.length === 0) {
+        toast({ title: "Todos los cursos seleccionados ya están activos" })
         return
       }
 
       await cursoCtrl.activarCurso(clienteSeleccionado.id, {
-        cursos: [...cursosActuales, cursoSeleccionado.id]
+        cursos: [...cursosActuales, ...nuevos]
       })
 
-      toast({ title: "Curso activado exitosamente" })
+      toast({ title: `${nuevos.length} curso${nuevos.length > 1 ? 's activados' : ' activado'} exitosamente` })
       queryClient.invalidateQueries("clientes")
       router.push("/")
     } catch {
-      toast({ variant: "destructive", title: "Error al activar el curso" })
+      toast({ variant: "destructive", title: "Error al activar los cursos" })
     } finally {
       setIsLoading(false)
     }
@@ -187,12 +197,19 @@ const ActivarCursos = () => {
             )}
           </div>
 
-          {/* Paso 2 — Seleccionar curso */}
+          {/* Paso 2 — Seleccionar cursos */}
           {clienteSeleccionado && !loadingCliente && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white text-xs font-bold">2</span>
-                <label className="text-sm font-semibold text-gray-700">Selecciona el curso a activar</label>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white text-xs font-bold">2</span>
+                  <label className="text-sm font-semibold text-gray-700">Selecciona los cursos a activar</label>
+                </div>
+                {cursosSeleccionados.length > 0 && (
+                  <span className="text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                    {cursosSeleccionados.length} seleccionado{cursosSeleccionados.length > 1 ? 's' : ''}
+                  </span>
+                )}
               </div>
 
               {(errorCursos || errorClientes) && (
@@ -209,24 +226,24 @@ const ActivarCursos = () => {
                   ))}
                 </div>
               ) : (
-                <div className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden max-h-64 overflow-y-auto">
+                <div className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden max-h-72 overflow-y-auto">
                   {cursosOrdenados.map(curso => {
                     const activo = cursosDelCliente?.some(c => c.id === curso.id)
-                    const seleccionado = cursoSeleccionado?.id === curso.id
+                    const seleccionado = cursosSeleccionados.some(c => c.id === curso.id)
 
                     return (
                       <button
                         key={curso.id}
                         type="button"
                         disabled={activo}
-                        onClick={() => { setCursoSeleccionado(curso); setConfirmando(false) }}
+                        onClick={() => toggleCurso(curso)}
                         className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors
                           ${activo ? 'bg-green-50 cursor-not-allowed opacity-70' :
                             seleccionado ? 'bg-green-50 border-l-2 border-green-500' :
                             'hover:bg-gray-50'}`}
                       >
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0
-                          ${activo ? 'bg-green-400 border-green-400' :
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0
+                          ${activo ? 'bg-green-400 border-green-400 rounded-full' :
                             seleccionado ? 'border-green-500 bg-green-500' :
                             'border-gray-300'}`}>
                           {(activo || seleccionado) && (
@@ -253,14 +270,21 @@ const ActivarCursos = () => {
           )}
 
           {/* Resumen + confirmación */}
-          {cursoSeleccionado && !yaInscrito && (
+          {cursosSeleccionados.length > 0 && (
             <div className={`bg-white rounded-2xl border-2 shadow-sm p-5 mb-6 transition-colors
               ${confirmando ? 'border-green-300' : 'border-gray-100'}`}>
 
-              <p className="text-sm text-gray-600 mb-4">
-                Vas a activar <span className="font-semibold text-gray-800">"{cursoSeleccionado.Titulo}"</span> para{' '}
-                <span className="font-semibold text-gray-800">{clienteSeleccionado.email}</span>.
+              <p className="text-sm text-gray-600 mb-2">
+                Vas a activar los siguientes cursos para{' '}
+                <span className="font-semibold text-gray-800">{clienteSeleccionado.email}</span>:
               </p>
+              <ul className="mb-4 space-y-1">
+                {cursosSeleccionados.map(c => (
+                  <li key={c.id} className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
+                    <span className="text-green-500">·</span> {c.Titulo}
+                  </li>
+                ))}
+              </ul>
 
               {!confirmando ? (
                 <button
@@ -268,7 +292,7 @@ const ActivarCursos = () => {
                   onClick={() => setConfirmando(true)}
                   className="w-full py-3 rounded-xl font-semibold text-sm bg-green-500 hover:bg-green-600 text-white transition-all active:scale-[0.98] shadow-sm"
                 >
-                  Activar curso
+                  Activar {cursosSeleccionados.length > 1 ? `${cursosSeleccionados.length} cursos` : 'curso'}
                 </button>
               ) : (
                 <div>
@@ -296,12 +320,6 @@ const ActivarCursos = () => {
                   </div>
                 </div>
               )}
-            </div>
-          )}
-
-          {yaInscrito && cursoSeleccionado && (
-            <div className="bg-green-50 border border-green-200 rounded-2xl p-5 text-center text-sm text-green-700 mb-6">
-              ✓ Este cliente ya tiene activo <strong>"{cursoSeleccionado.Titulo}"</strong>
             </div>
           )}
 

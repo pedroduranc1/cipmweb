@@ -51,7 +51,7 @@ const CursoPage = () => {
 
   useEffect(() => {
     if (!VideosData) return
-    const ordenados = [...VideosData].sort((a, b) => a.Fecha.toDate() - b.Fecha.toDate())
+    const ordenados = [...VideosData].sort((a, b) => (a.orden ?? 9999) - (b.orden ?? 9999))
     setVideosOrdenados(ordenados)
   }, [VideosData])
 
