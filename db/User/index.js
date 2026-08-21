@@ -119,6 +119,9 @@ export class User {
 
       await setDoc(userAppDocRef,UserAppData)
 
+      const cursosClienteRef = doc(db, "cursosCliente", uid)
+      await setDoc(cursosClienteRef, { cursos: [] })
+
       return true;
     } catch (error) {
       console.log(error.message)
